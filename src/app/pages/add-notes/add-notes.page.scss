@@ -1,0 +1,27 @@
+.profile-photo{
+    height: 35px;
+    width: 35px;
+}
+.delegate-profile .profile-photo img {
+    width: 100%;
+    height: 100%;
+}
+.textarea-container {
+    height: calc(100vh - 202px);
+    padding: 10px 20px;
+}
+/*ion-footer {
+    &.footer-md::before {
+        background-image: none;
+    }
+}*/
+ion-footer ion-toolbar{
+    height: auto !important;
+}
+
+.myBackButton {
+    position: absolute;
+}
+ion-textarea{
+    padding: 0px 10px 0px 2px;
+}

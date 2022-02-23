@@ -1,0 +1,107 @@
+<div class="prompt_modal filter-modal">
+	<div class="modal_container" (click)="dismiss()">
+		<div class="modal_content" (click)="stopPropagation($event)">
+			<button *ngIf="!help" ion-button icon-only (click)="dismiss()" class="btn-close">
+        <ion-icon class="fs-22" name="md-close"></ion-icon>
+      </button>
+      <button *ngIf="help" ion-button icon-only (click)="dismiss()" class="btn-close-help">
+        <ion-icon class="fs-20" name="md-close"></ion-icon>
+      </button>
+
+
+      <ng-container *ngIf="!help">
+			  <div *ngIf="!viewonly" class="section-title"> Connect your 
+          <span class="section-title"> {{name}} account? </span>
+        </div>
+
+			  <div *ngIf="viewonly" class="section-title"> 
+          <span *ngIf="name == 'Zoom'" class="section-title"> Zoom Email Address Id </span>
+          <span *ngIf="name != 'Zoom'" class="section-title"> {{name}} account </span>
+        </div>
+      
+        <div *ngIf="help" class="section-title"> Help: </div>
+
+        <div *ngIf="!viewonly" class="form-group block mb-10 {{isValidClass}}">
+          <label class="text-secondary mb-10"> Enter your 
+            <span *ngIf="name == 'Zoom'" class="text-secondary"> Zoom Email Address Id </span>
+            <span *ngIf="name != 'Zoom'" class="text-secondary"> {{name}} link or user account name. </span>
+            </label>
+          <div class="input-wrapper">
+            <input 
+              class="form-control" 
+              type="text" 
+              value="" 
+              [(ngModel)]="socialMedia" 
+              
+            >
+            <!-- <span class="icon">
+              <fa-icon [icon]="['fas', 'check-circle']" slot="end"></fa-icon>
+            </span> -->
+          </div>
+          <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter valid email. </p>
+        </div>
+      </ng-container>
+      <div *ngIf="help" class="section-title"> Help: </div>
+      <p *ngIf="help" class="mb-0 fs-15 lh-25">Click the check button to accept a meeting request, otherwise click the decline button to decline. 
+          You are only allowed to accept on request.
+          If a request is approved, all other requests, including the ones you've sent, will be declined.</p>
+
+      <div *ngIf="viewonly" class="form-group block mb-10 {{isValidClass}}">
+        <label class="text-secondary mb-15"> Tap the icon to copy the text to clipboard. </label>
+        <ion-grid no-padding>
+          <ion-row>
+            <ion-col size="10" no-padding>
+              <input 
+                class="form-control" 
+                type="text" 
+                value="" 
+                [(ngModel)]="socialMedia" 
+                readonly="true"
+              >
+            </ion-col>
+            <ion-col size="2" no-padding>
+              <div (click)="copyText()" class="flex ai-center jc-center h-100-per">
+                <fa-icon class="fs-20" [icon]="['far', 'clone']"></fa-icon>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+      
+			<div *ngIf="socialMedia && !viewonly" class="action-buttons" margin-top>
+				<ion-row>
+					<ion-col col-6> <button ion-button block class="btn-cancel" (click)="dismiss()"> Cancel </button> </ion-col>
+					<ion-col col-6> <button ion-button block color="primary" (click)="dismiss('save')"> Okay </button> </ion-col>
+				</ion-row>
+        <p *ngIf="haveSocialMedia" class="remove-p text-secondary" text-center (click)="dismiss('remove')">
+          Remove {{name}} Account
+        </p>
+			</div>
+      <div *ngIf="!socialMedia && haveSocialMedia && !viewonly" margin-top>
+        <button ion-button block class="btn btn-danger w-100-per" (click)="dismiss('remove')"> 
+          Remove {{name}} Account </button>
+      </div>
+
+      <!-- <ion-grid *ngIf="icon">
+        <ion-row>
+          <ion-col size="5">
+            <div class="for-line"></div>
+          </ion-col>
+          <ion-col size="2" text-center>
+            <span class="text-secondary"> or </span>
+          </ion-col>
+          <ion-col size="5">
+            <div class="for-line"></div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <div *ngIf="icon" class="social-media-icon box mt-10 {{class}}">
+        <a> 
+          <fa-icon [icon]="['fab', icon]" slot="start"></fa-icon>
+          <span class="ml-2" text-capitalize> {{name}} </span>
+        </a>
+      </div> -->
+		</div>
+	</div>
+</div>

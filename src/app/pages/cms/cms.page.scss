@@ -1,0 +1,15 @@
+.bg-content{
+    line-height: 1.5;
+    text-align: justify;
+    background-image: url("/assets/images/greybg.png");
+    background-size: 105% 105%;
+    background-position: -5px;
+    min-height: calc(100vh - 225px);
+}
+
+.border {
+    height: 5px;
+    width: 80px;
+    background-color: #7a9f12;
+    margin: 5px 0;
+}

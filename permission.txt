@@ -1,0 +1,2 @@
+Please allow face2face scheduler to gain access to your camera for uploading profile photo.
+Please allow face2face scheduler to gain access to your photo library for uploading profile photo.

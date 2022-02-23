@@ -1,0 +1,406 @@
+<ion-header *ngIf="pagetype">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button *ngIf="edit_user_profile" routerLink="/edit-user-profile">
+        <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+      </ion-button>
+      <ion-button *ngIf="!edit_user_profile" routerLink="/delegate-profile">
+        <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="p-0" text-center> Edit Company Details </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="ios-arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div *ngIf="!pagetype" class="container">
+    <div class="update-profile-banner">
+      <ion-icon routerLink="/edit-profile-preferences" class="routerLinkClass p-absolute back fs-30" name="ios-arrow-back"></ion-icon>
+      <div class="login-form p-10">
+        <ion-grid>
+          <ion-row class="mt-20">
+            <ion-col size="3">
+              <circle-progress
+                [percent]= "100"
+                [maxPercent] = "100"
+                [backgroundOpacity]="1"
+                [outerStrokeWidth]="10"
+                [outerStrokeColor]="'#799e11'"
+                [innerStrokeColor]="'#999999'"
+                [titleFontSize]= "30"
+                >
+
+              </circle-progress>
+            </ion-col>
+            <ion-col size="9">
+              <h6>Upload Company Information</h6>
+              <p class="fw-400">We already added all the info you initially gave, you just need to double check.</p>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+    </div>
+  </div>
+  <form class="container mb-80" [formGroup]="companyForm">
+    <div class="card p-0 b-rad-0 mb-20">
+      <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+        <ion-icon class="mr-5" src="assets/icon/company-info.svg" slot="start"></ion-icon>
+        <h6 class="h-title m-0"> Company Information </h6>
+      </div>
+
+      <div class="p-20 pb-0">
+        <div class="form-group block mb-20 {{isValidClass.name}}">
+          <label class="text-secondary mb-10" for="edit-name"> Company Name </label>
+          <div id="edit-name" class="input-wrapper">
+            <input 
+              class="form-control" 
+              type="text" 
+              value="" 
+              maxlength="150"
+              (keyup)="formValidator($event, 'name')"
+              formControlName="name" 
+            >
+          </div>
+          <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter your company name. </p>
+        </div>
+
+        <div class="form-group block mb-20 {{isValidClass.description}}">
+          <label class="text-secondary mb-10" for="edit-description"> Company Description </label>
+          <div id="edit-description" class="input-wrapper">
+            <textarea 
+              class="form-control w-100-per" 
+              type="text" 
+              value="" 
+              rows="5"
+              (keyup)="formValidator($event, 'description')"
+              formControlName="description" 
+            >
+            </textarea>
+          </div>
+          <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter company description. </p>
+        </div>
+      </div>
+
+      <div class="form-group block mb-20 {{isValidClass.sector}} pl-3 pr-3 pb-20">
+        <label class="text-secondary mb-10 pl-17 pr-17" for="edit-sector"> Sector </label>
+        <ion-item lines="none">
+          <ionic-selectable
+            class="form-control" 
+            [(ngModel)]="selectedSector"
+            [ngModelOptions]="{standalone: true}"
+            placeholder="Select Sector"
+            [items]="prefService.prefs.sectors.datas"
+            itemValueField="id"
+            itemTextField="name"
+            [canSearch]="true"
+            (onChange)="sectorChange($event)"
+            [shouldBackdropClose]="false">
+            <ng-template ionicSelectableItemIconTemplate let-port="item" let-isPortSelected="isItemSelected">
+              <ion-icon item-left slot="start" [name]="isPortSelected ? 'checkbox' : 'square-outline'" [color]="isPortSelected ? 'f2f' : 'medium'">
+              </ion-icon>
+            </ng-template>
+
+            <ng-template ionicSelectableCloseButtonTemplate>
+              <ion-icon name="ios-arrow-back" class="f-30"></ion-icon>
+            </ng-template>
+
+            <ng-template ionicSelectableTitleTemplate>
+              <div> Sector </div>
+            </ng-template>
+            <!-- 
+              [hasInfiniteScroll]="true"
+              (onSearch)="searchPorts($event)"
+              (onInfiniteScroll)="getMorePorts($event)"
+            -->
+          </ionic-selectable>
+        </ion-item>
+        <p class="error mt-5 mb-5 fs-15 text-danger pt-5 pb-10 pl-20 pr-20">
+          <fa-icon class="mr-5" [icon]="['fas', 'exclamation-circle']" slot="start"></fa-icon>
+            <span> 
+            Please select at least one. 
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <div class="card p-0 b-rad-0 mb-20">
+      <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+        <fa-icon class="mr-5" [icon]="['fas', 'map-marker-alt']" slot="start"></fa-icon>
+        <h6 class="h-title m-0"> Company Address </h6>
+      </div>
+      <div>
+        <ion-list lines="none" class="pb-15">	
+          <div class="p-20 pt-10 pb-10 text-secondary">
+            Country
+          </div>
+          
+          <div class="form-group block mb-10 {{isValidClass.country}} pl-3 pr-3">
+            <ion-item lines="none">
+              <ionic-selectable
+                class="form-control" 
+                [(ngModel)]="selectedCountry"
+                [ngModelOptions]="{standalone: true}"
+                placeholder="Select Countries"
+                [items]="prefService.prefs.countries.datas"
+                itemValueField="id"
+                itemTextField="nicename"
+                [canSearch]="true"
+                (onChange)="countryChange($event)"
+                [shouldBackdropClose]="false">
+
+                <ng-template ionicSelectableItemIconTemplate let-port="item" let-isPortSelected="isItemSelected">
+                  <ion-icon item-left slot="start" [name]="isPortSelected ? 'checkbox' : 'square-outline'" [color]="isPortSelected ? 'f2f' : 'medium'">
+                  </ion-icon>
+                </ng-template>
+
+                <ng-template ionicSelectableCloseButtonTemplate>
+                  <ion-icon name="ios-arrow-back" class="f-30"></ion-icon>
+                </ng-template>
+    
+                <ng-template ionicSelectableTitleTemplate>
+                  <div> Countries </div>
+                </ng-template>
+                <!-- 
+                  [hasInfiniteScroll]="true"
+                  (onSearch)="searchPorts($event)"
+                  (onInfiniteScroll)="getMorePorts($event)"
+                -->
+              </ionic-selectable>
+            </ion-item>
+            <p class="error mt-5 mb-5 fs-15 text-danger pt-5 pb-10 pl-20 pr-20">
+              <fa-icon class="mr-5" [icon]="['fas', 'exclamation-circle']" slot="start"></fa-icon>
+                <span> 
+                Please select at least one. 
+              </span>
+            </p>
+          </div>
+
+          <div class="p-20 pt-10 pb-10 text-secondary">
+            State/Province
+          </div>
+          <!-- <div class="select-button pt-10 pb-10 pl-20 pr-20 text-primary">
+            Select country and state/province. 
+            <fa-icon class="f-right" [icon]="['fas', 'chevron-right']" slot="start"></fa-icon>
+          </div> -->
+
+          <div *ngIf="prefService.prefs.states.total_count == 0" class="form-group block mb-10 {{isValidClass.state}}">
+            <div id="edit-state" class="input-wrapper pl-20 pr-20">
+              <input 
+                class="form-control" 
+                type="text" 
+                value="" 
+                (keyup)="formValidator($event, 'state')"
+                formControlName="state" 
+              >
+            </div>
+            <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter your company state/municipality. </p>
+          </div>
+
+          <div *ngIf="prefService.prefs.states.total_count > 0" class="form-group block mb-10 {{isValidClass.state}} pl-3 pr-3">
+            <ion-item lines="none">
+              <ionic-selectable
+                class="form-control" 
+                [(ngModel)]="selectedState"
+                [ngModelOptions]="{standalone: true}"
+                placeholder="Select State/Province"
+                [items]="prefService.prefs.states.datas"
+                itemValueField="name"
+                itemTextField="name"
+                [canSearch]="true"
+                (onChange)="stateChange($event)"
+                [shouldBackdropClose]="false">
+
+                <ng-template ionicSelectableItemIconTemplate let-port="item" let-isPortSelected="isItemSelected">
+                  <ion-icon item-left slot="start" [name]="isPortSelected ? 'checkbox' : 'square-outline'" [color]="isPortSelected ? 'f2f' : 'medium'">
+                  </ion-icon>
+                </ng-template>
+
+                <ng-template ionicSelectableCloseButtonTemplate>
+                  <ion-icon name="ios-arrow-back" class="f-30"></ion-icon>
+                </ng-template>
+    
+                <ng-template ionicSelectableTitleTemplate>
+                  <div> State/Province </div>
+                </ng-template>
+                <!-- 
+                  [hasInfiniteScroll]="true"
+                  (onSearch)="searchPorts($event)"
+                  (onInfiniteScroll)="getMorePorts($event)"
+                -->
+              </ionic-selectable>
+            </ion-item>
+            <p class="error mt-5 mb-5 fs-15 text-danger pt-5 pb-10 pl-20 pr-20">
+              <fa-icon class="mr-5" [icon]="['fas', 'exclamation-circle']" slot="start"></fa-icon>
+                <span> 
+                Please select at least one. 
+              </span>
+            </p>
+          </div>
+
+          <div class="p-20 pt-15">
+            <div class="form-group block mb-20 {{isValidClass.zipcode}}">
+              <label class="text-secondary mb-10" for="edit-zipcode"> Zip Code </label>
+              <div id="edit-zipcode" class="input-wrapper">
+                <input 
+                  class="form-control" 
+                  type="text" 
+                  value="" 
+                  (keyup)="formValidator($event, 'zipcode')"
+                  formControlName="zipcode" 
+                >
+              </div>
+              <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter your company zip code. </p>
+            </div>
+
+            <div class="form-group block mb-20 {{isValidClass.address}}">
+              <label class="text-secondary mb-10" for="edit-address"> Company Main Address </label>
+              <div id="edit-address" class="input-wrapper">
+                <input 
+                  class="form-control" 
+                  type="text" 
+                  value="" 
+                  (keyup)="formValidator($event, 'address')"
+                  formControlName="address" 
+                >
+              </div>
+              <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter your company main address. </p>
+            </div>
+          </div>
+        </ion-list>
+      </div>
+    </div>
+    
+        
+    <div class="card p-0 b-rad-0 mb-20">
+      <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+        <fa-icon class="mr-5" [icon]="['fas', 'phone']" slot="start"></fa-icon>
+        <h6 class="h-title m-0"> Company Contact Information </h6>
+      </div>
+      <div>
+        <ion-list lines="none" class="pb-15">
+          <div class="p-20">
+            <div class="form-group block mb-20 {{isValidClass.phoneNumber}}">
+              <label class="text-secondary mb-10" for="edit-phoneNumber"> Telephone </label>
+              <div id="edit-phoneNumber" class="input-wrapper">
+                <input 
+                  class="form-control" 
+                  type="number" 
+                  value="" 
+                  maxlength="150"
+                  (keyup)="formValidator($event, 'phoneNumber')"
+                  formControlName="phoneNumber" 
+                  onkeydown="return event.keyCode !== 69 && event.keyCode !== 190"
+                >
+              </div>
+              <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter your company telephone. </p>
+            </div>
+
+            <div class="form-group block mb-20 {{isValidClass.website}}">
+              <label class="text-secondary mb-10" for="edit-website"> Company Website </label>
+              <div id="edit-website" class="input-wrapper">
+                <input 
+                  class="form-control" 
+                  type="text" 
+                  value="" 
+                  maxlength="150"
+                  (keyup)="formValidator($event, 'website')"
+                  formControlName="website" 
+                >
+              </div>
+              <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter company website. </p>
+            </div>
+
+            <div class="textfield">
+              <label class="text-secondary mb-10" for="edit-mobile"> Social Links </label>
+              <ion-grid class="m-0 w-100-per">
+                <ion-row class="w-100-per mt-10">
+                  <ion-col text-center size="4">
+                    <div class="flex jc-center" >
+                      <div class="social-media-icon ln"
+                        (click)="presentSocialModal('Linkedln', 'ln', 'linkedin-in')">
+                        <a>
+                          <fa-icon [icon]="['fab', 'linkedin-in']"></fa-icon>
+                        </a>
+                      </div>
+                    </div>
+                    <p class="m-0 pt-5 text-lbl"> Linkedln </p>
+                  </ion-col>
+                  <ion-col text-center size="4">
+                    <div class="flex jc-center" >
+                      <div class="social-media-icon fb"
+                        (click)="presentSocialModal('Facebook', 'fb', 'facebook-f')">
+                        <a>
+                          <fa-icon [icon]="['fab', 'facebook-f']" slot="start"></fa-icon>
+                        </a>
+                      </div>
+                    </div>
+                    <p class="m-0 pt-5 text-lbl"> Facebook </p>
+                  </ion-col>
+                  <ion-col text-center size="4">
+                    <div class="flex jc-center" >
+                      <div class="social-media-icon tw"
+                        (click)="presentSocialModal('Twitter', 'tw', 'twitter')">
+                        <a>
+                          <fa-icon [icon]="['fab', 'twitter']" slot="start"></fa-icon>
+                        </a>
+                      </div>
+                    </div>
+                    <p class="m-0 pt-5 text-lbl"> Twitter </p>
+                  </ion-col>
+                </ion-row>
+                <ion-row class="w-100-per mt-10">
+                  <ion-col text-center size="4">
+                    <div class="flex jc-center" >
+                      <div class="social-media-icon wa"
+                        (click)="presentSocialModal('WhatsApp', 'wa')">
+                        <a>
+                          <fa-icon [icon]="['fab', 'whatsapp']" slot="start"></fa-icon>
+                        </a>
+                      </div>
+                    </div>
+                    <p class="m-0 pt-5 text-lbl"> WhatsApp </p>
+                  </ion-col>
+                  <ion-col text-center size="4">
+                    <div class="flex jc-center" >
+                      <div class="social-media-icon wc"
+                        (click)="presentSocialModal('WeChat', 'wc', 'weixin')">
+                        <a>
+                          <fa-icon [icon]="['fab', 'weixin']" slot="start"></fa-icon>
+                        </a>
+                      </div>
+                    </div>
+                    <p class="m-0 pt-5 text-lbl"> WeChat </p>
+                  </ion-col>
+                  <ion-col text-center size="4">
+                    <div class="flex jc-center" >
+                      <div class="social-media-icon kt"
+                        (click)="presentSocialModal('Kakao', 'kt')">
+                        <a> 
+                          <fa-icon [icon]="['fas', 'comment']" slot="start"></fa-icon>
+                        </a>
+                      </div>
+                    </div>
+                    <p class="m-0 pt-5 text-lbl"> Kakao </p>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </div>
+          </div>	
+        </ion-list>
+      </div>
+    </div>
+
+  </form>
+  <button (click)="save()" class="modal-btn-bottom fixed pointer fs-15 text-white">
+    <span *ngIf="!pagetype">
+      Update Profile
+    </span>
+    <span *ngIf="pagetype">
+      Update Company Details
+    </span>
+  </button>
+</ion-content>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>803859933995-k9jfuvv9i3s0omg3rs25o20tngbnpsnh.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.803859933995-k9jfuvv9i3s0omg3rs25o20tngbnpsnh</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBS_LSzPqtFe3EyIQPCVoY32f-MphQAIN4</string>
+	<key>GCM_SENDER_ID</key>
+	<string>803859933995</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.rwsolutions.face2face</string>
+	<key>PROJECT_ID</key>
+	<string>face2face-d3e7b</string>
+	<key>STORAGE_BUCKET</key>
+	<string>face2face-d3e7b.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:803859933995:ios:687dd669116060e4f7f36e</string>
+	<key>DATABASE_URL</key>
+	<string>https://face2face-d3e7b.firebaseio.com</string>
+</dict>
+</plist>

@@ -1,0 +1,115 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button *ngIf="event_id" (click)="goBack()">
+        <ion-icon class="back-button" slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+      <ion-title *ngIf="note && note != 'no-note'" class="p-0 fs-15" text-center> 
+        <span *ngIf="note && note.created_at == note.updated_at">
+          Added 
+        </span>
+        <span *ngIf="note && note.created_at != note.updated_at">
+          Edited
+        </span>
+        &nbsp;on
+        &nbsp;{{edited}} </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="ios-arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- skeleton loader -->
+  <ng-container *ngIf="!note">
+    <div class="dp-card card p-20 pt-15 pb-15 b-rad-0 b-bot ">
+      <div class="delegate-profile clearfix">
+        <div class="profile-photo w-35 h-35">
+          <ion-skeleton-text animated class="w-35 h-35 m-0"></ion-skeleton-text>
+        </div>
+        <div class="profile-basic-info pl-10">
+            <h1 class="fs-16 fw-500 mt-0 mb-10 ellipsis w-100-per capitalize flex ai-center">
+              <span><ion-skeleton-text animated class="w-135 h-16 m-0"></ion-skeleton-text></span> 
+            </h1>
+            <p class="fs-15 m-0 ellipsis w-100-per capitalize text-secondary">
+              <ion-skeleton-text animated class="w-155 h-15 m-0"></ion-skeleton-text>
+            </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-20 pt-15 pb-15 b-rad-0 b-bot fs-15 lh-22">
+      <ion-skeleton-text animated class="w-100-per h-15 mt-0 mb-10"></ion-skeleton-text>
+      <ion-skeleton-text animated class="w-100-per h-15 mt-0 mb-10"></ion-skeleton-text>
+      <ion-skeleton-text animated class="w-100-per h-15 mt-0 mb-10"></ion-skeleton-text>
+      <ion-skeleton-text animated class="w-75-per h-15 mt-0 mb-10"></ion-skeleton-text>
+    </div>
+  </ng-container>
+  <!-- end skeleton loader -->
+
+  <!-- start empty state -->
+  <ng-container *ngIf="note && note == 'no-note'">
+    <div class="card p-20 pt-15 pb-15 b-rad-0 b-bot ">
+      <p class="fs-15 text-default tC">No note yet.</p>
+    </div>
+  </ng-container>
+  <!-- end empty state -->
+
+
+  <ng-container *ngIf="note && note != 'no-note'">
+    <div class="card p-20 pt-15 pb-15 b-rad-0 b-bot ">
+      <div class="delegate-profile clearfix" (click)="gotoDelegateProfile(note.d2_id)">
+        <div class="profile-photo w-35 h-35">
+            <img class="w-35 h-35" src="{{note.d2_profile_photo}}" />
+        </div>
+        <div class="profile-basic-info pl-10">
+            <h1 class="fs-17 fw-500 mt-0 mb-5 ellipsis w-100-per capitalize flex ai-center">
+              <span>{{note.d2_company_name}}</span> 
+            </h1>
+            <p class="fs-16 m-0 ellipsis w-100-per capitalize text-secondary">{{note.d2_fullname}}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-20 pt-15 pb-15 b-rad-0 fs-15 lh-22" [innerHtml]="note.note"></div>
+  </ng-container>
+
+
+
+</ion-content>
+<ion-footer *ngIf="note" class=""> 
+  <div class="p-20 pt-10 pb-10">
+    <ion-grid no-padding>
+      <ion-row>
+        <ion-col size=6 class="pl-0">      
+          <button class="btn btn-primary fs-15 w-100-per" (click)="sendModal()"> 
+            <div class="flex ai-center jc-center">
+              <fa-icon class="mr-5" [icon]="['fas', 'envelope']" slot="start"></fa-icon>
+              Send to email 
+            </div>
+          </button>
+        </ion-col>
+        <ion-col size=3>      
+          <button class="btn btn-edit fs-15 w-100-per p-0" routerLink="/add-notes-enhance/{{note.delegate_id2}}/{{note.delegate_id2}}"> 
+            <div class="flex ai-center jc-center">
+              <ion-icon class="mr-5" src="assets/icon/white-notes.svg" slot="start"> </ion-icon>
+              Edit 
+            </div>
+          </button>
+        </ion-col>
+        <ion-col size=3 class="pr-0">      
+          <button class="btn btn-delete fs-15 w-100-per" (click)="deleteConfirmModal()"> 
+            <div class="flex ai-center jc-center">
+              <fa-icon class="mr-5" [icon]="['fas', 'trash-alt']" slot="start"></fa-icon>
+              Delete 
+            </div>
+          </button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-footer>

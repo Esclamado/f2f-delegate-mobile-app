@@ -1,0 +1,401 @@
+<ion-header *ngIf="pagetype">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button *ngIf="edit_user_profile" routerLink="/edit-user-profile">
+        <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+      </ion-button>
+      <ion-button *ngIf="!edit_user_profile" routerLink="/delegate-profile">
+        <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <!--  Update Preferences -->
+    <ion-title class="p-0" text-center> Update {{page_title}} </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="ios-arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div class="container mb-80">
+    <div *ngIf="!pagetype" class="update-profile-banner">
+      <ion-icon routerLink="/edit-profile-business-card" class="routerLinkClass p-absolute back fs-30" name="ios-arrow-back"></ion-icon>
+      <div class="login-form p-10">
+        <ion-grid>
+          <ion-row class="mt-20">
+            <ion-col size="3">
+              <circle-progress
+                [percent]= "100"
+                [maxPercent] = "100"
+                [backgroundOpacity]="1"
+                [outerStrokeWidth]="10"
+                [outerStrokeColor]="'#799e11'"
+                [innerStrokeColor]="'#999999'"
+                [titleFontSize]= "30"
+                >
+
+              </circle-progress>
+            </ion-col>
+            <ion-col size="9">
+              <h6>Update your Preferences</h6>
+              <p class="fw-400">Company services, specializations, and countries you're not interested in.</p>
+              <!-- <p class="text-secondary fw-400"> Next: Company Details </p> -->
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+    </div>
+    <div *ngIf="pagetype && !page_type" class="p-20 fs-17" text-center>
+      Preferences are company services, specializations, and countries you're not willing to meet 
+    </div>
+
+    <div *ngIf="page_type == 'services' || !pagetype" [ngClass]="{ 'mt-20': page_type == 'services' }" class="card p-0 b-rad-0 mb-20">
+      <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+        <h6 class="h-title m-0"> Services </h6>
+      </div>
+      <div [ngClass]="selectedServices && selectedServices.length > 0 ? 'pl-20 pr-20 pt-15 pb-15' : ''">
+        <!-- <ng-container *ngIf="!selectedServices">
+          <div class="p-20">
+            <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+          </div>
+        </ng-container> -->
+
+        <ng-container *ngIf="selectedServices">
+          <div *ngFor="let service of selectedServices">
+            <div class="flex ai-center">
+              <ion-icon name="ios-checkmark" class="text-success fs-30 mr-5"></ion-icon>
+              <span> {{service.name}} </span>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="form-group block mb-20 {{isValidClass.service}}">
+        <ion-item lines="none" class="select-button text-primary">
+          <ionic-selectable
+            class="form-control selectable" 
+            [ngModelOptions]="{standalone: true}"
+            [items]="prefs.services.datas"
+            itemValueField="id"
+            itemTextField="name"
+            [canSearch]="true"
+            (onChange)="selectableChange($event, 'service')"
+            [isMultiple]="true"
+            confirmButtonText="Save Selection"
+            item-content [(ngModel)]="selectedServices"
+            itemIconSlot="start"
+            [searchFailText]="'No results found.'"
+            >
+            <ng-template ionicSelectableItemIconTemplate let-port="item" let-isPortSelected="isItemSelected">
+              <ion-icon item-left slot="start" [name]="isPortSelected ? 'checkbox' : 'square-outline'" [color]="isPortSelected ? 'f2f' : 'medium'">
+              </ion-icon>
+            </ng-template>
+            
+            <ng-template ionicSelectablePlaceholderTemplate>
+              <span class="text-primary">Select services</span>
+            </ng-template>
+
+            <ng-template ionicSelectableCloseButtonTemplate>
+              <ion-icon name="ios-arrow-back" class="fs-30"></ion-icon>
+            </ng-template>
+
+            <ng-template ionicSelectableTitleTemplate>
+              <div> Services </div>
+            </ng-template>
+
+            <ng-template ionicSelectableValueTemplate let-ports="value">
+              <div class="ionic-selectable-value-item">
+                <!-- {{formatSelected(selectedServices, 'service')}} -->
+                Select services
+              </div>
+            </ng-template>
+
+            <!-- 
+              [hasInfiniteScroll]="true"
+              (onSearch)="searchPorts($event)"
+              (onInfiniteScroll)="getMorePorts($event)"
+            -->
+          </ionic-selectable>
+          <ion-icon class="p-absolute forward fs-20 text-primary" name="ios-arrow-forward"></ion-icon>
+        </ion-item> 
+        <p class="error mt-5 mb-5 fs-15 text-danger pt-5 pb-10 pl-20 pr-20">
+          <fa-icon class="mr-5" [icon]="['fas', 'exclamation-circle']" slot="start"></fa-icon>
+            <span> 
+            Please select at least one. 
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <div *ngIf="page_type == 'specializations' || !pagetype" [ngClass]="{ 'mt-20': page_type == 'specializations' }" class="card p-0 b-rad-0 mb-20">
+      <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+        <h6 class="h-title m-0"> Specializations </h6>
+      </div>
+      <!-- <div class="p-20">
+        Select specializations you're interested in.
+      </div>
+      <div class="select-button pt-10 pb-10 pl-20 pr-20 text-primary">
+        Select specializations you're interested in. 
+        <fa-icon class="f-right" [icon]="['fas', 'chevron-right']" slot="start" ></fa-icon>
+      </div> -->
+
+      <div [ngClass]="selectedSpecializations && selectedSpecializations.length > 0 ? 'pl-20 pr-20 pt-15 pb-15' : ''">
+        <!-- <ng-container *ngIf="!selectedSpecializations">
+          <div class="p-20">
+            <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+          </div>
+        </ng-container> -->
+
+        <ng-container *ngIf="selectedSpecializations">
+          <div *ngFor="let specialization of selectedSpecializations">
+            <div class="flex ai-center">
+              <ion-icon name="ios-checkmark" class="text-success fs-30 mr-5"></ion-icon>
+              <span> {{specialization.name}} </span>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="form-group block mb-20 {{isValidClass.specialization}}">
+        <ion-item lines="none" class="select-button text-primary">
+          <ionic-selectable
+            class="form-control selectable" 
+            [ngModelOptions]="{standalone: true}"
+            [items]="prefs.specializations.datas"
+            itemValueField="id"
+            itemTextField="name"
+            [canSearch]="true"
+            (onChange)="selectableChange($event, 'specialization')"
+            [isMultiple]="true"
+            confirmButtonText="Save Selection"
+            item-content [(ngModel)]="selectedSpecializations"
+            itemIconSlot="start"
+            [searchFailText]="'No results found.'"
+            >
+            <ng-template ionicSelectableItemIconTemplate let-port="item" let-isPortSelected="isItemSelected">
+              <ion-icon item-left slot="start" [name]="isPortSelected ? 'checkbox' : 'square-outline'" [color]="isPortSelected ? 'f2f' : 'medium'">
+              </ion-icon>
+            </ng-template>
+
+            <ng-template ionicSelectablePlaceholderTemplate>
+              <span class="text-primary">Select specializations</span>
+            </ng-template>
+
+            <ng-template ionicSelectableCloseButtonTemplate>
+              <ion-icon name="ios-arrow-back" class="fs-30"></ion-icon>
+            </ng-template>
+
+            <ng-template ionicSelectableTitleTemplate>
+              <div> Specializations </div>
+            </ng-template>
+
+            <ng-template ionicSelectableValueTemplate let-ports="value">
+              <div class="ionic-selectable-value-item">
+                <!-- {{formatSelected(selectedSpecializations, 'specialization')}} -->
+                Select specializations
+              </div>
+            </ng-template>
+
+            <!-- 
+              [hasInfiniteScroll]="true"
+              (onSearch)="searchPorts($event)"
+              (onInfiniteScroll)="getMorePorts($event)"
+            -->
+          </ionic-selectable>
+          <ion-icon class="p-absolute forward fs-20 text-primary" name="ios-arrow-forward"></ion-icon>
+        </ion-item>
+        <p class="error mt-5 mb-5 fs-15 text-danger pt-5 pb-10 pl-20 pr-20">
+          <fa-icon class="mr-5" [icon]="['fas', 'exclamation-circle']" slot="start"></fa-icon>
+            <span> 
+            Please select at least one. 
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <div *ngIf="page_type == 'preferences' || !pagetype" [ngClass]="{ 'mt-20': page_type == 'preferences' }" class="card p-0 b-rad-0 mb-20">
+      <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+        <h6 class="h-title m-0"> Countries I'm not prepared to meet (this will not show up in your profile) </h6>
+      </div>
+      <!-- <div class="p-20">
+        Select countries you're not interested in.
+      </div>
+      <div class="select-button pt-10 pb-10 pl-20 pr-20 text-primary">
+        Select countries you're not interested in. 
+        <fa-icon class="f-right" [icon]="['fas', 'chevron-right']" slot="start"></fa-icon>
+      </div> -->
+
+      <div [ngClass]="selectedCountries && selectedCountries.length > 0 ? 'pl-20 pr-20 pt-15 pb-15' : ''">
+        <!-- <ng-container *ngIf="!selectedCountries">
+          <div class="p-20">
+            <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+          </div>
+        </ng-container> -->
+
+        <ng-container *ngIf="selectedCountries">
+          <div *ngFor="let countries of selectedCountries" class="pt-4 pb-4">
+            <div class="flex ai-center">
+              <span class="mini-flag-icon" [ngStyle]="{'background-image': 'url(assets/images/flags/'+ countries.iso +'.png)'}"> </span> 
+              <span> {{countries.nicename}} </span>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="form-group block mb-20 {{isValidClass.countries}}">
+        <ion-item lines="none" class="select-button text-primary">
+          <ionic-selectable
+            class="form-control selectable" 
+            [ngModelOptions]="{standalone: true}"
+            [items]="prefs.countries.datas"
+            itemValueField="id"
+            itemTextField="nicename"
+            [canSearch]="true"
+            (onChange)="selectableChange($event, 'countries')"
+            [isMultiple]="true"
+            confirmButtonText="Save Selection"
+            item-content [(ngModel)]="selectedCountries"
+            [searchFailText]="'No results found.'"
+            >
+            <ng-template ionicSelectableItemIconTemplate let-port="item" let-isPortSelected="isItemSelected">
+              <ion-icon item-left slot="start" [name]="isPortSelected ? 'checkbox' : 'square-outline'" [color]="isPortSelected ? 'f2f' : 'medium'">
+              </ion-icon>
+            </ng-template>
+
+            <ng-template ionicSelectablePlaceholderTemplate>
+              <span class="text-primary">Select countries</span>
+            </ng-template>
+
+            <ng-template ionicSelectableCloseButtonTemplate>
+              <ion-icon name="ios-arrow-back" class="fs-30"></ion-icon>
+            </ng-template>
+
+            <ng-template ionicSelectableTitleTemplate>
+              <div class="ellipsis"> Countries I'm not prepared to meet (this will not show up in your profile) </div>
+            </ng-template>
+
+            <ng-template ionicSelectableValueTemplate let-ports="value">
+              <div class="ionic-selectable-value-item">
+                <!-- {{formatSelected(selectedCountries, 'countries')}} -->
+                Select countries
+              </div>
+            </ng-template>
+
+            <!-- 
+              [hasInfiniteScroll]="true"
+              (onSearch)="searchPorts($event)"
+              (onInfiniteScroll)="getMorePorts($event)"
+            -->
+          </ionic-selectable>
+          <ion-icon class="p-absolute forward fs-20 text-primary" name="ios-arrow-forward"></ion-icon>
+        </ion-item> 
+        <p class="error mt-5 mb-5 fs-15 text-danger pt-5 pb-10 pl-20 pr-20">
+          <fa-icon class="mr-5" [icon]="['fas', 'exclamation-circle']" slot="start"></fa-icon>
+            <span> 
+            Please select at least one. 
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <div *ngIf="page_type == 'operational_software' || !pagetype" [ngClass]="{ 'mt-20': page_type == 'operational_software' }" class="card p-0 b-rad-0 mb-20">
+      <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+        <h6 class="h-title m-0"> Operational Software </h6>
+      </div>
+      <!-- <div class="p-20">
+        Select software you're interested in.
+      </div>
+      <div class="select-button pt-10 pb-10 pl-20 pr-20 text-primary">
+        Select software you're interested in. 
+        <fa-icon class="f-right" [icon]="['fas', 'chevron-right']" slot="start"></fa-icon>
+      </div> -->
+      <div [ngClass]="selectedSoftwares && selectedSoftwares.length > 0 ? 'pl-20 pr-20 pt-15 pb-15' : ''">
+        <!-- <ng-container *ngIf="!selectedSoftwares">
+          <div class="p-20">
+            <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+          </div>
+        </ng-container> -->
+
+        <ng-container *ngIf="selectedSoftwares">
+          <div *ngFor="let software of selectedSoftwares">
+            <div class="flex ai-center">
+              <ion-icon name="ios-checkmark" class="text-success fs-30 mr-5"></ion-icon>
+              <span> {{software.name}} </span>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="form-group block mb-20 {{isValidClass.software}}">
+        <ion-item lines="none" class="select-button text-primary">
+          <ionic-selectable
+            class="form-control selectable" 
+            [ngModelOptions]="{standalone: true}"
+            [items]="prefs.softwares.datas"
+            itemValueField="id"
+            itemTextField="name"
+            [canSearch]="true"
+            (onChange)="selectableChange($event, 'software')"
+            [isMultiple]="true"
+            confirmButtonText="Save Selection"
+            item-content [(ngModel)]="selectedSoftwares"
+            [searchFailText]="'No results found.'"
+            >
+            <ng-template ionicSelectableItemIconTemplate let-port="item" let-isPortSelected="isItemSelected">
+              <ion-icon item-left slot="start" [name]="isPortSelected ? 'checkbox' : 'square-outline'" [color]="isPortSelected ? 'f2f' : 'medium'">
+              </ion-icon>
+            </ng-template>
+
+            <ng-template ionicSelectablePlaceholderTemplate>
+              <span class="text-primary">Select operational software</span>
+            </ng-template>
+
+            <ng-template ionicSelectableCloseButtonTemplate>
+              <ion-icon name="ios-arrow-back" class="fs-30"></ion-icon>
+            </ng-template>
+
+            <ng-template ionicSelectableTitleTemplate>
+              <div> Operational Software </div>
+            </ng-template>
+
+            <ng-template ionicSelectableValueTemplate let-ports="value">
+              <div class="ionic-selectable-value-item">
+                <!-- {{formatSelected(selectedSoftwares, 'software')}} -->
+                Select operational software
+              </div>
+            </ng-template>
+
+            <!-- 
+              [hasInfiniteScroll]="true"
+              (onSearch)="searchPorts($event)"
+              (onInfiniteScroll)="getMorePorts($event)"
+            -->
+          </ionic-selectable>
+          <ion-icon class="p-absolute forward fs-20 text-primary" name="ios-arrow-forward"></ion-icon>
+        </ion-item> 
+        <p class="error mt-5 mb-5 fs-15 text-danger pt-5 pb-10 pl-20 pr-20">
+          <fa-icon class="mr-5" [icon]="['fas', 'exclamation-circle']" slot="start"></fa-icon>
+            <span> 
+            Please select at least one. 
+          </span>
+        </p>
+      </div>
+    </div>
+  </div>
+ 
+  <button (click)="nextStep()" class="modal-btn-bottom fixed fs-15 text-white"> 
+    <span *ngIf="!pagetype">
+      <!-- Next -->
+      Update Profile
+    </span>
+    <span *ngIf="pagetype">
+      Save {{page_title}}
+    </span>
+    <!-- <fa-icon *ngIf="!pagetype" class="ml-5" [icon]="['fas', 'chevron-right']" slot="end"></fa-icon> -->
+  </button>
+</ion-content>

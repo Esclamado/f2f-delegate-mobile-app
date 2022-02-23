@@ -1,0 +1,50 @@
+ion-content {
+    --ion-background-color: #ebebeb;
+}
+
+.ts-items {
+    height: 41px;
+    border-radius: 5px;
+    background-color: #d5e5ff;
+    border: 1px solid #1a4ba0;
+    position: relative;
+
+    p {
+        white-space: nowrap;
+    }
+
+    &.active {
+        background-color: #1a4ba0;
+        p {
+            color: #ffffff;
+        }
+    }
+}
+
+
+
+.info-card {
+    position: relative;
+    background: #ffffff;
+
+    .info-items {
+        padding: 25px 0px;
+
+        &.ms-icon {
+            width: 50px;
+            text-align: center;
+            color: #666666;
+        }
+
+        .centerV {
+            right: 0;
+            height: 45px;
+            width: 45px;
+            background: transparent;
+        }
+    }
+}
+.schedule-meeting {
+    width: 100%;
+    border-radius: 0;
+}

@@ -1,0 +1,82 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title text-center> Notifications </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>     
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- skeleton loader -->
+  <ng-container *ngIf="!notifications">
+    <div class="notif-item b-bot clearfix">           
+      <div class="avatar-photo">
+        <ion-skeleton-text class="m-0" animated style="width: 100%; height: 100%;"></ion-skeleton-text>
+      </div>
+      <div class="notif-desc pl-10">
+        <p class="m-0 fs-16 fw-500"><ion-skeleton-text class="m-0" animated style="width: 100%;"></ion-skeleton-text></p>
+        <p class="mb-0 mt-5 fs-14 fw-400"><ion-skeleton-text class="m-0" animated style="width: 90%;"></ion-skeleton-text></p>
+        <p class="fs-13 m-0 text-secondary">
+          <ion-skeleton-text class="mb-0 mt-10" animated style="width: 40%;"></ion-skeleton-text>
+        </p>
+      </div>
+    </div>
+  </ng-container>
+  <!-- end skeleton loader -->
+
+  <!-- empty state -->
+  <ng-container *ngIf="notifications && notification_total_page == 0">
+    <div class="d-table">
+      <div class="card b-rad-0 va-center" text-center>
+        <img class="w-50-per" src="/assets/empty_states/no_notification.png" />
+        <h6 class="mt-10">No notification yet</h6>
+        <p class="">Stay tuned! We'll let you know when we get news for you.</p>
+      </div>
+    </div>
+  </ng-container>
+  <!-- end empty state -->
+  <ng-container *ngIf="notifications && notification_total_page > 0">
+    <div *ngFor="let notif of notifications" (click)="redirectPage(notif)" class="notif-item b-bot clearfix"
+      [ngClass]="{ 'unread' : notif.status == '2' }">           
+      <div *ngIf="notif.owner_user_id != 'admin' && notif.owner_user_id != 'cron'" class="avatar-photo br-50">
+        <img class="h-26 w-26 mt-2 ml-2" *ngIf="notif.data.data_type == 'delegate_pending_noshow'" src="assets/icon/notif-noshow-decline.svg" />
+        <img class="br-50" *ngIf="notif.type != 'time_slot' && notif.meeting_schedule && notif.data.data_type != 'delegate_pending_noshow'" src="{{notif.meeting_schedule.delegate_profile_photo}}" />
+        <img class="br-50" *ngIf="notif.type != 'time_slot' && (!notif.meeting_schedule && notif.owner_profile) && notif.data.data_type != 'delegate_pending_noshow'" src="{{notif.owner_profile.profile_photo}}" />
+      </div>
+      <div *ngIf="notif.owner_user_id == 'admin'" class="avatar-photo w-30 h-30">
+        <img *ngIf="notif.data.data_type == 'disable_timeslot'" class="h-22 w-22 mt-4 ml-4" src="assets/icon/notif-block-sched.svg" />
+        <img *ngIf="notif.data.data_type == 'decline_noshow'" class="h-26 w-26 mt-2 ml-2" src="assets/icon/notif-noshow-decline.svg" />
+        <img *ngIf="notif.data.data_type == 'set_meeting' || notif.data.data_type == 'admin_set_meeting'" class="h-26 w-26 mt-2 ml-2" src="assets/icon/notif-meeting-approve.svg" />
+        <img *ngIf="notif.data.data_type == 'reschedule_meeting_request'" class="h-26 w-26 mt-2 ml-2" src="assets/icon/notif-meeting-request-resched.svg" />
+        <img *ngIf="notif.data.data_type == 'reschedule_meeting'" class="h-26 w-26 mt-2 ml-2" src="assets/icon/notif-meeting-request-resched.svg" />
+        <img *ngIf="notif.data.data_type == 'approve_noshow' && notif.data.reported_delegate_id != notif.read_by_user_id" class="h-26 w-26 mt-2 ml-2" src="assets/icon/notif-noshow-mark.svg" />
+        <img *ngIf="notif.data.data_type == 'approve_noshow' && notif.data.reported_delegate_id == notif.read_by_user_id" class="h-26 w-26 mt-2 ml-2" src="assets/icon/notif-noshow-you-mark.svg" />     
+        <img *ngIf="notif.data.data_type == 'enable_timeslot'" class="h-26 w-26 mt-2 ml-2" src="assets/icon/notif-enable-sched.svg" />
+        <img *ngIf="notif.data.data_type == 'cancel_scheduled_meeting'" class="h-22 w-22 mt-4 ml-4" src="assets/icon/notif-meeting-cancel.svg" />
+        <img *ngIf="notif.data.data_type == 'approve_cancellation_request'" class="h-22 w-22 mt-4 ml-4" src="assets/icon/notif-meeting-cancel.svg" />
+        <img *ngIf="notif.data.data_type == 'disapprove_cancellation_request'" class="h-26 w-26 mt-2 ml-2" src="assets/icon/notif-meeting-cancel-declined.svg" />
+      </div>
+
+      <div *ngIf="notif.owner_user_id == 'cron'" class="avatar-photo br-50">
+        <img class="br-50" src="{{notif.event && notif.event.event_icon_url ? notif.event.event_icon_url : '/assets/empty_states/no_event_profile.png'}}" />
+      </div>
+
+      <div class="notif-desc pl-10">
+        <div class="fs-15 mt-0 mb-5 lh-18" [innerHtml]="notif.message | safeHtml">
+        </div>
+        <p class="fs-13 m-0 text-secondary">
+          {{notif.formatted_date}} 
+        </p>
+      </div>
+    </div>
+    <ion-infinite-scroll *ngIf="moreNotification" class="mt-20" (ionInfinite)="loadData($event)">
+      <ion-infinite-scroll-content
+        loadingSpinner="bubbles"
+        loadingText="Loading more notification...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </ng-container>
+
+</ion-content>

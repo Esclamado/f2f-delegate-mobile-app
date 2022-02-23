@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="p-0" text-center> Cancel Meeting </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="ios-arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+<div class="pl-15 pr-15 pt-30 pb-30">
+  <p class="m-0 fs-15 lh-22">Can you provide us the reason for cancellation? Don’t worry this is optional.
+  This can help us review your request.</p>
+  <p class="mb-0 mt-5 fs-15 lh-22"> 
+    <fa-icon style="color: #1a3d8e;" [icon]="['fas', 'info-circle']"></fa-icon> Please note that this request will be upon approval of the admin.
+  </p>
+  <div class="cancel-message">
+    <ion-textarea class="lh-25 h-auto textfield m-0" 
+      [(ngModel)]="cancelMessage" 
+      [ngModelOptions]="{standalone: true}" 
+      rows="3"
+      placeholder="Enter your messsage..."
+      autoGrow="true"
+    ></ion-textarea>
+  </div>
+</div>
+</ion-content>
+
+<ion-footer>
+<button class="btn grad btn-primary cancel-btn" (click)="startCacelRequest()">
+  Request to cancel meeting
+</button>
+</ion-footer>

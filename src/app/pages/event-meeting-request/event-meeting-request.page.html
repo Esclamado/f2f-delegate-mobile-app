@@ -1,0 +1,152 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button routerLink="/tabs/event-settings/{{event_id}}">
+        <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="p-0" text-center> Meeting Requests </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="ios-arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+
+  <div class="mt-0">
+    <div class="tabs w-100-per">
+      <div class="tabs-item w-50-per flex ai-center jc-center" [ngClass]="selectedtab == 'received' ? 'active' : ''" (click)="selectTab('received')">
+          <p>
+            <span class="mr-5">
+              <ion-icon src="assets/icon/sched-receive.svg" slot="end"></ion-icon>
+            </span>
+            <span>Received</span>
+            <span class="count-container">
+              <span class="count-badge">{{request_count.received}}</span>
+            </span>
+          </p>
+      </div>
+      <div class="tabs-item w-50-per flex ai-center jc-center" [ngClass]="selectedtab == 'sent' ? 'active' : ''" (click)="selectTab('sent')">
+          <p>
+            <span class="mr-5">
+              <ion-icon src="assets/icon/sched-send.svg" slot="end"></ion-icon>
+            </span>
+            <span>Sent</span>
+            <span class="count-container">
+              <span class="count-badge">{{request_count.sent}}</span>
+            </span>
+          </p>
+      </div>
+    </div>
+  </div>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="(haveRequest && haveRequest != 'pending')&& days" class="content-container">
+    <div class="tab-event-days pl-15 pr-15 pt-6 pb-6">
+      <ul class="flex ai-center">
+        <li>
+          <div class="tab-event-day fw-500">
+            {{monthName}}
+          </div>
+        </li>
+
+        <ng-container *ngIf="days">
+          <ng-container *ngFor="let d of days">
+            <li *ngIf="d.can_dispay" (click)="selectDay(d.milisec)">
+              <div class="tab-event-day" [ngClass]="{'active' : selected_ms_date == d.milisec}">
+                <div class="day-name">{{d.day_name}}</div>
+                <div class="date-no"><span>{{d.date}}</span></div>
+              </div>
+            </li>
+          </ng-container>
+        </ng-container>
+      </ul>
+    </div>
+
+    <ng-container *ngIf="days">
+      <ng-container *ngFor="let d of days">
+        <ng-container *ngIf="selected_ms_date == d.milisec && d.can_dispay">
+
+          <ng-container *ngIf="d.timeslots.length > 0">
+            <ng-container *ngFor="let ts of d.timeslots">
+              <div class="mr-timeslot" *ngIf="ts.meeting_schedule_count > 0" [ngClass]="{'active' : ts.meeting_schedule_count > 0}" (click)="showRequestListModal(d, ts)">
+                <p class="m-0 fs-16" [ngClass]="{'fw-500' : ts.meeting_schedule_count > 0}">
+                  {{ts.start_time}} - {{ts.end_time_orig}}
+                </p>
+
+                <ng-container *ngIf="ts.meeting_schedule_count > 0">
+                  <div class="clearfix">
+                    <div class="mt-10 f-left meeting-request-count {{selectedtab}}">
+                      <div class="m-0 flex ai-center">
+                        <span class="flex ai-center" *ngIf="selectedtab == 'received'"><ion-icon src="assets/icon/sched-receive.svg" slot="end"></ion-icon></span>
+                        <span class="flex ai-center" *ngIf="selectedtab == 'sent'"> <ion-icon src="assets/icon/sched-send.svg" slot="end"></ion-icon></span>
+                        
+                        <!-- Sent -->
+                        <ng-container *ngIf="selectedtab == 'sent'">
+                          <ng-container *ngIf="ts.meeting_schedule_count > 1">
+                            <span class="ml-5">{{ts.meeting_schedule_count}} meeting requests sent</span>
+                          </ng-container>
+                          <ng-container *ngIf="ts.meeting_schedule_count == 1">
+                            <span class="ml-5">{{ts.meeting_schedule_count}} meeting request sent</span>
+                          </ng-container>
+                        </ng-container>
+                        
+                        <!-- Received -->
+                        <ng-container *ngIf="selectedtab == 'received'">
+                          <ng-container *ngIf="ts.meeting_schedule_count > 1">
+                            <span class="ml-5">{{ts.meeting_schedule_count}} meeting requests received</span>
+                          </ng-container>
+                          <ng-container *ngIf="ts.meeting_schedule_count == 1">
+                            <span class="ml-5">{{ts.meeting_schedule_count}} meeting request received</span>
+                          </ng-container>
+                        </ng-container>
+                      </div>
+                    </div>
+                  </div>
+                  <button class="view-btn text-default centerV">
+                    <ion-icon slot="icon-only" name="ios-arrow-forward"></ion-icon>
+                  </button>
+                </ng-container>
+
+              </div>
+            </ng-container>
+          </ng-container>
+
+          <ng-container *ngIf="d.timeslots.length == 0">
+            <div class="d-table mt-25">
+              <div class="card b-rad-0 va-center" text-center>
+                  <img class="w-30-per" src="/assets/empty_states/no_meetings.png" />
+                  <h6 class="mt-10">No Timeslot Yet</h6>
+              </div>
+            </div>
+          </ng-container>
+
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <ng-container *ngIf="haveRequest == 'pending'">
+    <div *ngFor="let sksleton of skeleton_loader" class="p-20 b-bot skeleton-container">
+      <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+      <ion-skeleton-text animated class="mt-15" style="width: 75%"></ion-skeleton-text>
+
+      <button class="view-btn text-default centerV">
+        <ion-icon slot="icon-only" name="ios-arrow-forward"></ion-icon>
+      </button>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!haveRequest">
+    <div class="d-table w-100-per">
+      <div class="card b-rad-0 va-center" text-center>
+        <img class="w-50-per" src="/assets/empty_states/no_meeting_request.svg" />
+        <h6 class="mt-10"> No meeting requests </h6>
+        <p class="">No available meeting request yet.</p>
+      </div>
+    </div>
+  </ng-container>
+
+</ion-content>

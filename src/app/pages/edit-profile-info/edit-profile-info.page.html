@@ -1,0 +1,265 @@
+<ion-content>
+    <div class="container">
+      <div class="update-profile-banner">
+        <!-- <ion-icon *ngIf="!firstlogin" routerLink="/settings" class="routerLinkClass p-absolute back fs-30" name="ios-arrow-back"></ion-icon>
+        <ion-icon *ngIf="firstlogin" routerLink="/changepassword" class="routerLinkClass p-absolute back fs-30" name="ios-arrow-back"></ion-icon> -->
+        <div class="login-form p-10 pb-30 pt-25">
+          <ion-grid>
+            <ion-row>
+              <ion-col size="3">
+                <circle-progress
+                  [percent]= "33"
+                  [maxPercent] = "100"
+                  [backgroundOpacity]="1"
+                  [outerStrokeWidth]="10"
+                  [outerStrokeColor]="'#799e11'"
+                  [innerStrokeColor]="'#999999'"
+                  [titleFontSize]= "30"
+                  >
+                </circle-progress>
+              </ion-col>
+              <ion-col size="9">
+                <h6>Update your profile</h6>
+                <p class="fw-400">We already added all the information, you initially gave, you just need to double check.</p>
+                <p class="text-secondary fw-400"> Next: Upload Business Card </p>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </div>
+      </div>
+      <div *ngIf="delegate" class="card p-0 b-rad-0">
+  
+        <div class="avatar-container">
+          <div *ngIf="delegate.profile_photo.length > 1" class="pic-thumb flex jc-center ai-center" [ngStyle]="{'background-image': 'url(' + delegate.profile_photo_url + ')'}">
+            <fa-icon (click)="cropUpload()" class="cam-holder" [icon]="['fas', 'camera']" slot="start"></fa-icon>
+          </div>
+          <div *ngIf="delegate.profile_photo.length == 1" class="pic-thumb flex jc-center ai-center">
+            <fa-icon class="fs-30 text-gray" [icon]="['fas', 'user']" slot="start"></fa-icon>
+            <fa-icon (click)="cropUpload()" class="cam-holder" [icon]="['fas', 'camera']" slot="start"></fa-icon>
+          </div>
+        </div>
+  
+        <div class="pt-10 pb-20" text-center>
+          <h6 class="m-0" text-capitalize> {{delegate.fullname}} </h6>
+          <p class="text-secondary fw-400 m-5" text-capitalize> {{delegate.job_title}} </p>
+          <p class="fw-400 m-5" text-capitalize> {{delegate.company.name}} </p>
+        </div>
+      </div>
+      
+      <form class="container" [formGroup]="registrationForm">
+        <div class="card p-0 b-rad-0 mb-20">
+          <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+            <fa-icon class="mr-5" [icon]="['fas', 'user']" slot="start"></fa-icon>
+            <h6 class="h-title m-0"> Basic Information </h6>
+          </div>
+          <div class="p-20">
+            <!-- <div class="form-group block mb-20 {{isValidClass.fullname}}"> -->
+            <div class="form-group block mb-20">  
+              <label class="text-secondary mb-10" for="edit-fullname"> Full Name </label>
+              <div id="edit-fullname" class="input-wrapper t-disable">
+                <input 
+                  class="form-control" 
+                  type="name" 
+                  value="" 
+                  maxlength="150"
+                  (keyup)="formValidator($event, 'fullname')"
+                  formControlName="fullname" 
+                  disabled="disabled" 
+                >
+               <!---->
+              </div>
+              <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter your full name. </p>
+            </div>
+
+            <!-- <div class="form-group block mb-20 {{isValidClass.email}}"> -->
+            <div class="form-group block mb-20">
+              <label class="text-secondary mb-10" for="edit-email"> Email </label>
+              <div id="edit-email" class="input-wrapper t-disable">
+                <input 
+                  class="form-control" 
+                  type="email" 
+                  value="" 
+                  maxlength="150"
+                  (keyup)="formValidator($event, 'email')"
+                  formControlName="email" 
+                  disabled="disabled" 
+                >
+               <!--  -->
+              </div>
+              <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter valid email. </p>
+            </div>
+
+            <!-- <div class="form-group block mb-20 {{isValidClass.job_title}}"> -->
+            <div class="form-group block mb-20">
+              <label class="text-secondary mb-10" for="edit-jobtitle"> Job Title </label>
+              <div id="edit-jobtitle" class="input-wrapper">
+                <input 
+                  class="form-control" 
+                  type="text" 
+                  value="" 
+                  maxlength="150"
+                  (keyup)="formValidator($event, 'job_title')"
+                  formControlName="job_title" 
+                >
+                <!-- -->
+              </div>
+              <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter your job title. </p>
+            </div>
+
+            <!-- <div class="form-group block mb-20 {{isValidClass.pref_lang}}"> -->
+            <!-- <div class="form-group block mb-20">
+              <label class="text-secondary mb-10" for="edit-preflang"> Preferred Languages </label>
+
+              <ion-badge *ngFor="let lang of selectedLanguage; let i=index" class="lang mr-5">
+                <span class="flex ai-center jc-center">
+                  <span class="fw-400"> {{lang}} </span>
+                  <ion-icon (click)="removeLanguage(i)" class="fs-20 ml-5" slot="end" name="close-circle"></ion-icon>
+                </span>
+              </ion-badge>
+              <div id="edit-preflang" class="input-wrapper dropdown-content">
+                  <input type="text"
+                    class="form-control" 
+                    (focusin)="focusInField($event)"
+                    (focusout)="focusOutField()"
+                    [(ngModel)]="search"
+                    [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="this.autoCompleteLanguage.next($event)"
+                    (keyup.enter)="setLangValue()"
+                    placeholder="Enter preferred language/s "
+                  />
+
+                  <div *ngIf="showLanguages && lang_total_page != 0" class="dropdown-container">
+                    <div class="content" 
+                      *ngFor='let lang of languages' 
+                      (click)="setLangValue(lang.language)"
+                    > {{lang.language}}</div>
+                  </div>
+              </div>
+              <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter your preferred languages. </p>
+            </div> -->
+          </div>
+        </div>
+        
+        <div class="card p-0 b-rad-0 mb-20">
+          <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+            <fa-icon class="mr-5" [icon]="['fas', 'phone']" slot="start"></fa-icon>
+            <h6 class="h-title m-0"> Contact Information </h6>
+          </div>
+          <div>
+            <ion-list lines="none" class="pb-15">
+              <div class="p-20">
+                <!-- <div class="form-group block mb-20 {{isValidClass.mobile}}"> -->
+                <div class="form-group block mb-20">
+                  <label class="text-secondary mb-10" for="edit-mobile"> Mobile </label>
+                  <div id="edit-mobile" class="input-wrapper">
+                    <input 
+                      class="form-control" 
+                      type="number" 
+                      value="" 
+                      maxlength="150"
+                      (keyup)="formValidator($event, 'mobile')"
+                      formControlName="mobile" 
+                      onkeydown="return event.keyCode !== 69 && event.keyCode !== 190"
+                    >
+                   <!--  -->
+                  </div>
+                  <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter your mobile. </p>
+                </div>
+                <div class="textfield">
+                  <label class="text-secondary mb-10" for="edit-mobile"> Social Links </label>
+                  <ion-grid class="m-0 w-100-per">
+                    <ion-row class="w-100-per mt-10">
+                      <ion-col text-center size="4">
+                        <div class="flex jc-center" >
+                          <div class="social-media-icon ln" 
+                            (click)="presentSocialModal('Linkedin', 'ln', 'linkedin-in')">
+                            <a>
+                              <fa-icon [icon]="['fab', 'linkedin-in']"></fa-icon>
+                            </a>
+                          </div>
+                        </div>
+                        <p class="m-0 pt-5 text-lbl"> LinkedIn </p>
+                      </ion-col>
+                      <ion-col text-center size="4">
+                        <div class="flex jc-center" >
+                          <div class="social-media-icon fb" 
+                            (click)="presentSocialModal('Facebook', 'fb', 'facebook-f')">
+                            <a>
+                              <fa-icon [icon]="['fab', 'facebook-f']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                        </div>
+                        <p class="m-0 pt-5 text-lbl"> Facebook </p>
+                      </ion-col>
+                      <ion-col text-center size="4">
+                        <div class="flex jc-center" >
+                          <div class="social-media-icon tw"
+                            (click)="presentSocialModal('Twitter', 'tw', 'twitter')">
+                            <a>
+                              <fa-icon [icon]="['fab', 'twitter']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                        </div>
+                        <p class="m-0 pt-5 text-lbl"> Twitter </p>
+                      </ion-col>
+                    </ion-row>
+                    <ion-row class="w-100-per mt-10">
+                      <ion-col text-center size="4">
+                        <div class="flex jc-center" >
+                          <div class="social-media-icon wa"
+                            (click)="presentSocialModal('WhatsApp', 'wa')">
+                            <a>
+                              <fa-icon [icon]="['fab', 'whatsapp']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                        </div>
+                        <p class="m-0 pt-5 text-lbl"> WhatsApp </p>
+                      </ion-col>
+                      <ion-col text-center size="4">
+                        <div class="flex jc-center" >
+                          <div class="social-media-icon wc"
+                            (click)="presentSocialModal('WeChat', 'wc', 'weixin')">
+                            <a>
+                              <fa-icon [icon]="['fab', 'weixin']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                        </div>
+                        <p class="m-0 pt-5 text-lbl"> WeChat </p>
+                      </ion-col>
+                      <ion-col text-center size="4">
+                        <div class="flex jc-center" >
+                          <div class="social-media-icon kt"
+                            (click)="presentSocialModal('Kakao', 'kt')">
+                            <a> 
+                              <fa-icon [icon]="['fas', 'comment']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                        </div>
+                        <p class="m-0 pt-5 text-lbl"> Kakao </p>
+                      </ion-col>
+                    </ion-row>
+                  </ion-grid>
+                </div>
+              </div>	
+            </ion-list>
+          </div>
+        </div>
+
+        <div class="card p-0 b-rad-0 mb-80">
+          <ion-list lines="none">	
+            <ion-item>
+              <ion-label>Let other delegates view my profile </ion-label>
+              <ion-toggle mode="md" [(ngModel)]="user_privacy" 
+              [ngModelOptions]="{standalone: true}"></ion-toggle>
+            </ion-item>
+          </ion-list>
+        </div>
+      </form>
+      
+    </div>
+    <button (click)="nextStep()" class="modal-btn-bottom fixed fs-15 text-white"> 
+      Next 
+      <fa-icon class="ml-5" [icon]="['fas', 'chevron-right']" slot="start"></fa-icon>
+    </button>
+    
+  </ion-content>

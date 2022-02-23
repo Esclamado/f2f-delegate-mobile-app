@@ -1,0 +1,112 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">
+        <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="p-0 sm-header" text-center>
+        <p *ngIf="timeslot_id" class="fs-14 mt-0 mb-0 tC fw-400">Schedule a meeting</p>
+        <h4 class="fs-18 fw-500 mt-0 mb-0 tC text-default">Select a delegate</h4>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="ios-arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <div class="form-group block pr-15 pl-15 mt-25 mb-15">
+    <div class="input-wrapper">
+      <p class="m-0 search-icon fs-18 text-default"><fa-icon [icon]="['fas', 'search']" slot="end"></fa-icon></p>
+      <input 
+        class="form-control pr-35" 
+        type="txt" 
+        value="" 
+        maxlength="255"
+        placeholder="{{searchPlaceholder}}"
+        [(ngModel)]="search_string"
+        (ngModelChange)="this.onStopTyping.next($event)"
+      >
+    </div>
+  </div>
+</ion-header>
+
+<ion-content>
+  <!-- skeleton loader -->
+  <ng-container *ngIf="!data">
+    <div class="card">
+      <div class="delegate-profile clearfix mt-20">
+        <div class="profile-photo">
+            <ion-skeleton-text animated style="width: 100%; height: 100%; border-radius: 27px;"></ion-skeleton-text>
+        </div>
+        <div class="profile-basic-info pl-10">
+          <h4 class="fs-16 fw-500 mt-0 mb-10 ellipsis w-100-per capitalize">
+            <ion-skeleton-text animated style="width: 85%;"></ion-skeleton-text>
+          </h4>
+          <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">
+            <ion-skeleton-text animated style="width: 35%;"></ion-skeleton-text>
+          </p>
+          <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">
+              <ion-skeleton-text animated style="width: 35%;"></ion-skeleton-text>
+          </p>
+          <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">
+              <ion-skeleton-text animated style="width: 35%;"></ion-skeleton-text>
+          </p>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <!-- end skeleton loader -->
+
+  <ng-container *ngIf="data">
+
+    <!-- empty state -->
+    <ng-container *ngIf="data.datas">
+      <ng-container *ngIf="data.datas.length == 0">
+        <div class="d-table mt-25">
+          <div class="card b-rad-0 va-center" text-center>
+              <img class="w-30-per" src="/assets/empty_states/no_delegates.png" />
+              <h6 class="mt-10">No available delegate</h6>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+    <!-- end empty state -->
+
+    <ng-container *ngIf="data.datas">
+      <ng-container *ngIf="data.datas.length > 0">
+        <ng-container *ngFor="let d of data.datas">
+
+
+          <div class="card" [ngClass]="{'active' : selected.id == d.id}">
+            <div class="delegate-profile clearfix" (click)="selectDelegate(d)">
+              <div class="profile-photo">
+                  <img src="{{d.profile_photo}}" />
+              </div>
+              <div class="profile-basic-info pl-10">
+                <h4 class="fs-16 fw-500 mt-0 mb-10 ellipsis w-100-per">{{d.company_name}}</h4>
+                <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">{{d.fullname}}</p>
+                <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize text-secondary">{{d.job_title}}</p>
+                <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">
+                    <span class="country-flag" [ngStyle]="{'background-image': 'url(/assets/images/flags/'+d.company_country_flag+'.png)'}"></span>
+                    <span>{{d.company_country}}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+
+        </ng-container>
+        <ion-infinite-scroll class="mt-20" threshold="100px" (ionInfinite)="infiScroll($event)">
+          <ion-infinite-scroll-content
+            loadingSpinner="bubbles"
+            loadingText="Loading more delegate...">
+          </ion-infinite-scroll-content>
+        </ion-infinite-scroll>
+      </ng-container>
+    </ng-container>
+
+
+  </ng-container>
+</ion-content>

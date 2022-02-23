@@ -1,0 +1,1600 @@
+<ion-content>
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+
+    <div class="container profile-banner">
+      <ion-buttons class="p-absolute" slot="start">
+        <ion-button (click)="myBackButton()">
+          <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back" class="text-white"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+
+      <ion-buttons *ngIf="!delegate_id" routerLink="/edit-user-profile" class="p-absolute a-left-align" slot="end">
+        <ion-button class="w-90 fw-400 text-capitalize" color="light" fill="outline">
+          <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+          Edit
+        </ion-button>
+      </ion-buttons>
+
+
+    </div>
+
+    <div class="card p-0 b-rad-0">
+      <ion-item *ngIf="delegate" class="mt--50" lines="none">
+        <ion-avatar class="avatar-overlay h-90 w-90" slot="start">
+          <img *ngIf="delegate.profile_photo.length == 1" src="/assets/empty_states/profile_avatar_{{delegate.profile_photo}}.png">
+          <img *ngIf="delegate.profile_photo.length > 1" src="{{delegate.profile_photo_url}}">
+        </ion-avatar>
+        <ion-label class="mt-60">
+          <h6 class="fw-500 fs-16" text-capitalize> {{delegate.fullname}} </h6>
+          <p text-capitalize> {{delegate.job_title}} </p>
+          
+          <div *ngIf="delegate && delegate.count_no_show > 0" class="mt-10 mb-10">
+            <p class="m-0 text-danger fs-14">
+              <span class="mr-10"><fa-icon [icon]="['fas', 'flag']" slot="end"></fa-icon></span>
+              <span>{{delegate.count_no_show}} no show meeting</span><span *ngIf="delegate.count_no_show > 1">s</span>
+            </p>
+          </div>
+
+        </ion-label>
+      </ion-item>
+
+      <ion-grid class="pt-0 pb-0 p-15" *ngIf="delegate_id && delegate" >
+        <ion-row *ngIf="event_details && !event_details.archive_in" class="p-0">
+
+          <!-- 
+            ------
+            If the delegate have a meeting scheduled
+            not able to set a meeting schedule again
+            -------
+          -->
+
+          <ng-container *ngIf="delegate.meeting_schedule">
+            <ion-col size="8" class="pl-0">
+              <ion-button *ngIf="delegate.meeting_schedule" (click)="gotoMeetingDetails(delegate.meeting_schedule)" class="button light-green w-100-per">
+                <fa-icon class="mr-10" [icon]="['fas', 'check-circle']" slot="start"></fa-icon>
+                Meeting Scheduled
+              </ion-button>
+            </ion-col>
+            <ion-col size="2" class="pl-0 pr-0">
+              <ion-button class="button blue w-100-per" (click)="showChatbox(delegate_id)">
+                <ion-icon class="fs-20" src="assets/icon/del-white-chat.svg" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col size="2" class="pr-0">
+              <ion-button (click)="addNote(delegate)" class="button dark-gray w-100-per">
+                <ion-icon class="fs-20" src="assets/icon/del-white-notes.svg" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ng-container>
+
+          <!-- 
+            ------
+            If the delegate have a doesn't have scheduled
+            can able to set a meeting schedule
+            -------
+          -->
+
+          <ng-container *ngIf="event_details.set_meeting && event_details.canSetSchedule && !delegate.meeting_schedule">
+            <ion-col size="8" class="pl-0">
+              <ion-button *ngIf="!delegate.meeting_schedule" (click)="scheduleAMeeting()" class="button success w-100-per fs-14" color="schedule">
+                <span class="mr-10"><fa-icon [icon]="['fas', 'handshake']" slot="end"></fa-icon></span>
+                Schedule a meeting   
+              </ion-button>
+            </ion-col>
+            <ion-col size="2" class="pl-0 pr-0">
+              <ion-button class="button blue w-100-per" (click)="showChatbox(delegate_id)">
+                <ion-icon class="fs-20" src="assets/icon/del-white-chat.svg" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col size="2" class="pr-0">
+              <ion-button (click)="addNote(delegate)" class="button dark-gray w-100-per">
+                <ion-icon class="fs-20" src="assets/icon/del-white-notes.svg" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ng-container>
+
+          <!-- 
+            ------
+            If the event doesn't allow to set schedule
+            by delegate to delegate
+            -------
+          -->
+
+          <ng-container *ngIf="(!event_details.set_meeting || !event_details.canSetSchedule) && !delegate.meeting_schedule">
+            <ion-col size="6" class="pl-0">
+              <ion-button class="button w-100-per blue ls-0" (click)="showChatbox(delegate_id)" no-padding>
+                <ion-icon class="fs-20 pr-10" src="assets/icon/del-white-chat.svg" slot="icon-only"></ion-icon>
+                Message
+              </ion-button>
+            </ion-col>
+            <ion-col size="6" class="pl-2">
+              <ion-button *ngIf="!delegate.event_notes" (click)="addNote(delegate)" no-padding class="button w-100-per dark-gray ls-0">
+                <ion-icon class="fs-20 pr-10" src="assets/icon/del-white-notes.svg" slot="icon-only"></ion-icon>
+                <span> Add notes </span>
+              </ion-button>
+              <ion-button *ngIf="delegate.event_notes" (click)="viewNote(delegate)" no-padding class="button w-100-per dark-gray ls-0">
+                <ion-icon class="fs-20 pr-10" src="assets/icon/del-white-notes.svg" slot="icon-only"></ion-icon>
+                <span> View Notes </span>
+              </ion-button>
+            </ion-col>
+          </ng-container>
+        </ion-row>
+
+        <!-- 
+          ------
+          If the event is past
+          not allowed to set schedule
+          -------
+        -->
+
+        <ion-row *ngIf="event_details && event_details.archive_in" class="p-0">
+          <ion-col size="6" class="pl-0">
+            <ion-button class="button w-100-per blue ls-0" (click)="showChatbox(delegate_id)" no-padding>
+              <ion-icon class="fs-20 pr-10" src="assets/icon/del-white-chat.svg" slot="icon-only"></ion-icon>
+              Message
+            </ion-button>
+          </ion-col>
+          <ion-col size="6" class="pl-2">
+            <ion-button *ngIf="!delegate.event_notes" (click)="addNote(delegate)" no-padding class="button w-100-per dark-gray ls-0">
+              <ion-icon class="fs-20 pr-10" src="assets/icon/del-white-notes.svg" slot="icon-only"></ion-icon>
+              <span> Add notes </span>
+            </ion-button>
+            <ion-button *ngIf="delegate.event_notes" (click)="viewNote(delegate)" no-padding class="button w-100-per dark-gray ls-0">
+              <ion-icon class="fs-20 pr-10" src="assets/icon/del-white-notes.svg" slot="icon-only"></ion-icon>
+              <span> View Notes </span>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+
+    <div *ngIf="!delegate_id" class="event-listing-tabs ml--20 mr--20 pt-5 card p-0 b-rad-0">
+      <div class="tabs w-100-per">
+          <div class="tabs-item w-50-per flex ai-center jc-center" [ngClass]="selectedtab == 'profile' ? 'active' : ''" (click)="selectTab('profile')">
+              <p>Profile</p>
+          </div>
+          <div class="tabs-item w-50-per flex ai-center jc-center" [ngClass]="selectedtab == 'company' ? 'active' : ''" (click)="selectTab('company')">
+              <p>Company</p>
+          </div>
+      </div>
+    </div>
+
+      <div *ngIf="delegate_id" class="event-listing-tabs ml--20 mr--20 pt-5 card p-0 b-rad-0">
+        <div class="tabs w-100-per" style="border-top: 1px solid #ebebeb;">
+            <div class="tabs-item w-33-per flex ai-center jc-center" [ngClass]="selectedtab == 'profile' ? 'active' : ''" (click)="selectTab('profile')">
+                <p>Profile</p>
+            </div>
+            <div class="tabs-item w-34-per flex ai-center jc-center" [ngClass]="selectedtab == 'schedules' ? 'active' : ''" (click)="selectTab('schedules')">
+                <p>Schedules</p>
+            </div>
+            <div class="tabs-item w-33-per flex ai-center jc-center" [ngClass]="selectedtab == 'company' ? 'active' : ''" (click)="selectTab('company')">
+                <p>Company</p>
+            </div>
+        </div>
+      </div>
+
+      <ng-container [ngSwitch]="selectedtab">
+          <div *ngSwitchCase="'profile'" [ngClass]="{ 'height-cal': (delegate && delegate_id && delegate.user_privacy != 'yes')}">
+
+            <div *ngIf="delegate && !delegate_id" class="bg-content pt-25 pb-40">
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <fa-icon class="mr-10" [icon]="['fas', 'user']" slot="start"></fa-icon>
+                  <h6 class="h-title m-0"> Basic Information Personal</h6>
+                  <div *ngIf="!delegate_id" (click)="gotoEditProfile('basic-info')" class="routerLinkClass edit text-primary">
+                    <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+                    <label> Edit </label>
+                  </div>
+                </div>
+                <div class="p-20">
+                  <div class="form-group block mb-15">
+                    <!-- <h6 class="h-title"> Services: </h6> -->
+                    <label class="text-secondary mb-5"> Services: </label>
+                    <ng-container class="mt-5" *ngIf="delegate.pref_services_ids_detail">
+                      <ion-badge class="mr-5 fw-400" *ngFor="let ser of delegate.pref_services_ids_detail">{{ser.name}}</ion-badge>
+                    </ng-container>
+                    <p *ngIf="!delegate.pref_services_ids_detail || (delegate.pref_services_ids_detail && delegate.pref_services_ids_detail.length == 0)" class="m-0"> 
+                      No services
+                    </p>
+                  </div>
+                  <div class="form-group block mb-15">
+                    <!-- <h6 class="h-title"> Specializations: </h6> -->
+                    <label class="text-secondary mb-5"> Specializations: </label>
+                    <ng-container class="mt-5" *ngIf="delegate.pref_specialization_ids_detail" >
+                      <ion-badge class="mr-5 fw-400" *ngFor="let special of delegate.pref_specialization_ids_detail">{{special.name}}</ion-badge>
+                    </ng-container>
+                    <p *ngIf="!delegate.pref_specialization_ids_detail || ( delegate.pref_specialization_ids_detail && delegate.pref_specialization_ids_detail.length == 0)" class="m-0"> 
+                      No specializations
+                    </p>
+                  </div>
+                  <div class="form-group block">
+                    <!-- <h6 class="h-title"> Operational Software: </h6> -->
+                    <label class="text-secondary mb-5"> Operational Software: </label>
+                    <ng-container class="mt-5" *ngIf="delegate.pref_software_ids_detail">
+                      <ion-badge class="mr-5 fw-400" *ngFor="let software of delegate.pref_software_ids_detail">{{software.name}}</ion-badge>
+                    </ng-container>
+                    <p *ngIf="!delegate.pref_software_ids_detail || (delegate.pref_software_ids_detail && delegate.pref_software_ids_detail.length == 0)" class="m-0"> 
+                      No operational software
+                    </p>
+                  </div>
+                </div>
+                <!-- 
+                <div class="form-group block">
+                  <label class="text-secondary mb-10"> Preferred Language/s: </label>
+                  <ng-container *ngIf="delegate.pref_lang">
+                    <ion-badge *ngFor="let lang of delegate.pref_lang_details; let i=index" class="lang mr-5">
+                      <span class="flex ai-center jc-center">
+                        <span class="fw-400"> {{lang}} </span>
+                      </span>
+                    </ion-badge>
+                  </ng-container>
+                  <p *ngIf="!delegate.pref_lang" class="m-0"> 
+                    No preferred language
+                    <span *ngIf="delegate_id"> shared </span> 
+                    <span *ngIf="!delegate_id"> yet </span>
+                  </p>
+                </div> -->
+              </div>
+
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <fa-icon class="mr-10" [icon]="['fas', 'phone']" slot="start"></fa-icon>
+                  <h6 class="h-title m-0"> Contact Information </h6>
+                  <div *ngIf="!delegate_id" (click)="gotoEditProfile('contact-info')" class="routerLinkClass edit text-primary">
+                    <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+                    <label> Edit </label>
+                  </div>
+                </div>
+                <div class="p-20">
+                  <div class="form-group block mb-15">
+                    <label class="text-secondary"> Mobile: </label>
+                    <p *ngIf="delegate.mobile" class="m-0"> {{delegate.mobile}} </p>
+                    <p *ngIf="!delegate.mobile" class="m-0"> 
+                      No mobile 
+                      <span *ngIf="delegate_id"> shared </span> 
+                      <span *ngIf="!delegate_id"> yet </span>
+                    </p>
+                  </div>
+                  <div class="form-group block mb-15">
+                    <label class="text-secondary"> Email: </label>
+                    <p class="m-0"> {{delegate.email}} </p>
+                  </div>
+                  <div class="form-group block">
+                    <!-- Own Profile -->
+                    <label class="text-secondary"> Social Links </label> 
+                    <div *ngIf="delegate.social_media_links_detail">
+                      <div *ngIf="delegate.social_media_links_detail.linkedin" (click)="presentSocialModal(delegate, 'Linkedin', 'ln', 'linkedin-in')" class="mt-10 mb-10 flex ai-center">
+                        <div class="social-media-icon ln mr-5">
+                          <a>
+                            <fa-icon [icon]="['fab', 'linkedin-in']"></fa-icon>
+                          </a>
+                        </div>
+                        <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.social_media_links_detail.linkedin}} </p>
+                      </div>
+
+                      <div *ngIf="delegate.social_media_links_detail.facebook" (click)="presentSocialModal(delegate, 'Facebook', 'fb', 'facebook-f')" class="mt-10 mb-10 flex ai-center">
+                        <div class="social-media-icon fb mr-5">
+                          <a>
+                            <fa-icon [icon]="['fab', 'facebook-f']" slot="start"></fa-icon>
+                          </a>
+                        </div>
+                        <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.social_media_links_detail.facebook}} </p>
+                      </div>
+                      
+                      <div *ngIf="delegate.social_media_links_detail.twitter" (click)="presentSocialModal(delegate, 'Twitter', 'tw', 'twitter')" class="mt-10 mb-10 flex ai-center">
+                        <div class="social-media-icon tw mr-5">
+                          <a>
+                            <fa-icon [icon]="['fab', 'twitter']" slot="start"></fa-icon>
+                          </a>
+                        </div>
+                        <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.social_media_links_detail.twitter}} </p>
+                      </div>
+
+                      <div *ngIf="delegate.social_media_links_detail.whatsapp" (click)="presentSocialModal(delegate, 'Whatsapp', 'wa', 'whatsapp')" class="mt-10 mb-10 flex ai-center">
+                        <div class="social-media-icon wa mr-5">
+                          <a>
+                            <fa-icon [icon]="['fab', 'whatsapp']" slot="start"></fa-icon>
+                          </a>
+                        </div>
+                        <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.social_media_links_detail.whatsapp}} </p>
+                      </div>
+
+                      <div *ngIf="delegate.social_media_links_detail.wechat" (click)="presentSocialModal(delegate, 'Wechat', 'wc', 'weixin')" class="mt-10 mb-10 flex ai-center">
+                        <div class="social-media-icon wc mr-5">
+                          <a>
+                            <fa-icon [icon]="['fab', 'weixin']" slot="start"></fa-icon>
+                          </a>
+                        </div>
+                        <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.social_media_links_detail.wechat}} </p>
+                      </div>
+
+                      <div *ngIf="delegate.social_media_links_detail.kakao" (click)="presentSocialModal(delegate, 'Kakao', 'kt', 'comment')" class="mt-10 mb-10 flex ai-center">
+                        <div class="social-media-icon kt mr-5">
+                          <a> 
+                            <fa-icon [icon]="['fas', 'comment']" slot="start"></fa-icon>
+                          </a>
+                        </div>
+                        <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.social_media_links_detail.kakao}} </p>
+                      </div>
+
+                      <div *ngIf="delegate.social_media_links_detail.skype" (click)="presentSocialModal(delegate, 'Skype', 'sk', 'skype')" class="mt-10 mb-10 flex ai-center">
+                        <div class="social-media-icon sk mr-5">
+                          <a> 
+                            <fa-icon [icon]="['fab', 'skype']" slot="start"></fa-icon>
+                          </a>
+                        </div>
+                        <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.social_media_links_detail.skype}} </p>
+                      </div>
+
+                      <div *ngIf="delegate.social_media_links_detail.zoom" (click)="presentSocialModal(delegate, 'Zoom', 'zm', 'video')" class="mt-10 mb-10 flex ai-center">
+                        <div class="social-media-icon zm mr-5">
+                          <a> 
+                            <fa-icon [icon]="['fas', 'video']" slot="start"></fa-icon>
+                          </a>
+                        </div>
+                        <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.social_media_links_detail.zoom}} </p>
+                      </div>
+                    </div>
+                    <p *ngIf="!delegate.social_media_links_detail"> 
+                        No social media 
+                      <span *ngIf="delegate_id"> shared </span> 
+                      <span *ngIf="!delegate_id"> yet </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <fa-icon class="mr-10" [icon]="['fas', 'thumbs-up']" slot="start"></fa-icon>
+                  <h6 class="h-title m-0"> <span *ngIf="!delegate_id"> Meeting </span>Preferences </h6>
+                  <div *ngIf="!delegate_id" (click)="editPreferencesProfile('preferences')" class="routerLinkClass edit text-primary">
+                    <ng-container *ngIf="!delegate.pref_countries_ids_detail">
+                      <fa-icon class="mr-5 fs-11" [icon]="['fas', 'plus']"></fa-icon>
+                      <label class="m-0"> Add </label>
+                    </ng-container>
+                    <ng-container *ngIf="delegate.pref_countries_ids_detail">
+                      <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+                      <label class="m-0"> Edit </label>
+                    </ng-container>
+                  </div>
+                </div>
+                <div class="mt-0" class="p-20">
+                  <!-- <p class="mt-0">
+                    Services, specializations, operational software, and countries I'm not interested in.
+                  </p> -->
+                  <div *ngIf="delegate.pref_countries_ids_detail" class="form-group block">
+                    <h6 class="h-title  mt-0"> Countries I'm not prepared to meet (this will not show up in your profile): </h6>
+                    <ion-badge *ngFor="let country of delegate.pref_countries_ids_detail" class="country mr-5">
+                      <span class="flex">
+                        <span class="mini-flag-icon" [ngStyle]="{'background-image': 'url(assets/images/flags/'+country.iso+'.png)'}"> </span> 
+                        <span class="fw-400"> {{country.nicename}} </span>
+                      </span>
+                    </ion-badge>
+                  </div>
+                  <p *ngIf="!delegate.pref_countries_ids_detail" class="m-0"> 
+                    You can add here the countries you're not willing to meet so we can filter it out for you.
+                  </p>
+                </div>
+              </div>
+
+              <div *ngIf="!delegate_id" class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <ion-icon class="mr-10" src="/assets/icon/b-card.svg" slot="start"></ion-icon>
+                  <h6 class="h-title m-0"> <span *ngIf="!delegate_id"> My </span> Business Card </h6>
+                  <div *ngIf="!delegate_id" (click)="gotoEditProfile('business-card')" class="routerLinkClass edit text-primary">
+                    <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+                    <label class="m-0"> Edit </label>
+                  </div>
+                </div>
+                <div class="p-20">
+                  <div *ngIf="delegate && (!delegate.businesscard || delegate.businesscard.length  == 1)" class="business-card pt-40 pb-30" text-center>
+                    <div class="flex jc-center">
+                      <img class="h-60 pb-5" src="assets/images/business-card.png">
+                    </div>
+                    You didn't upload any business card.
+                    <!-- <p (click)="cropUpload()" class="text-primary mt-5 mb-0"> <fa-icon class="mr-5" [icon]="['fas', 'camera']" slot="start"></fa-icon> Upload one now? </p> -->
+                  </div>
+
+                  <ng-container *ngIf="delegate && (delegate.businesscard && delegate.businesscard.length > 1)">
+                    <div class="business-card text-primary photo" [ngStyle]="{'background-image': 'url('+ delegate.businesscard_url + ')'}">
+                    </div>
+                    <!-- <div (click)="cropUpload()" class="text-secondary mt-10 flex ai-center jc-center"> <fa-icon class="mr-5" [icon]="['fas', 'times']" slot="start"></fa-icon> Change photo </div> -->
+                  </ng-container>
+                </div>
+              </div>
+
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <fa-icon class="mr-5" [icon]="['fas', 'map-marker-alt']" slot="start"></fa-icon> &nbsp;&nbsp;
+                  <h6 class="h-title m-0"> My City and Timezone </h6>
+                  <div  (click)="gotoEditProfile()" class="routerLinkClass edit text-primary">
+                    <ng-container >
+                      <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+                      <label class="m-0"> Edit </label>
+                    </ng-container>
+                  </div>
+                </div>
+
+                <div class="p-20" *ngIf = "delegate.timezone_status && delegate.timezone_status == 1">
+                  <div class="approval-badge p-20">
+                    <div  class="form-group block">
+                      <label class="text-secondary"> <span class="fw-500"> Please confirm your address and timezone </span> </label> <br>
+                      <label class="text-secondary"> <span class="fw-500"> City: </span>  {{delegate.address}} </label>
+                      <label class="text-secondary"> <span class="fw-500"> Timezone: </span> {{delegate.timezone}} </label> <br>
+                      <button (click)="verifyAddressAndTimezone(delegate.id)" class="btn btn-primary"> Verify</button> &nbsp;&nbsp;
+                      <button (click)="gotoEditProfile()" class="btn btn-secondary"> Edit</button>
+                    </div>
+                  </div>
+                </div>                
+
+                <div class="mt-0" class="p-20">
+                  <div  class="form-group block">
+                    <label class="text-secondary"> City: </label>
+                    <p *ngIf="delegate.timezone_status && delegate.timezone_status != 0" class="m-0"> {{delegate.timezone_status == 2 ? delegate.address : 'No Address'}} </p>
+                  </div>
+                </div>
+
+                <div class="mt-0" class="p-20 pt-0">
+                  <div  class="form-group block">
+                    <label class="text-secondary"> Timezone: </label>
+                    <p *ngIf="delegate.timezone_status && delegate.timezone_status != 0" class="m-0"> {{delegate.timezone_status == 2 ? delegate.timezone : 'No Timezone'}} </p>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="delegate_id && delegate && (delegate.businesscard && delegate.businesscard.length > 1)" class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <ion-icon class="mr-10" src="/assets/icon/b-card.svg" slot="start"></ion-icon>
+                  <h6 class="h-title m-0"> Business Card  </h6>
+                </div>
+                <div class="p-20">
+                  <ng-container>
+                    <div class="business-card photo" [ngStyle]="{'background-image': 'url('+ delegate.businesscard_url + ')'}">
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="delegate && delegate_id && delegate.user_privacy == 'yes'" class="bg-content pt-25 pb-40">
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <fa-icon class="mr-10" [icon]="['fas', 'user']" slot="start"></fa-icon>
+                  <h6 class="h-title m-0"> Basic Information</h6>
+                  <div *ngIf="!delegate_id" (click)="gotoEditProfile('basic-info')" class="routerLinkClass edit text-primary">
+                    <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+                    <label class="m-0"> Edit </label>
+                  </div>
+                </div>
+                <div class="p-20">
+                  <div *ngIf="delegate.pref_services_ids_detail" class="form-group block mb-15">
+                    <!-- <h6 class="h-title"> Services: </h6> -->
+                    <label class="text-secondary mb-10"> Services: </label>
+                    <ion-badge class="mr-5 fw-400" *ngFor="let ser of delegate.pref_services_ids_detail">{{ser.name}}</ion-badge>
+                  </div>
+                  <div *ngIf="delegate.pref_specialization_ids_detail" class="form-group block mb-15">
+                    <!-- <h6 class="h-title"> Specializations: </h6> -->
+                    <label class="text-secondary mb-10"> Specializations: </label>
+                    <ion-badge class="mr-5 fw-400" *ngFor="let special of delegate.pref_specialization_ids_detail">{{special.name}}</ion-badge>
+                  </div>
+                  <div *ngIf="delegate.pref_software_ids_detail" class="form-group block">
+                    <!-- <h6 class="h-title"> Operational Software: </h6> -->
+                    <label class="text-secondary mb-10"> Operational Software: </label>
+                    <ion-badge class="mr-5 fw-400" *ngFor="let software of delegate.pref_software_ids_detail">{{software.name}}</ion-badge>
+                  </div>
+                  <p *ngIf="!delegate.pref_services_ids_detail && !delegate.pref_specialization_ids_detail && !delegate.pref_software_ids_detail" class="m-0"> 
+                    {{delegate.fullname}} haven't added services, specializations and operational software.
+                  </p>
+                  <!-- <div class="form-group block">
+                    <label class="text-secondary mb-10"> Preferred Language/s: </label>
+                    <ng-container *ngIf="delegate.pref_lang">
+                      <ion-badge *ngFor="let lang of delegate.pref_lang_details; let i=index" class="lang mr-5">
+                        <span class="flex ai-center jc-center">
+                          <span class="fw-400"> {{lang}} </span>
+                        </span>
+                      </ion-badge>
+                    </ng-container>
+                    <p *ngIf="!delegate.pref_lang" class="m-0"> 
+                      No preferred language
+                      <span *ngIf="delegate_id"> shared </span> 
+                      <span *ngIf="!delegate_id"> yet </span>
+                    </p>
+                  </div> -->
+                </div>
+              </div>
+
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <fa-icon class="mr-10" [icon]="['fas', 'phone']" slot="start"></fa-icon>
+                  <h6 class="h-title m-0"> Contact Information </h6>
+                  <div *ngIf="!delegate_id" (click)="gotoEditProfile('contact-info')" class="routerLinkClass edit text-primary">
+                    <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+                    <label class="m-0"> Edit </label>
+                  </div>
+                </div>
+                <div class="p-20">
+                  <div class="form-group block mb-15">
+                    <label class="text-secondary"> Mobile: </label>
+                    <p *ngIf="delegate.mobile" class="m-0"> {{delegate.mobile}} </p>
+                    <p *ngIf="!delegate.mobile" class="m-0"> 
+                      No mobile 
+                      <span *ngIf="delegate_id"> shared </span> 
+                      <span *ngIf="!delegate_id"> yet </span>
+                    </p>
+                  </div>
+                  <div class="form-group block mb-15">
+                    <label class="text-secondary"> Email: </label>
+                    <p class="m-0"> {{delegate.email}} </p>
+                  </div>
+                  <div class="form-group block">
+                    <!-- Other Delegate Profile -->
+                    <label class="text-secondary"> Social Links </label>
+                    <div *ngIf="delegate.social_media_links_detail">
+                      <div *ngIf="delegate.social_media_links_detail.linkedin" (click)="presentSocialModal(delegate, 'Linkedin', 'ln', 'linkedin-in')" class="mt-10 mb-10 flex ai-center">
+                        <div class="social-media-icon ln mr-5">
+                          <a>
+                            <fa-icon [icon]="['fab', 'linkedin-in']"></fa-icon>
+                          </a>
+                        </div>
+                        <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.social_media_links_detail.linkedin}} </p>
+                      </div>
+
+                      <div *ngIf="delegate.social_media_links_detail.facebook" (click)="presentSocialModal(delegate, 'Facebook', 'fb', 'facebook-f')" class="mt-10 mb-10 flex ai-center">
+                        <div class="social-media-icon fb mr-5">
+                          <a>
+                            <fa-icon [icon]="['fab', 'facebook-f']" slot="start"></fa-icon>
+                          </a>
+                        </div>
+                        <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.social_media_links_detail.facebook}} </p>
+                      </div>
+                      
+                      <div *ngIf="delegate.social_media_links_detail.twitter" (click)="presentSocialModal(delegate, 'Twitter', 'tw', 'twitter')" class="mt-10 mb-10 flex ai-center">
+                        <div class="social-media-icon tw mr-5">
+                          <a>
+                            <fa-icon [icon]="['fab', 'twitter']" slot="start"></fa-icon>
+                          </a>
+                        </div>
+                        <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.social_media_links_detail.twitter}} </p>
+                      </div>
+
+                      <div *ngIf="delegate.social_media_links_detail.whatsapp" (click)="presentSocialModal(delegate, 'Whatsapp', 'wa', 'whatsapp')" class="mt-10 mb-10 flex ai-center">
+                        <div class="social-media-icon wa mr-5">
+                          <a>
+                            <fa-icon [icon]="['fab', 'whatsapp']" slot="start"></fa-icon>
+                          </a>
+                        </div>
+                        <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.social_media_links_detail.whatsapp}} </p>
+                      </div>
+
+                      <div *ngIf="delegate.social_media_links_detail.wechat" (click)="presentSocialModal(delegate, 'Wechat', 'wc', 'weixin')" class="mt-10 mb-10 flex ai-center">
+                        <div class="social-media-icon wc mr-5">
+                          <a>
+                            <fa-icon [icon]="['fab', 'weixin']" slot="start"></fa-icon>
+                          </a>
+                        </div>
+                        <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.social_media_links_detail.wechat}} </p>
+                      </div>
+
+                      <div *ngIf="delegate.social_media_links_detail.kakao" (click)="presentSocialModal(delegate, 'Kakao', 'kt', 'comment')" class="mt-10 mb-10 flex ai-center">
+                        <div class="social-media-icon kt mr-5">
+                          <a> 
+                            <fa-icon [icon]="['fas', 'comment']" slot="start"></fa-icon>
+                          </a>
+                        </div>
+                        <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.social_media_links_detail.kakao}} </p>
+                      </div>
+
+                      <div *ngIf="delegate.social_media_links_detail.skype" (click)="presentSocialModal(delegate, 'Skype', 'sk', 'skype')" class="mt-10 mb-10 flex ai-center">
+                        <div class="social-media-icon sk mr-5">
+                          <a> 
+                            <fa-icon [icon]="['fab', 'skype']" slot="start"></fa-icon>
+                          </a>
+                        </div>
+                        <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.social_media_links_detail.skype}} </p>
+                      </div>
+
+                      <div *ngIf="delegate.social_media_links_detail.zoom" (click)="presentSocialModal(delegate, 'Zoom', 'zm', 'video')" class="mt-10 mb-10 flex ai-center">
+                        <div class="social-media-icon zm mr-5">
+                          <a> 
+                            <fa-icon [icon]="['fas', 'video']" slot="start"></fa-icon>
+                          </a>
+                        </div>
+                        <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.social_media_links_detail.zoom}} </p>
+                      </div>
+                    </div>
+                    <p *ngIf="!delegate.social_media_links_detail"> 
+                        No social media 
+                      <span *ngIf="delegate_id"> shared </span> 
+                      <span *ngIf="!delegate_id"> yet </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="!delegate_id" class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <ion-icon class="mr-10" src="/assets/icon/b-card.svg" slot="start"></ion-icon>
+                  <h6 class="h-title m-0"> <span *ngIf="!delegate_id"> My </span> Business Card </h6>
+                </div>
+                <div class="p-20">
+                  <div *ngIf="delegate && (!delegate.businesscard || delegate.businesscard.length  == 1)" class="business-card pt-40 pb-30" text-center>
+                    <div class="flex jc-center">
+                      <img class="h-60 pb-5" src="assets/images/business-card.png">
+                    </div>
+                    You didn't upload any business card.
+                    <!-- <p (click)="cropUpload()" class="text-primary mt-5 mb-0"> <fa-icon class="mr-5" [icon]="['fas', 'camera']" slot="start"></fa-icon> Upload one now? </p> -->
+                  </div>
+
+                  <ng-container *ngIf="delegate && (delegate.businesscard && delegate.businesscard.length > 1)">
+                    <div class="business-card text-primary photo" [ngStyle]="{'background-image': 'url('+ delegate.businesscard_url + ')'}">
+                    </div>
+                    <!-- <div (click)="cropUpload()" class="text-secondary mt-10 flex ai-center jc-center"> <fa-icon class="mr-5" [icon]="['fas', 'times']" slot="start"></fa-icon> Change photo </div> -->
+                  </ng-container>
+                </div>
+              </div>
+
+              <div *ngIf="delegate_id && delegate && (delegate.businesscard && delegate.businesscard.length > 1)" class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <ion-icon class="mr-10" src="/assets/icon/b-card.svg" slot="start"></ion-icon>
+                  <h6 class="h-title m-0"> <span *ngIf="!delegate_id"> My </span> Business Card  </h6>
+                </div>
+                <div class="p-20">
+                  <ng-container>
+                    <div class="business-card photo" [ngStyle]="{'background-image': 'url('+ delegate.businesscard_url + ')'}">
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <fa-icon class="mr-5" [icon]="['fas', 'map-marker-alt']" slot="start"></fa-icon> &nbsp;&nbsp;
+                  <h6 class="h-title m-0"> City and Timezone </h6>            
+                </div>              
+
+                <div class="mt-0" class="p-20">
+                  <div  class="form-group block">
+                    <label class="text-secondary"> Address: </label>
+                    <p class="m-0"> {{delegate.timezone_status == 2 ? delegate.address : 'No Address'}} </p>
+                  </div>
+                </div>
+
+                <div class="mt-0" class="p-20 pt-0">
+                  <div  class="form-group block">
+                    <label class="text-secondary"> Timezone: </label>
+                    <p class="m-0"> {{delegate.timezone_status == 2 ? delegate.timezone : 'No Timezone'}} </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="!delegate" class="bg-content pt-25 pb-40">
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <fa-icon class="mr-5" [icon]="['fas', 'user']" slot="start"></fa-icon>
+                  <h6 class="h-title m-0"> Basic Information </h6>
+                </div>
+                <div class="p-20">
+                  <div class="form-group block mb-15">
+                    <label> Services: </label>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                  </div>
+                  <div class="form-group block mb-15">
+                    <label> Specializations: </label>
+                    <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+                  </div>
+                  <div class="form-group block mb-15">
+                    <label> Operational Software: </label>
+                    <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                  </div>
+                </div>
+                <!-- 
+                <div class="form-group block">
+                  <label class="text-secondary"> Preferred Language/s: </label>
+                  <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+                </div> -->
+              </div>
+
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <fa-icon class="mr-5" [icon]="['fas', 'phone']" slot="start"></fa-icon>
+                  <h6 class="h-title m-0"> Contact Information </h6>
+                </div>
+                <div class="p-20">
+                  <div class="form-group block mb-15">
+                    <label class="text-secondary"> Mobile: </label>
+                    <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                  </div>
+                  <div class="form-group block mb-15">
+                    <label class="text-secondary"> Email: </label>
+                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                  </div>
+                  <div class="form-group block">
+                    <!-- Skeleton Loader Delegate Profile Social Links -->
+                    <label class="text-secondary"> Social Links  </label>
+                    <div class="mt-10 mb-10 flex ai-center">
+                      <div class="social-media-icon ln mr-5">
+                        <a>
+                          <fa-icon [icon]="['fab', 'linkedin-in']"></fa-icon>
+                        </a>
+                      </div>
+                      <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+                    </div>
+
+                    <div class="mt-10 mb-10 flex ai-center">
+                      <div class="social-media-icon tw mr-5">
+                        <a>
+                          <fa-icon [icon]="['fab', 'twitter']" slot="start"></fa-icon>
+                        </a>
+                      </div>
+                      <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+                    </div>
+
+                    <div class="mt-10 mb-10 flex ai-center">
+                      <div class="social-media-icon wa mr-5">
+                        <a>
+                          <fa-icon [icon]="['fab', 'whatsapp']" slot="start"></fa-icon>
+                        </a>
+                      </div>
+                      <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+                    </div>
+
+                    <div class="mt-10 mb-10 flex ai-center">
+                      <div class="social-media-icon wc mr-5">
+                        <a>
+                          <fa-icon [icon]="['fab', 'weixin']" slot="start"></fa-icon>
+                        </a>
+                      </div>
+                      <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+                    </div>
+
+                    <div class="mt-10 mb-10 flex ai-center">
+                      <div class="social-media-icon kt mr-5">
+                        <a>
+                          <fa-icon [icon]="['fas', 'comment']" slot="start"></fa-icon>
+                        </a>
+                      </div>
+                      <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <fa-icon class="mr-5" [icon]="['fas', 'thumbs-up']" slot="start"></fa-icon>
+                  <h6 class="h-title m-0"> Preferences </h6>
+                </div>
+                <div class="p-20">
+                  <!-- <p class="mt-0 fw-200">
+                    Services, specializations, operational software, and countries I'm not interested in.
+                  </p> -->
+                  <!-- <div class="form-group block mb-15">
+                    <label> Services: </label>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                  </div>
+                  <div class="form-group block mb-15">
+                    <label> Specializations: </label>
+                    <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+                  </div>
+                  <div class="form-group block mb-15">
+                    <label> Operational Software: </label>
+                    <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                  </div> -->
+                  <div class="form-group block">
+                    <label> Countries I'm not prepared to meet (this will not show up in your profile): </label>
+                    <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="delegate && delegate_id && delegate.user_privacy != 'yes'" class="d-table">
+              <div class="card b-rad-0 va-center" text-center>
+                <img class="w-50-per" src="/assets/empty_states/private_profile.svg" />
+                <h6 class="mt-10">This account is private</h6>
+                <p class="">This user has set account to private.</p>
+              </div>
+            </div>
+          </div>
+
+          <div *ngSwitchCase="'company'" [ngClass]="{ 'height-cal': (delegate && delegate_id && delegate.user_privacy != 'yes')}">
+            <div *ngIf="delegate && !delegate_id && delegate.company_id > 0" class="pt-25 pb-40">
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <ion-icon class="mr-10" src="assets/icon/company-info.svg" slot="start"></ion-icon>
+                  <h6 class="h-title m-0"> Company Information </h6>
+                  <!-- <div *ngIf="!delegate_id" (click)="editProfile()" class="edit text-primary">
+                    <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+                    <label> Edit </label>
+                  </div> -->
+                </div>
+                <div class="p-20">
+                  <h5 class="mt-0 mb-15" *ngIf="delegate.company"> 
+                    {{delegate.company.name}}
+                  </h5>
+                  <div class="form-group block mb-15">
+                    <label class="fw-400 text-secondary"> Description </label>
+                    <p *ngIf="delegate.company && delegate.company.description" class="m-0"> {{delegate.company.description}} </p>
+                    <p *ngIf="delegate.company && !delegate.company.description" class="m-0"> 
+                      No description 
+                      <span *ngIf="delegate_id"> shared </span> 
+                      <span *ngIf="!delegate_id"> yet </span>
+                    </p>
+                  </div>
+                  <div class="form-group block mb-15">
+                    <label class="fw-400 text-secondary"> Sector </label>
+                    <p *ngIf="delegate.company && delegate.company.pref_sector_name" class="m-0"> {{delegate.company.pref_sector_name}}
+                    </p>
+                    <p *ngIf="delegate.company && !delegate.company.pref_sector_name" class="m-0"> 
+                      No sector 
+                      <span *ngIf="delegate_id"> shared </span> 
+                      <span *ngIf="!delegate_id"> yet </span>
+                    </p>
+                  </div>
+                  <div class="form-group block" *ngIf="delegate.company && delegate.company.member_since">
+                    <label class="fw-400 text-secondary"> Member Since </label>
+                    <p class="m-0"> {{delegate.company.member_since}}
+                    </p>                   
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="card p-0 b-rad-0 mb-20">
+                    <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                      <fa-icon class="mr-10" [icon]="['fas', 'project-diagram']" slot="start"></fa-icon>
+                      <h6 class="h-title m-0"> Network Infromation </h6>
+                    </div>
+                    <div class="p-20">
+                      <div class="form-group block mb-15">
+                        <label class="fw-400 text-secondary"> Network </label> 
+                        <p *ngIf="delegate.company && delegate.company.pref_network_name" class="m-0 flex ai-center"> 
+                          {{delegate.company.pref_network_name}} 
+                        </p>
+                        <p *ngIf="!delegate.company && !delegate.company.pref_network_name" class="m-0"> 
+                          No network 
+                          <span *ngIf="delegate_id"> shared </span> 
+                          <span *ngIf="!delegate_id"> yet </span> 
+                        </p>
+                      </div>
+                      <div class="form-group block">
+                        <label class="fw-400 text-secondary"> Membership Status </label>
+                        <p *ngIf="delegate.company && delegate.company.membershipstatus" class="m-0"> {{delegate.company.membershipstatus}} </p>
+                        <p *ngIf="delegate.company && !delegate.company.membershipstatus" class="m-0"> 
+                          No membership status 
+                          <span *ngIf="delegate_id"> shared </span> 
+                          <span *ngIf="!delegate_id"> yet </span>
+                       </p>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="card p-0 b-rad-0 mb-20">
+                    <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                      <fa-icon class="mr-10" [icon]="['fas', 'map-marker-alt']" slot="start"></fa-icon>
+                      <h6 class="h-title m-0"> Company Address </h6>
+                      <!-- <div *ngIf="!delegate_id" (click)="editProfile()" class="edit text-primary">
+                        <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+                        <label> Edit </label>
+                      </div> -->
+                    </div>
+                    <div class="p-20">
+                      <div class="form-group block mb-15">
+                        <label class="fw-400 text-secondary"> Country </label> 
+                        <p *ngIf="delegate.company_country && delegate.company_country.nicename" class="m-0 flex ai-center"> 
+                          <span *ngIf="delegate.company_country && delegate.company_country.iso" class="mini-flag-icon" [ngStyle]="{'background-image': 'url(assets/images/flags/'+ delegate.company_country.iso +'.png)'}"> </span>
+                          {{delegate.company_country.nicename}} 
+                        </p>
+                        <p *ngIf="!delegate.company_country && !delegate.company_country.nicename" class="m-0"> 
+                          No country 
+                          <span *ngIf="delegate_id"> shared </span> 
+                          <span *ngIf="!delegate_id"> yet </span> 
+                        </p>
+                      </div>
+                      <div class="form-group block mb-15">
+                        <label class="fw-400 text-secondary"> Zip code </label>
+                        <p *ngIf="delegate.company && delegate.company.zipcode" class="m-0"> {{delegate.company.zipcode}} </p>
+                        <p *ngIf="delegate.company && !delegate.company.zipcode" class="m-0"> 
+                          No zipcode 
+                          <span *ngIf="delegate_id"> shared </span> 
+                          <span *ngIf="!delegate_id"> yet </span>
+                       </p>
+                      </div>
+                      <div class="form-group block">
+                        <label class="fw-400 text-secondary"> Address </label>
+                        <p *ngIf="delegate.company && delegate.company.address" class="m-0"> {{delegate.company.address}} </p>
+                        <p *ngIf="delegate.company && !delegate.company.address" class="m-0"> No address
+                          <span *ngIf="delegate_id"> shared </span> 
+                          <span *ngIf="!delegate_id"> yet </span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <fa-icon class="mr-10" [icon]="['fas', 'phone']" slot="start"></fa-icon>
+                  <h6 class="h-title m-0"> Company Contact Information </h6>
+                  <!-- <div *ngIf="!delegate_id" (click)="editProfile()" class="edit text-primary">
+                    <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+                    <label> Edit </label>
+                  </div> -->
+                </div>
+                <div class="p-20" *ngIf="delegate.company">
+                  <div class="form-group block mb-15" *ngIf="delegate.company.social_media_links_detail && delegate.company.social_media_links_detail.phoneNumber">
+                    <label class="fw-400 text-secondary"> Telephone: </label>
+                    <p class="m-0"> 
+                      <!-- <span *ngIf="!delegate.company.social_media_links_detail.phoneNumber">
+                        No company telephone yet
+                      </span> -->
+                      <span>
+                        {{delegate.company.social_media_links_detail.phoneNumber}}
+                      </span>
+                    </p>
+                  </div>
+                  <div class="form-group block mb-15" *ngIf="delegate.company.social_media_links_detail && delegate.company.social_media_links_detail.website">
+                    <label class="fw-400 text-secondary"> Company Website: </label>
+                    <p class="m-0" *ngIf="delegate.company.social_media_links_detail.website"> 
+                      <span *ngIf="!delegate.company.social_media_links_detail.website">
+                        No company website yet
+                      </span>
+                      <span>
+                        {{delegate.company.social_media_links_detail.website}}
+                      </span>
+                    </p>
+                  </div>
+                  
+                  <div class="form-group block">
+                    <ng-container>
+                      <!-- Company Social Links -->
+                      <label class="text-secondary"> Social Links </label>
+                      <div *ngIf="delegate.company.social_media_links_detail" class="flex" >
+                        <div *ngIf="delegate.company.social_media_links_detail.linkedln"  (click)="presentSocialModal(delegate.company, 'Linkedln', 'ln', 'linkedin-in')" class="mt-10 mb-10 flex ai-center">
+                          <div class="social-media-icon ln mr-5">
+                            <a>
+                              <fa-icon [icon]="['fab', 'linkedin-in']"></fa-icon>
+                            </a>
+                          </div>
+                          <p *ngIf="delegate.company.social_media_links_detail.linkedln" class="m-0 fs-14 ellipsis w-90-per"> {{delegate.company.social_media_links_detail.linkedln}} </p>
+                        </div>
+  
+                        <div *ngIf="delegate.company.social_media_links_detail.facebook" (click)="presentSocialModal(delegate.company, 'Facebook', 'fb', 'facebook-f')" class="mt-10 mb-10 flex ai-center">
+                          <div class="social-media-icon fb mr-5">
+                            <a>
+                              <fa-icon [icon]="['fab', 'facebook-f']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                          <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.company.social_media_links_detail.facebook}} </p>
+                        </div>
+                        
+                        <div *ngIf="delegate.company.social_media_links_detail.twitter" (click)="presentSocialModal(delegate.company, 'Twitter', 'tw', 'twitter')" class="mt-10 mb-10 flex ai-center">
+                          <div class="social-media-icon tw mr-5">
+                            <a>
+                              <fa-icon [icon]="['fab', 'twitter']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                          <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.company.social_media_links_detail.twitter}} </p>
+                        </div>
+  
+                        <div *ngIf="delegate.company.social_media_links_detail.whatsapp" (click)="presentSocialModal(delegate.company, 'Whatsapp', 'wa', 'whatsapp')" class="mt-10 mb-10 flex ai-center">
+                          <div class="social-media-icon wa mr-5">
+                            <a>
+                              <fa-icon [icon]="['fab', 'whatsapp']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                          <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.company.social_media_links_detail.whatsapp}} </p>
+                        </div>
+  
+                        <div *ngIf="delegate.company.social_media_links_detail.wechat" (click)="presentSocialModal(delegate.company, 'Wechat', 'wc', 'weixin')" class="mt-10 mb-10 flex ai-center">
+                          <div class="social-media-icon wc mr-5">
+                            <a>
+                              <fa-icon [icon]="['fab', 'weixin']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                          <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.company.social_media_links_detail.wechat}} </p>
+                        </div>
+  
+                        <div *ngIf="delegate.company.social_media_links_detail.kakao" (click)="presentSocialModal(delegate.company, 'Kakao', 'kt', 'comment')" class="mt-10 mb-10 flex ai-center">
+                          <div class="social-media-icon kt mr-5">
+                            <a> 
+                              <fa-icon [icon]="['fas', 'comment']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                          <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.company.social_media_links_detail.kakao}} </p>
+                        </div>
+  
+                        <div *ngIf="delegate.company.social_media_links_detail.skype" (click)="presentSocialModal(delegate, 'Skype', 'sk', 'skype')" class="mt-10 mb-10 flex ai-center">
+                          <div class="social-media-icon sk mr-5">
+                            <a> 
+                              <fa-icon [icon]="['fab', 'skype']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                          <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.company.social_media_links_detail.skype}} </p>
+                        </div>
+    
+                        <div *ngIf="delegate.company.social_media_links_detail.zoom" (click)="presentSocialModal(delegate, 'Zoom', 'zm', 'video')" class="mt-10 mb-10 flex ai-center">
+                          <div class="social-media-icon zm mr-5">
+                            <a> 
+                              <fa-icon [icon]="['fas', 'video']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                          <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.company.social_media_links_detail.zoom}} </p>
+                        </div>
+                      </div>
+                      <div *ngIf="!delegate.company.social_media_links_detail || 
+                          (
+                            !delegate.company.social_media_links_detail.facebook && 
+                            !delegate.company.social_media_links_detail.kakao && 
+                            !delegate.company.social_media_links_detail.linkedln && 
+                            !delegate.company.social_media_links_detail.skype && 
+                            !delegate.company.social_media_links_detail.twitter && 
+                            !delegate.company.social_media_links_detail.wechat && 
+                            !delegate.company.social_media_links_detail.whatsapp && 
+                            !delegate.company.social_media_links_detail.zoom
+                          )">
+                          No social media 
+                        <span *ngIf="delegate_id"> shared </span> 
+                        <span *ngIf="!delegate_id"> yet </span>
+                      </div>
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="card p-0 b-rad-0 mb-20">
+                    <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                      <ion-icon class="mr-10" src="assets/icon/other-delegate.svg" slot="start"></ion-icon>
+                      <h6 class="h-title m-0"> Other delegates from this company </h6>
+                    </div>
+                    <div *ngIf="other_delegate && total_other_delegate > 0">
+                      <ion-list class="mb-10" lines="full" no-padding>
+                        <ion-item *ngFor="let del of other_delegate">
+                          <ion-avatar class="avatar-overlay h-48 w-48" slot="start">
+                            <img *ngIf="del.profile_photo.length == 1" src="/assets/empty_states/profile_avatar_{{del.profile_photo}}.png">
+                            <img *ngIf="del.profile_photo.length > 1" src="{{del.profile_photo_url}}">
+                          </ion-avatar>
+                          <ion-label class="pt-10 pb-10">
+                            <h6 text-capitalize> {{del.fullname}} </h6>
+                            <p text-capitalize> {{del.job_title}} </p>
+                          </ion-label>
+                        </ion-item>
+                      </ion-list>
+                      <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMoreData($event)">
+                        <ion-infinite-scroll-content
+                          loadingSpinner="bubbles"
+                          loadingText="Loading more data...">
+                        </ion-infinite-scroll-content>
+                      </ion-infinite-scroll>
+                    </div>
+                    <div *ngIf="other_delegate && total_other_delegate == 0">
+                      <div class="p-20" text-center>
+                        No delegate 
+                        <span *ngIf="delegate_id"> shared </span> 
+                        <span *ngIf="!delegate_id"> yet </span>
+                      </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="delegate && delegate_id && delegate.company_id > 0 && delegate.user_privacy == 'yes'" class="pt-25 pb-40">
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <ion-icon class="mr-10" src="assets/icon/company-info.svg" slot="start"></ion-icon>
+                  <h6 class="h-title m-0"> Company Information </h6>
+                  <!-- <div *ngIf="!delegate_id" (click)="editProfile()" class="edit text-primary">
+                    <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+                    <label> Edit </label>
+                  </div> -->
+                </div>
+                <div class="p-20">
+                  <h5 class="mt-0 mb-15" *ngIf="delegate.company"> 
+                    {{delegate.company.name}}
+                  </h5>
+                  <div class="form-group block mb-15">
+                    <label class="fw-400 text-secondary"> Description </label>
+                    <p *ngIf="delegate.company && delegate.company.description" class="m-0"> {{delegate.company.description}} </p>
+                    <p *ngIf="delegate.company && !delegate.company.description" class="m-0"> 
+                      No description 
+                      <span *ngIf="delegate_id"> shared </span> 
+                      <span *ngIf="!delegate_id"> yet </span>
+                    </p>
+                  </div>
+                  <div class="form-group block mb-15">
+                    <label class="fw-400 text-secondary"> Sector </label>
+                    <p *ngIf="delegate.company && delegate.company.pref_sector_name" class="m-0"> {{delegate.company.pref_sector_name}}
+                    </p>
+                    <p *ngIf="delegate.company && !delegate.company.pref_sector_name" class="m-0"> 
+                      No sector 
+                      <span *ngIf="delegate_id"> shared </span> 
+                      <span *ngIf="!delegate_id"> yet </span>
+                    </p>
+                  </div>
+
+                  <div class="form-group block" *ngIf="delegate.company && delegate.company.member_since">
+                    <label class="fw-400 text-secondary"> Member Since </label>
+                    <p class="m-0"> {{delegate.company.member_since}}
+                    </p>                   
+                  </div>
+                </div>
+              </div>
+
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="card p-0 b-rad-0 mb-20">
+                    <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                      <fa-icon class="mr-10" [icon]="['fas', 'project-diagram']" slot="start"></fa-icon>
+                      <h6 class="h-title m-0"> Network Infromation </h6>
+                    </div>
+                    <div class="p-20">
+                      <div class="form-group block mb-15">
+                        <label class="fw-400 text-secondary"> Network </label> 
+                        <p *ngIf="delegate.company && delegate.company.pref_network_name" class="m-0 flex ai-center"> 
+                          {{delegate.company.pref_network_name}} 
+                        </p>
+                        <p *ngIf="!delegate.company && !delegate.company.pref_network_name" class="m-0"> 
+                          No network 
+                          <span *ngIf="delegate_id"> shared </span> 
+                          <span *ngIf="!delegate_id"> yet </span> 
+                        </p>
+                      </div>
+                      <div class="form-group block">
+                        <label class="fw-400 text-secondary"> Membership Status </label>
+                        <p *ngIf="delegate.company && delegate.company.membershipstatus" class="m-0"> {{delegate.company.membershipstatus}} </p>
+                        <p *ngIf="delegate.company && !delegate.company.membershipstatus" class="m-0"> 
+                          No membership status 
+                          <span *ngIf="delegate_id"> shared </span> 
+                          <span *ngIf="!delegate_id"> yet </span>
+                       </p>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="card p-0 b-rad-0 mb-20">
+                    <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                      <fa-icon class="mr-10" [icon]="['fas', 'map-marker-alt']" slot="start"></fa-icon>
+                      <h6 class="h-title m-0"> Company Address </h6>
+                      <!-- <div *ngIf="!delegate_id" (click)="editProfile()" class="edit text-primary">
+                        <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+                        <label> Edit </label>
+                      </div> -->
+                    </div>
+                    <div class="p-20">
+                      <div class="form-group block mb-15">
+                        <label class="fw-400 text-secondary"> Country </label> 
+                        <p *ngIf="delegate.company_country && delegate.company_country.nicename" class="m-0 flex ai-center"> 
+                          <span *ngIf="delegate.company_country && delegate.company_country.iso" class="mini-flag-icon" [ngStyle]="{'background-image': 'url(assets/images/flags/'+ delegate.company_country.iso +'.png)'}"> </span>
+                          {{delegate.company_country.nicename}} 
+                        </p>
+                        <p *ngIf="!delegate.company_country && !delegate.company_country.nicename" class="m-0"> 
+                          No country 
+                          <span *ngIf="delegate_id"> shared </span> 
+                          <span *ngIf="!delegate_id"> yet </span> 
+                        </p>
+                      </div>
+                      <div class="form-group block mb-15">
+                        <label class="fw-400 text-secondary"> Zip code </label>
+                        <p *ngIf="delegate.company && delegate.company.zipcode" class="m-0"> {{delegate.company.zipcode}} </p>
+                        <p *ngIf="delegate.company && !delegate.company.zipcode" class="m-0"> 
+                          No zipcode 
+                          <span *ngIf="delegate_id"> shared </span> 
+                          <span *ngIf="!delegate_id"> yet </span>
+                       </p>
+                      </div>
+                      <div class="form-group block">
+                        <label class="fw-400 text-secondary"> Address </label>
+                        <p *ngIf="delegate.company && delegate.company.address" class="m-0"> {{delegate.company.address}} </p>
+                        <p *ngIf="delegate.company && !delegate.company.address" class="m-0"> No address
+                          <span *ngIf="delegate_id"> shared </span> 
+                          <span *ngIf="!delegate_id"> yet </span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                  <fa-icon class="mr-10" [icon]="['fas', 'phone']" slot="start"></fa-icon>
+                  <h6 class="h-title m-0"> Company Contact Information </h6>
+                  <!-- <div *ngIf="!delegate_id" (click)="editProfile()" class="edit text-primary">
+                    <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+                    <label> Edit </label>
+                  </div> -->
+                </div>
+                <div class="p-20" *ngIf="delegate.company">
+                  <div class="form-group block mb-15" *ngIf="delegate.company.social_media_links_detail && delegate.company.social_media_links_detail.phoneNumber">
+                    <label class="fw-400 text-secondary"> Telephone: </label>
+                    <p class="m-0"> 
+                      <!-- <span *ngIf="!delegate.company.social_media_links_detail.phoneNumber">
+                        No company telephone yet
+                      </span> -->
+                      <span>
+                        {{delegate.company.social_media_links_detail.phoneNumber}}
+                      </span>
+                    </p>
+                  </div>
+                  <div class="form-group block mb-15" *ngIf="delegate.company.social_media_links_detail && delegate.company.social_media_links_detail.website">
+                    <label class="fw-400 text-secondary"> Company Website: </label>
+                    <p class="m-0"> 
+                      <!-- <span *ngIf="delegate.company.social_media_links_detail.website.length == 0">
+                        No company website yet
+                      </span> -->
+                      <span>
+                        {{delegate.company.social_media_links_detail.website}}
+                      </span>
+                    </p>
+                  </div>
+                  <div class="form-group block">
+                    <ng-container>
+                      <!-- Company Social Links -->
+                      <label class="text-secondary"> Social Links </label>
+                      <div *ngIf="delegate.company.social_media_links_detail" class="flex" >
+                        <div *ngIf="delegate.company.social_media_links_detail.linkedln" (click)="presentSocialModal(delegate.company, 'Linkedln', 'ln', 'linkedin-in')" class="mt-10 mb-10 flex ai-center">
+                          <div class="social-media-icon ln mr-5">
+                            <a>
+                              <fa-icon [icon]="['fab', 'linkedin-in']"></fa-icon>
+                            </a>
+                          </div>
+                          <p *ngIf="delegate.company.social_media_links_detail.linkedln" class="m-0 fs-14 ellipsis w-90-per"> {{delegate.company.social_media_links_detail.linkedln}} </p>
+                        </div>
+  
+                        <div *ngIf="delegate.company.social_media_links_detail.facebook" (click)="presentSocialModal(delegate.company, 'Facebook', 'fb', 'facebook-f')" class="mt-10 mb-10 flex ai-center">
+                          <div class="social-media-icon fb mr-5">
+                            <a>
+                              <fa-icon [icon]="['fab', 'facebook-f']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                          <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.company.social_media_links_detail.facebook}} </p>
+                        </div>
+                        
+                        <div *ngIf="delegate.company.social_media_links_detail.twitter" (click)="presentSocialModal(delegate.company, 'Twitter', 'tw', 'twitter')" class="mt-10 mb-10 flex ai-center">
+                          <div class="social-media-icon tw mr-5">
+                            <a>
+                              <fa-icon [icon]="['fab', 'twitter']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                          <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.company.social_media_links_detail.twitter}} </p>
+                        </div>
+  
+                        <div *ngIf="delegate.company.social_media_links_detail.whatsapp" (click)="presentSocialModal(delegate.company, 'Whatsapp', 'wa', 'whatsapp')" class="mt-10 mb-10 flex ai-center">
+                          <div class="social-media-icon wa mr-5">
+                            <a>
+                              <fa-icon [icon]="['fab', 'whatsapp']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                          <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.company.social_media_links_detail.whatsapp}} </p>
+                        </div>
+  
+                        <div *ngIf="delegate.company.social_media_links_detail.wechat" (click)="presentSocialModal(delegate.company, 'Wechat', 'wc', 'weixin')" class="mt-10 mb-10 flex ai-center">
+                          <div class="social-media-icon wc mr-5">
+                            <a>
+                              <fa-icon [icon]="['fab', 'weixin']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                          <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.company.social_media_links_detail.wechat}} </p>
+                        </div>
+  
+                        <div *ngIf="delegate.company.social_media_links_detail.kakao" (click)="presentSocialModal(delegate.company, 'Kakao', 'kt', 'comment')" class="mt-10 mb-10 flex ai-center">
+                          <div class="social-media-icon kt mr-5">
+                            <a> 
+                              <fa-icon [icon]="['fas', 'comment']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                          <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.company.social_media_links_detail.kakao}} </p>
+                        </div>
+  
+                        <div *ngIf="delegate.company.social_media_links_detail.skype" (click)="presentSocialModal(delegate, 'Skype', 'sk', 'skype')"  class="mt-10 mb-10 flex ai-center">
+                          <div class="social-media-icon sk mr-5">
+                            <a> 
+                              <fa-icon [icon]="['fab', 'skype']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                          <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.company.social_media_links_detail.skype}} </p>
+                        </div>
+    
+                        <div *ngIf="delegate.company.social_media_links_detail.zoom" (click)="presentSocialModal(delegate, 'Zoom', 'zm', 'video')" class="mt-10 mb-10 flex ai-center">
+                          <div class="social-media-icon zm mr-5">
+                            <a> 
+                              <fa-icon [icon]="['fas', 'video']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                          <p class="m-0 fs-14 ellipsis w-90-per"> {{delegate.company.social_media_links_detail.zoom}} </p>
+                        </div>
+                      </div>
+                      <div *ngIf="!delegate.company.social_media_links_detail || 
+                          (
+                            !delegate.company.social_media_links_detail.facebook && 
+                            !delegate.company.social_media_links_detail.kakao && 
+                            !delegate.company.social_media_links_detail.linkedln && 
+                            !delegate.company.social_media_links_detail.skype && 
+                            !delegate.company.social_media_links_detail.twitter && 
+                            !delegate.company.social_media_links_detail.wechat && 
+                            !delegate.company.social_media_links_detail.whatsapp && 
+                            !delegate.company.social_media_links_detail.zoom
+                          )">
+                          No social media 
+                        <span *ngIf="delegate_id"> shared </span> 
+                        <span *ngIf="!delegate_id"> yet </span>
+                      </div>
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card p-0 b-rad-0 mb-20">
+                <div class="card p-0 b-rad-0 mb-20">
+                    <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                      <ion-icon class="mr-10" src="assets/icon/other-delegate.svg" slot="start"></ion-icon>
+                      <h6 class="h-title m-0"> Other delegates from this company </h6>
+                    </div>
+                    <div *ngIf="other_delegate && total_other_delegate > 0">
+                      <ion-list class="mb-10" lines="full" no-padding>
+                        <ion-item *ngFor="let del of other_delegate">
+                          <ion-avatar class="avatar-overlay h-48 w-48" slot="start">
+                            <img *ngIf="del.profile_photo.length == 1" src="/assets/empty_states/profile_avatar_{{del.profile_photo}}.png">
+                            <img *ngIf="del.profile_photo.length > 1" src="{{del.profile_photo_url}}">
+                          </ion-avatar>
+                          <ion-label class="pt-10 pb-10">
+                            <h6 text-capitalize> {{del.fullname}} </h6>
+                            <p text-capitalize> {{del.job_title}} </p>
+                          </ion-label>
+                        </ion-item>
+                      </ion-list>
+                      <ion-infinite-scroll *ngIf="tempOtherDelegate.length > 0" threshold="100px" (ionInfinite)="loadMoreData($event)">
+                        <ion-infinite-scroll-content
+                          loadingSpinner="bubbles"
+                          loadingText="Loading more data...">
+                        </ion-infinite-scroll-content>
+                      </ion-infinite-scroll>
+                    </div>
+                    <div *ngIf="other_delegate && total_other_delegate == 0">
+                      <div class="p-20" text-center>
+                        No delegate 
+                        <span *ngIf="delegate_id"> shared </span> 
+                        <span *ngIf="!delegate_id"> yet </span>
+                      </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+            
+            <div *ngIf="delegate && !delegate_id && delegate.company_id == 0" class="pt-25 pb-40">
+              <div class="card b-rad-0 va-center" text-center>
+                <img class="w-30-per" src="/assets/empty_states/no_companies.png" />
+                <h6 class="mt-10">
+                  No company 
+                  <span *ngIf="delegate_id"> shared </span> 
+                  <span *ngIf="!delegate_id"> yet </span>
+                </h6>
+              </div>
+            </div>
+            <div *ngIf="delegate && delegate_id && delegate.company_id == 0 && delegate.user_privacy == 'yes'" class="pt-25 pb-40">
+              <div class="card b-rad-0 va-center" text-center>
+                <img class="w-30-per" src="/assets/empty_states/no_companies.png" />
+                <h6 class="mt-10">
+                  No company 
+                  <span *ngIf="delegate_id"> shared </span> 
+                  <span *ngIf="!delegate_id"> yet </span>
+                </h6>
+              </div>
+            </div>
+
+            <div *ngIf="delegate && delegate_id && delegate.company_id > 0 && delegate.user_privacy != 'yes'" class="d-table">
+              <div class="card b-rad-0 va-center" text-center>
+                <img class="w-50-per" src="/assets/empty_states/private_profile.svg" />
+                <h6 class="mt-10">This account is private</h6>
+                <p class="">This user has set account to private.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- start schedules -->
+          <div *ngSwitchCase="'schedules'" [ngClass]="{ 'height-cal': (delegate && delegate.user_privacy != 'yes')}">
+            <ng-container *ngIf="delegate && delegate.user_privacy == 'yes'">
+              <div class="bg-content of-auto">
+                <div class="card p-0 b-rad-0 mt-25 mb-20">
+
+                  <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+                    <ion-icon class="mr-10" src="assets/icon/meeting-sched.svg" slot="start"></ion-icon>
+                    <h6 class="h-title m-0">
+                      <span text-capitalize *ngIf="delegate">
+                        {{delegate.fullname}}'s&nbsp;
+                      </span>
+                      Meeting Schedules</h6>
+                  </div>
+
+                  <!-- skeleton loader -->
+                  <div *ngIf="!event" class="tab-event-days pl-15 pr-15 pt-6 pb-6">
+                    <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+                  </div>
+                  <!-- end skeleton loader -->
+
+                  <div *ngIf="event" class="tab-event-days pl-15 pr-15 pt-6 pb-6">
+                    <ul class="flex ai-center">
+                      <li>
+                        <div class="tab-event-day">
+                          {{monthName}}
+                        </div>
+                      </li>
+
+                      <ng-container *ngFor="let d of event.days">
+                        <li (click)="selectDay(d.milisec)">
+                          <div class="tab-event-day" [ngClass]="{'active' : selected_ms_date == d.milisec}">
+                            <div class="day-name">{{d.day_name}}</div>
+                            <div class="date-no"><span>{{d.date}}</span></div>
+                          </div>
+                        </li>
+                      </ng-container>
+                    </ul>
+                  </div>
+                </div>
+
+
+
+
+                <div class="event-day">
+                    <!-- skeleton loader -->
+                    <div *ngIf="!event && d" class="timeslots">
+                      <div *ngIf="!d.schedules.length" class="ed-items clearfix mb-20">
+                        <div class="indicator">
+                          <div class="radio-style r-all-5p"><div class="dot"></div></div>
+                        </div>
+                        <div class="card-item f-right r-tl-5p r-bl-5p">
+                          <h4 class="fs-18 fw-500 mt-0 mb-0 text-primary"><ion-skeleton-text animated style="width: 40%"></ion-skeleton-text></h4>
+                          <div class="meeting-location flex -ai-center mt-15">
+                            <p class="m-0"><ion-skeleton-text animated style="width: 60%"></ion-skeleton-text></p>
+                            <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- empty stskeleton loader -->
+
+                    <div *ngIf="event" class="timeslots">
+
+                      <ng-container *ngFor="let d of event.days">
+                        <ng-container *ngIf="d.milisec == selected_ms_date">
+
+
+                          <!-- empty state -->
+                          <div class="d-table w-100-per mt-25 mb-25" *ngIf="!d.schedules.length">
+                              <div class="card b-rad-0 va-center" text-center>
+                                  <img class="w-30-per" src="/assets/empty_states/no_meetings.png" />
+                                  <h6 class="mt-10">No meeting schedule</h6>
+                              </div>
+                          </div>
+                          <!-- end empty state -->
+
+                          <ng-container *ngFor="let ms of d.schedules">
+                            <div class="ed-items clearfix mb-20" *ngIf="ms.status != 4" >
+                              <div class="indicator">
+                                <div class="radio-style r-all-5p"><div class="dot"></div></div>
+                              </div>
+                              <div class="card-item f-right r-tl-5p r-bl-5p" [ngClass]="ms.start_mili <= eventTimezoneMiliTime && ms.end_mili >= eventTimezoneMiliTime ? 'active' : '' " >
+                                <h4 class="fs-18 fw-500 mt-0 mb-0 text-primary">{{ms.ts_start_time_formated}} - {{ms.ts_end_time_formated}}</h4>
+                                <div class="meeting-location flex -ai-center mt-15" *ngIf = "eventDetails.type !== '2'">
+                                  <p class="m-0">Meeting Location:</p>
+                                  <div class="chip table ml-10" *ngIf="ms.table_type == 'Regular'">
+                                    <p class="m-0 chip-label">Table {{ms.table_table_no}}</p>
+                                  </div>
+                                  <div class="chip table-vip ml-10" *ngIf="ms.table_type == 'VIP'">
+                                    <p class="m-0 chip-label">VIP {{ms.table_table_no}}</p>
+                                  </div>
+                                  <div class="chip table-booth ml-10" *ngIf="ms.table_type == 'Booth'">
+                                    <p class="m-0 chip-label">Booth {{ms.table_table_no}}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <!-- empty state if cancel -->
+                            <!-- <div class="d-table w-100-per mt-25 mb-25" *ngIf="ms.status == 4">
+                              <div class="card b-rad-0 va-center" text-center>
+                                  <img class="w-30-per" src="/assets/empty_states/no_meetings.png" />
+                                  <h6 class="mt-10">No meeting schedule</h6>
+                              </div>
+                            </div> -->
+                            <!-- end empty state -->
+
+                          </ng-container>
+                        </ng-container>
+                      </ng-container>
+
+
+                        <!-- <div class="ed-items clearfix mb-20 active">
+                          <div class="indicator">
+                            <div class="radio-style r-all-5p"><div class="dot"></div></div>
+                          </div>
+                          <div class="card-item f-right r-tl-5p r-bl-5p">
+                            <h4 class="fs-18 fw-500 mt-0 mb-0 text-primary">1:40 PM - 1:55 PM</h4>
+                            <div class="meeting-location flex -ai-center mt-15">
+                              <p class="m-0">Meeting Location:</p>
+                              <div class="chip table ml-10">
+                                <p class="m-0 chip-label">Table 36</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div> -->
+
+
+
+
+                        <!-- <div class="ed-items clearfix mb-20">
+                          <div class="indicator">
+                            <div class="radio-style r-all-5p"><div class="dot"></div></div>
+                          </div>
+                          <div class="card-item f-right r-tl-5p r-bl-5p">
+                            <h4 class="fs-18 fw-500 mt-0 mb-0 text-primary">1:40 PM - 1:55 PM</h4>
+                            <div class="meeting-location flex -ai-center mt-15">
+                              <p class="m-0">Meeting Location:</p>
+                              <div class="chip table ml-10">
+                                <p class="m-0 chip-label">Table 65</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div> -->
+
+
+
+
+                        <!-- <div class="ed-items clearfix mb-20 blocked">
+                          <div class="indicator">
+                            <div class="radio-style r-all-5p"><div class="dot"></div></div>
+                          </div>
+                          <div class="card-item f-right r-tl-5p r-bl-5p">
+                            <h4 class="fs-18 fw-500 mt-0 mb-0 text-danger">1:40 PM - 1:55 PM</h4>
+                            <div class="meeting-location mt-15">
+                              <p class="m-0 fw-500">Schedule Blocked</p>
+                            </div>
+                          </div>
+                        </div> -->
+
+
+
+
+                        <!-- <div class="ed-items clearfix mb-20">
+                          <div class="indicator">
+                            <div class="radio-style r-all-5p"><div class="dot"></div></div>
+                          </div>
+                          <div class="card-item f-right r-tl-5p r-bl-5p">
+                            <h4 class="fs-18 fw-500 mt-0 mb-0 text-primary">1:40 PM - 1:55 PM</h4>
+                            <div class="meeting-location flex -ai-center mt-15">
+                              <p class="m-0">Meeting Location:</p>
+                              <div class="chip table-vip ml-10">
+                                <p class="m-0 chip-label">VIP</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div> -->
+
+
+
+
+
+                    </div>
+                </div>
+              </div>
+            </ng-container>
+
+            <div *ngIf="delegate && delegate.user_privacy != 'yes'" class="d-table">
+              <div class="card b-rad-0 va-center" text-center>
+                <img class="w-50-per" src="/assets/empty_states/private_profile.svg" />
+                <h6 class="mt-10">This account is private</h6>
+                <p class="">This user has set account to private.</p>
+              </div>
+            </div>
+          </div>
+          <!-- end schedules -->
+          
+      </ng-container>
+</ion-content>

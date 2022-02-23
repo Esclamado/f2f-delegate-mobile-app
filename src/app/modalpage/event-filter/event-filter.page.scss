@@ -1,0 +1,21 @@
+.prompt_modal .modal_container {
+    vertical-align: bottom;
+    text-align: left;
+
+    .content-field {
+        height: 400px;
+    }
+}
+.apply-filter {
+    position: fixed;
+    width: 100%;
+    z-index: 99999999;
+    bottom: 0;
+    left: 0;
+
+    .btn {
+        width: 100%;
+        border-radius: 0;
+        height: 45px;
+    }
+}

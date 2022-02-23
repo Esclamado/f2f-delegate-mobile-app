@@ -1,0 +1,128 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title text-center> Messages </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+
+  <!-- start skeleton loader -->
+  <ng-container *ngIf="!env.chatSocket.convos">
+    <div class="inbox-item">
+      <div class="inbox-user clearfix">
+        <div class="inbox-user-pp">
+            <ion-skeleton-text class="m-0" animated style="width: 100%; height: 100%;"></ion-skeleton-text>
+        </div>
+        <div class="inbox-user-info pl-15">
+          <p class="m-0 fs-16 fw-500"><ion-skeleton-text class="m-0" animated style="width: 70%;"></ion-skeleton-text></p>
+          <p class="mb-0 mt-5 fs-14 fw-400"><ion-skeleton-text class="m-0" animated style="width: 70%;"></ion-skeleton-text></p>
+        </div>
+      </div>
+      <div class="inbox-last-message inbox-last-message mb-0 mt-15 fs-15 fw-500">
+          <ion-skeleton-text class="m-0" animated style="width: 100%;"></ion-skeleton-text>
+      </div>
+    </div>
+  </ng-container>
+  <!-- end skeleton loader -->
+
+  <!-- empty state -->
+  <ng-container *ngIf="env.chatSocket.convos">
+    <ng-container *ngIf="!env.chatSocket.convos.datas.length">
+      <div class="d-table mt-25">
+        <div class="card b-rad-0 va-center" text-center>
+          <img class="w-30-per" src="/assets/empty_states/no_message.png" />
+          <h6 class="mt-10">No messages yet</h6>
+          <p class="">You don't have any conversation yet! To start a conversation, tap the pencil button</p>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+  <!-- end empty state -->
+
+
+
+  <ng-container *ngIf="env.chatSocket.convos">
+    <ng-container *ngIf="env.chatSocket.convos.datas.length">
+
+      <ng-container *ngFor="let convo of env.chatSocket.convos.datas">
+        <div class="inbox-item" (click)="openChatBox(convo)">
+          <div class="inbox-user clearfix">
+            <div class="inbox-user-pp" [ngClass]="{'online': env.chatSocket.active_users['user_id_'+convo.userid] }">
+              <img src="{{convo.profile_photo}}">
+            </div>
+            <div class="inbox-user-info pl-15">
+              <p class="m-0 fs-16 fw-500" [ngClass]="{'unread': convo.unread, 'read': !convo.unread}">{{convo.company}}</p>
+              <p class="mb-0 mt-0 fs-14 fw-400" [ngClass]="{'unread': convo.unread, 'read': !convo.unread}" >{{convo.fullname}}</p>
+            </div>
+          </div>
+          <div class="inbox-last-message inbox-last-message mb-0 mt-15 clearfix">
+            <div class="fs-15 last-msg ellipsis" [ngClass]="{'fw-500': convo.unread, 'fw-400 text-secondary': !convo.unread}">
+                {{convo.last_message}}
+            </div>
+            <div class="fs-10 fw-400 time-sent">
+                {{convo.last_message_date_foramatted}}
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ion-infinite-scroll class="mt-20" threshold="100px" (ionInfinite)="infiScroll($event)">
+        <ion-infinite-scroll-content
+          loadingSpinner="bubbles"
+          loadingText="Loading more delegate...">
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+
+      <!-- <div class="inbox-item">
+        <div class="inbox-user clearfix">
+          <div class="inbox-user-pp">
+            <img src="http://panel.face2facescheduler.com/public/deploy1568187835/images/ff/admin/aW1hZ2VzL3VwbG9hZHMvcHJvZmlsZV9waG90by9oL2M/type/towidth/width/100/allow_enlarge/0/hc_1567045039_esozks6d1z53wemlrduq.png">
+          </div>
+          <div class="inbox-user-info pl-15">
+            <p class="m-0 fs-16 fw-500 unread">Eurocargo Logistics</p>
+            <p class="mb-0 mt-5 fs-14 fw-400 unread">Ramona Freeman</p>
+          </div>
+        </div>
+        <div class="inbox-last-message inbox-last-message mb-0 mt-15 clearfix">
+          <div class="fs-15 fw-500 last-msg ellipsis">
+              Hello, I’m Allan from Express Air Freigh...
+          </div>
+          <div class="fs-10 fw-400 time-sent">
+              8:32 PM
+          </div>
+        </div>
+      </div>
+
+      <div class="inbox-item">
+        <div class="inbox-user clearfix">
+          <div class="inbox-user-pp online">
+            <img src="http://panel.face2facescheduler.com/public/deploy1568187835/images/ff/admin/aW1hZ2VzL3VwbG9hZHMvcHJvZmlsZV9waG90by9oL2M/type/towidth/width/100/allow_enlarge/0/hc_1567045039_esozks6d1z53wemlrduq.png">
+          </div>
+          <div class="inbox-user-info pl-15">
+            <p class="m-0 fs-16 fw-500 read">Eurocargo Logistics</p>
+            <p class="mb-0 mt-5 fs-14 fw-400 read">Ramona Freeman</p>
+          </div>
+        </div>
+        <div class="inbox-last-message inbox-last-message mb-0 mt-15 clearfix">
+          <div class="fs-15 fw-400 text-secondary last-msg ellipsis">
+              Hello, I’m Allan from Express Air Freigh...
+          </div>
+          <div class="fs-10 fw-400 time-sent">
+              8:32 PM
+          </div>
+        </div>
+      </div> -->
+
+
+
+    </ng-container>
+  </ng-container>
+
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="f2f-primary" (click)="showDelegatesModal()">
+      <ion-icon class="fav-icon-message" src="./assets/icon/edit_icon.svg"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

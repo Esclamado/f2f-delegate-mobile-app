@@ -1,0 +1,62 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="myBackButton()">
+        <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="p-0" text-center> Feedback </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="ios-arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="pl-15 pr-15 pt-20 pb-30">
+    <div class="card b-rad-0 p-20 mb-20" text-center>
+      <img class="w-30-per" src="/assets/icon/feedback-icon.png" />
+      <h6 class="mt-10"> Leave us a feedback </h6> 
+      <p class="m-0 fs-15 lh-22">
+        Your feedback help us improve our events and mobile app, thank you!
+      </p>
+    </div>
+    <p class="m-0 fs-15 lh-22">
+      <span class="required">*</span> 
+      Share us your event experience:
+      <!-- How was your experience with Face2Face Scheduler been? -->
+    </p>
+    <div class="feedback-message mt-15 {{formValidation}}">
+      <ion-textarea class="lh-25 textfield m-0" 
+        [(ngModel)]="feedbackMessage" 
+        [ngModelOptions]="{standalone: true}" 
+        rows="3"
+        placeholder="Enter your feedback..."
+        autoGrow="true"
+        (ionChange)="isTyping()"
+        (focusin)="focusInField()"
+        (focusout)="focusOutField()"
+        maxLength="200"
+      ></ion-textarea>
+    </div>
+    <ion-grid class="p-0">
+      <ion-row >
+        <ion-col size="8" class="p-0">
+          <p *ngIf="invalidFeedback" class="error mt-5 mb-5 fs-15 text-danger"> Please enter your feedback </p>
+        </ion-col>
+        <ion-col class="p-0">
+          <p class="mb-0 mt-5 text-secondary" text-right> {{feedbackLength}}/200 </p>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <button class="btn grad btn-primary feedback-btn" (click)="sendFeedback()">
+    <span *ngIf="event && !event.feedback_id"> Send Feedback </span>
+    <span *ngIf="event && event.feedback_id"> Update Feedback </span>
+  </button>
+</ion-footer>

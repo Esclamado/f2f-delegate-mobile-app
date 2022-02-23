@@ -1,0 +1,24 @@
+{
+  "appId": "com.rwsolutions.face2face",
+  "appName": "network",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www",
+  "cordova": {
+    "preferences": {
+      "ScrollEnabled": "false",
+      "android-minSdkVersion": "19",
+      "BackupWebStorage": "none",
+      "SplashMaintainAspectRatio": "true",
+      "FadeSplashScreenDuration": "300",
+      "SplashShowOnlyFirstTime": "false",
+      "ShowSplashScreenSpinner": "false",
+      "SplashScreen": "screen",
+      "SplashScreenDelay": "3000",
+      "loadUrlTimeoutValue": "70000",
+      "AutoHideSplashScreen": "false",
+      "StatusBarOverlaysWebView": "false",
+      "orientation": "portrait"
+    }
+  }
+}

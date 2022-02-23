@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="myBackButton()">
+        <ion-icon class="back-button" slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="delegate" class="card p-20 pt-15 pb-15 b-rad-0 b-bot ">
+    <div class="delegate-profile clearfix">
+      <div class="profile-photo">
+          <img *ngIf="!delegate.d2_profile_photo || delegate.d2_profile_photo == undefined" src="/assets/empty_states/profile_avatar_1.png" />
+          <img *ngIf="delegate.d2_profile_photo && delegate.d2_profile_photo != undefined" src="{{delegate.d2_profile_photo}}" />
+      </div>
+      <div class="profile-basic-info pl-10">
+          <h1 class="fs-16 fw-500 mt-0 mb-5 ellipsis w-100-per capitalize flex ai-center">
+            <span>{{delegate.d2_company_name}}</span> </h1>
+          <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize text-secondary">{{delegate.d2_fullname}}</p>
+      </div>
+    </div>
+  </div>
+  <div class="textarea-container">
+    <ion-textarea class="c-textarea lh-25 h-100-per m-0" 
+      [(ngModel)]="note" 
+      auto-grow="true"
+      rows="10"
+      [ngModelOptions]="{standalone: true}"
+      placeholder="Enter your notes..."
+      (keyup)="isTyping()"
+      ></ion-textarea>
+  </div>
+</ion-content>
+<ion-footer>
+  <ion-toolbar class="flex ai-center jc-center pt-10 pb-10" no-border>
+    <button (click)="saveNotes()" class="btn routerLinkClass btn-primary w-90-per fs-15 text-white flex ai-center jc-center m-auto"> 
+      <ion-icon class="mr-10" src="assets/icon/del-white-notes.svg"></ion-icon>
+      Save notes 
+    </button>
+  </ion-toolbar>
+</ion-footer>

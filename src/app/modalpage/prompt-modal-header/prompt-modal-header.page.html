@@ -1,0 +1,31 @@
+<div class="prompt_modal">
+  <div class="modal_container">
+    <div class="modal_content">
+      <div class="prompt_modal-header">
+        <h4 class="fs-16 text-default fw-500 m-0">{{title}}</h4>
+        <button ion-button icon-only (click)="dismiss()" class="btn-close">
+          <ion-icon class="fs-22" name="md-close"></ion-icon>
+        </button>
+      </div>
+
+
+      <div class="prompt_modal-content">
+        <p *ngIf="msg" class="m-0">{{msg}}</p>
+        <div *ngIf="msgHtml" [innerHtml]="msgHtml"></div>
+      </div>
+
+      <div class="prompt_modal-footer p-15 flex ai-center jc-end clearfix">
+        <button (click)="dismiss()" class="btn p-0 text-gray mr-15 text-secondary" *ngIf="btn_cancel">
+          {{btn_cancel}}
+        </button>
+        <button (click)="dismiss('save')" class="btn btn-primary p-14" *ngIf="btn_save">
+          {{btn_save}}
+        </button>
+        <button (click)="dismiss()" class="btn btn-primary p-14 w-100-per" *ngIf="btn">
+          {{btn}}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

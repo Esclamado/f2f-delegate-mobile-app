@@ -1,0 +1,35 @@
+
+.delegate-locator-wrapper{
+	background-color: #ebebeb;
+	min-height: 100%;
+	.search-field{
+		background-color: #fff;
+		box-shadow: 1px 1px 4px 0px rgba(0, 0, 0, 0.1);
+		.input-wrapper{
+			fa-icon{
+				position: absolute;
+			    right: 0;
+			    font-size: 20px;
+			    height: 100%;
+			    padding: 8px 12px;
+			    top: 60%;
+    			transform: translate(0%, -50%);
+    			color: #888;
+			}
+		}
+	}
+	.search-result-container{
+		/*.result-list{
+			box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.1);
+		}*/
+		.card:last-child{
+			border-bottom: 0px !important;
+		}
+	}
+}
+.chip{
+	display: inline-block !important;
+}
+.highlight{
+	background-color:red;
+}

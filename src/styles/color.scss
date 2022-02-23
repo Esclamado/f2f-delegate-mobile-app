@@ -1,0 +1,43 @@
+$primary-light: #e5eeff;
+$primary: #0a3b8c;
+$primary-grad: linear-gradient(90deg, #1e50a6 20%, #0a3b8c 100%);
+$primary-dark: linear-gradient(90deg, #112846 0%, #05172e 100%);
+$default: #e5eeff;
+$success-light: #f5ffd9; 
+$success: #688b06;
+$done: #2f8e10;
+$archive-light: #e3e3e3;
+$f2f-color : #7a9f12;
+
+/* darker green of gradient */
+$success-dark: linear-gradient(90deg, #389d18 0%, #237d06 100%);
+
+/* lighter green of gradient */
+$success-grad: linear-gradient(180deg, #88af1b 0%, #688b06 100%);
+$success-grad-vv: linear-gradient(90deg, #688b06 0%,  #88af1b 100%);
+$danger-light: #eadbdd;
+$danger: #b01b30;
+$danger-grad: linear-gradient(90deg, #b01b30 0%, #8c0618 100%);
+$secondary : #666;
+$secondary-grad: linear-gradient(90deg, #888888 0%, #666666 100%);
+$secondary-grad-light: linear-gradient(0deg, #e3e3e3 0%, #cccccc 100%);
+
+$warning: #c45405;
+$warning-grad: linear-gradient(90deg, #fa7517 0%, #c45405 100%);
+$vip-table: linear-gradient(90deg, #face17 0%, #e2ba13 100%);
+$booth-table: linear-gradient(90deg, #a42d80 0%, #8c1668 100%);
+$regular-table: linear-gradient(90deg, #112846 0%, #05172e 100%);
+$default-text-color: #05172e;
+$green-text: #0f9d89;
+$regular : #05172e;
+$dark : #2f3031;
+$gray : #cccccc;
+$white : #fff;
+$archive-text : #666666;
+$gray-text : #999999;
+$back-button : rgb(66, 66, 66);
+
+$published: linear-gradient(90deg, #389d18 0%, #237d06 100%);
+$unpublish: linear-gradient(90deg, #fa7517 0%, #c45405 100%);
+$archive: linear-gradient(90deg, #888888 0%, #666666 100%);
+$ongoing: linear-gradient(90deg, #2caa99 0%, #037b6b 100%);

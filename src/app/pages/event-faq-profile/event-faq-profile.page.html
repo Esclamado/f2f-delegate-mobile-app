@@ -1,0 +1,63 @@
+<ion-header no-border>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-button (click)="myBackButton()">
+          <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+<ion-content padding>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="!faq" class="mb-30">
+    <ion-skeleton-text class="mb-20 h-24" animated style="width: 80%;"></ion-skeleton-text>
+    <div>
+      <ion-skeleton-text animated style="width: 100%;"></ion-skeleton-text>
+      <ion-skeleton-text class="mb-20" animated style="width: 50%;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 100%;"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 50%;"></ion-skeleton-text>
+    </div>
+
+    <div class="card p-0 pt-20 pb-20 no-bg b-rad-0 mt-20">
+      <div class="clearfix bg-dark flex ai-center jc-center w-100-per h-200">
+        <fa-icon class="skeleton-play-icon flex ai-center" [icon]="['far', 'play-circle']" slot="start"></fa-icon>
+      </div>
+    </div>
+  </div>
+  
+  <div *ngIf="faq" class="mb-30">
+    <h4 class="mb-25"> {{faq.question}} </h4>
+    <div [innerHtml]="faq.answer | safeHtml"></div>	
+
+    <div *ngIf="faq.youtubelink" class="card p-0 pt-20 pb-20 no-bg b-rad-0 mt-20">
+      <div class="clearfix w-100-per h-200">
+        <iframe width="100%" height="100%" [src]="faq.youtubelink | safeUrl" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <p *ngIf="(faq && !faq.vote) || vote_undo" class="mb-25">
+      Was this article helpful? 
+      <span (click)="faqVote('yes')" class="text-primary fw-500"> Yes </span> 
+      or 
+      <span (click)="faqVote('no')" class="text-primary fw-500"> No </span>
+    </p>
+    <p *ngIf="(faq && faq.vote) && !vote_undo" class="mb-25">
+      I've already voted for <span class="fw-500"> {{faq.vote_value}}. </span>
+      <span (click)="voteUndo()" class="text-primary fw-500"> Undo </span>
+    </p>
+    <p routerLink="/event-feedback/{{event_id}}" class="text-primary no-outline">
+      <span *ngIf="event && !event.feedback_id">
+        Give feedback
+      </span>
+      <span *ngIf="event && event.feedback_id">
+        Update feedback
+      </span>
+    </p>
+  </div>
+</ion-content>

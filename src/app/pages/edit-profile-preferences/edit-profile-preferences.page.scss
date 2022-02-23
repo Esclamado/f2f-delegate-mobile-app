@@ -1,0 +1,15 @@
+ion-content{
+    --ion-background-color:#ebebeb;
+}
+
+.country-flag {
+    display: inline-block;
+    width: 20px;
+}
+
+.button:disabled,
+button[disabled]{
+  background-color: #cccccc !important;
+  color: #666666 !important;
+  background-image: none !important;
+}

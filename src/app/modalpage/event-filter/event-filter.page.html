@@ -1,0 +1,151 @@
+<div class="prompt_modal">
+  <div class="modal_container" (click)="dismiss()">
+    <div (click)="stopPropagation($event)">
+
+
+
+
+          <div class="modal-header of-auto">
+            <div class="clearfix mt-16">
+              <h4 class="m-0 text-uc fs-15 fw-500 f-left">Filter</h4>
+              <a class="text-uc fs-16 f-right text-default" (click)="resetFilter()">Reset</a>
+            </div>
+          </div>
+          <div class="content-field pl-15 pr-15 pt-30 pb-30 card b-rad-0 of-auto">
+            <div *ngIf="filters.scheduled_meetings && (event && !event.archive_in)" class="mb-30 clearfix flex ai-center">
+              <p class="fs-15 m-0 w-100-per">
+                Show done schedules
+              </p>
+              <ion-toggle class="f-right" checked [(ngModel)]="filters.show_done_schedules" (click)="getEventById($event)"></ion-toggle>
+            </div>
+
+            <div class="filter-field">
+              <div class="flex jc-space-between">
+                <h4 class="mt-0 mb-10 fs-15 fw-500" text-left>Filter by type</h4>
+                <!-- <p class="mt-0 mb-10 text-primary" text-right> Clear filter </p> -->
+              </div>
+
+              <div class="form-check">
+                <ng-container *ngIf="typeFilterSelectAllSettter"></ng-container>
+                <input 
+                  type="checkbox" 
+                  class="form-check-input" 
+                  id="filter-select-all-types" 
+                  [(ngModel)]="typeFilter"
+                  (click)="selectAllNotDays($event)"
+                />
+                <label class="form-check-label text-secondary" for="filter-select-all-types">Select All Types</label>
+                <div class="cb-style">
+                  <div class="cb-style-icon">
+                    <fa-icon [icon]="['fas', 'check']" slot="end"></fa-icon>
+                  </div>
+                </div>
+              </div>
+    
+              <div class="form-check">
+                <input 
+                  type="checkbox" 
+                  class="form-check-input" 
+                  id="filter-agenda" 
+                  [(ngModel)]="agenda"
+                  (change)="updateFilter()"
+                />
+                <label class="form-check-label text-secondary" for="filter-agenda">Agenda</label>
+                <div class="cb-style">
+                  <div class="cb-style-icon">
+                    <fa-icon [icon]="['fas', 'check']" slot="end"></fa-icon>
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="form-check">
+                <input 
+                  type="checkbox" 
+                  class="form-check-input" 
+                  id="filter-scheduled-meetings" 
+                  [(ngModel)]="scheduled_meetings"
+                  (change)="updateFilter()"
+                />
+                <label class="form-check-label text-secondary" for="filter-scheduled-meetings">Scheduled Meetings</label>
+                <div class="cb-style">
+                  <div class="cb-style-icon">
+                    <fa-icon [icon]="['fas', 'check']" slot="end"></fa-icon>
+                  </div>
+                </div>
+              </div>
+
+
+              <div *ngIf="event && !event.archive_in" class="form-check">
+                <input 
+                  type="checkbox" 
+                  class="form-check-input" 
+                  id="filter-available-timeslots" 
+                  [(ngModel)]="available_timeslots"
+                  (change)="updateFilter()"
+                />
+                <label class="form-check-label text-secondary" for="filter-available-timeslots">Available Timeslots</label>
+                <div class="cb-style">
+                  <div class="cb-style-icon">
+                    <fa-icon [icon]="['fas', 'check']" slot="end"></fa-icon>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+            <div *ngIf="event" class="filter-field mt-15 mb-45">
+              <div class="flex jc-space-between">
+                <h4 class="mt-0 mb-10 fs-15 fw-500">Filter by day</h4>
+                <!-- <p class="mt-0 mb-10 text-primary" text-right> Clear filter </p> -->
+              </div>
+
+              <div class="form-check">
+                <ng-container *ngIf="dayFilterSelectAllSetter"></ng-container>
+                <input 
+                  type="checkbox" 
+                  class="form-check-input" 
+                  id="filter-select-all-days" 
+                  [(ngModel)]="dayFilter"
+                  (click)="selectAllDays($event)"
+                />
+                <label class="form-check-label text-secondary" for="filter-select-all-days">Select All Days</label>
+                <div class="cb-style">
+                  <div class="cb-style-icon">
+                    <fa-icon [icon]="['fas', 'check']" slot="end"></fa-icon>
+                  </div>
+                </div>
+              </div>
+
+              <ng-container *ngFor="let day of schedules">
+                  
+                <div class="form-check">
+                  <input 
+                    type="checkbox" 
+                    class="form-check-input" 
+                    id="filter-select-day-{{day.milisec}}" 
+                    [(ngModel)]="filDays['day_' + day.milisec]"
+                    (change)="updateFilterDays($event, day.milisec)"
+                  />
+                  <label class="form-check-label text-secondary" for="filter-select-day-{{day.milisec}}">{{day.formatted}}</label>
+                  <div class="cb-style">
+                    <div class="cb-style-icon">
+                      <fa-icon [icon]="['fas', 'check']" slot="end"></fa-icon>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+
+
+            </div>
+
+            <div class="apply-filter">
+              <button class="btn grad btn-primary" (click)="dismiss()">
+                Apply Filters
+              </button>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>

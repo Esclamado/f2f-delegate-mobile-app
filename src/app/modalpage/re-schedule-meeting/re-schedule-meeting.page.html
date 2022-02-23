@@ -1,0 +1,159 @@
+<ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-button (click)="dismiss()">
+          <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title class="p-0 sm-header" text-center>
+          <p class="fs-14 mt-0 mb-0 tC fw-400">Schedule a meeting</p>
+          <h4 class="fs-18 fw-500 mt-0 mb-0 tC text-default">Select date & time</h4>
+      </ion-title>
+      <ion-buttons slot="end">
+        <ion-button>
+          <ion-icon slot="icon-only" name="ios-arrow-back-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div *ngIf="re_sched_request" class="card p-0 b-rad-0 mb-25">
+    <div class="card-header">
+      <h4>Current Schedule:</h4>
+    </div>
+    <div class="card-body p-0">
+      
+      <div class="info-card clearfix flex ai-top">
+        <div class="info-items ms-icon">
+          <fa-icon [icon]="['fas', 'clock']" slot="end"></fa-icon>
+        </div>
+  
+        <div class="info-items ms-info">
+          <p class="fs-16 fw-500 mt-0 mb-10">{{meeting.filter_date}}</p>
+          <p class="fs-15 mt-0 mb-0">{{meeting.start_time}} - {{meeting.end_time_orig}}</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="card p-0 b-rad-0">
+    <div class="card-header">
+      <h4>Select <span *ngIf="re_sched_request"> New </span> Date:</h4>
+    </div>
+
+    <div class="card-body">
+      <div class="form-group block p-0">
+        <label class="mb-10 p-0 fs-14 text-default" for="edit-sector">Select a date to view its available timeslots:</label>
+        <ion-item class="ml--15 mr--15" lines="none">
+          <ionic-selectable
+            class="form-control" 
+            [(ngModel)]="selectedDay"
+            [ngModelOptions]="{standalone: true}"
+            placeholder="Select Date"
+            [items]="schedules"
+            itemValueField="milisec"
+            itemTextField="filter_date"
+            [canSearch]="true"
+            (onChange)="selectableChange($event, 'event_date')"
+            [shouldBackdropClose]="false">
+            <ng-template ionicSelectableCloseButtonTemplate>
+              <ion-icon name="ios-arrow-back" class="f-30"></ion-icon>
+            </ng-template>
+
+            <ng-template ionicSelectableTitleTemplate>
+              <div class="">Select a <span *ngIf="re_sched_request"> new </span> date</div>
+            </ng-template>
+          </ionic-selectable>
+        </ion-item>
+      </div>
+    </div>
+  </div>
+
+  <!-- skeleton loader -->
+  <div *ngIf="collectingData" class="card p-0 b-rad-0 mt-30">
+    <div class="card-header">
+      <h4><ion-skeleton-text animated style="width: 35%"></ion-skeleton-text></h4>
+    </div>
+    <div class="card-body"> 
+      <p class="fs-15 text-default"><ion-skeleton-text animated style="width: 75%"></ion-skeleton-text></p>
+      <div class="mr--15 ml--15">
+          <ion-grid class="pl-10 pr-10 pt-0 pb-0">
+            <ion-row>
+              <ion-col size=4 class="">
+                <div class="ts-items">
+                  <p class="m-0 centerVH w-65"><ion-skeleton-text animated style="width: 100%"></ion-skeleton-text></p>
+                </div>
+              </ion-col>
+              
+              <ion-col size=4 class="">
+                <div class="ts-items">
+                  <p class="m-0 centerVH w-65"><ion-skeleton-text animated style="width: 100%"></ion-skeleton-text></p>
+                </div>
+              </ion-col>
+              
+              <ion-col size=4 class="">
+                <div class="ts-items">
+                  <p class="m-0 centerVH w-65"><ion-skeleton-text animated style="width: 100%"></ion-skeleton-text></p>
+                </div>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </div>
+    </div>
+  </div>
+  <!-- end skeleton loader -->
+
+  <!-- empty state -->
+  <!-- <div class="d-table mt-25 h-150" *ngIf="!collectingData && !selectedDay && timeslots.length == 0">
+      <div class="card b-rad-0 va-center" text-center>
+          <img class="w-30-per" src="/assets/empty_states/no_meetings.png" />
+          <h6 class="mt-10">Please select date</h6>
+      </div>
+  </div> -->
+  <div class="d-table mt-25 h-150 w-100-per" *ngIf="!collectingData && selectedDay && timeslots.length == 0">
+      <div class="card b-rad-0 va-center" text-center>
+          <img class="w-30-per" src="/assets/empty_states/no_meetings.png" />
+          <h6 class="mt-10">No available timeslot</h6>
+      </div>
+  </div>
+  <!-- end empty state -->
+
+  <div *ngIf="!collectingData && selectedDay && timeslots.length > 0" class="card p-0 b-rad-0 mt-30">
+    <div class="card-header">
+      <h4>Select <span *ngIf="re_sched_request"> New </span> Time:</h4>
+    </div>
+    <div class="card-body"> 
+      <p class="fs-15 text-default">You and <span text-capitalize>{{delegate.fullname}}</span> are both available in these timeslots, please select one to set a meeting:</p>
+      <div class="mr--15 ml--15">
+        <ion-grid class="pl-10 pr-10 pt-0 pb-0">
+          <ion-row>
+
+            <ng-container *ngFor="let ts of timeslots">
+                <ion-col size=4 class="" (click)=setTimeslot(ts)>
+                  <div class="ts-items" [ngClass]="{
+                    'active' : selectedSlot.id == ts.id,
+                    'active' : timeslot && timeslot.id == ts.id
+                  }">
+                    <p class="m-0 centerVH">{{ts.start_time}}</p>
+                  </div>
+                </ion-col>
+            </ng-container>
+
+          </ion-row>
+        </ion-grid>
+      </div>
+    </div>
+  </div>
+
+
+</ion-content>
+
+<ion-footer *ngIf="re_sched_request && selectedSlot.id">
+  <button class="btn grad btn-primary schedule-meeting" (click)="startScheduling()">
+    Reschedule meeting
+  </button>
+</ion-footer>

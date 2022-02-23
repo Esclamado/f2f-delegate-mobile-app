@@ -1,0 +1,499 @@
+<ion-content>
+  <div class="container profile-banner">
+    <ion-buttons class="p-absolute" slot="start">
+      <ion-button (click)="goToProfile()">
+        <ion-icon slot="icon-only" color="666" name="ios-arrow-back" class="text-white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-buttons (click)="saveProfile()" class="p-absolute a-left-align" slot="end">
+      <ion-button class="fw-400 text-capitalize save" color="light">
+        Save
+      </ion-button>
+    </ion-buttons>
+  </div>
+
+  <div class="b-shadow pb-20">
+    <ion-item *ngIf="delegate" class="mt--50" lines="none">
+      <ion-avatar *ngIf="delegate.profile_photo.length == 1" (click)="cropUpload()" class="avatar-overlay h-90 w-90 p-relative" slot="start" 
+        [ngStyle]="{'background-image': 'url(/assets/empty_states/profile_avatar_'+delegate.profile_photo+'.png)'}">
+        <div class="opacity"></div>
+        <!-- <fa-icon style="z-index: 9;" class="center text-white fs-30" [icon]="['fas', 'camera']"></fa-icon> -->
+        <div class="center">
+          <ion-icon class="mt-5 fs-40" src="assets/icon/camera-add.svg"></ion-icon>
+        </div>
+      </ion-avatar>
+
+      <ion-avatar *ngIf="delegate.profile_photo.length > 1" (click)="cropUpload()" class="avatar-overlay h-90 w-90 p-relative" slot="start" 
+        [ngStyle]="{'background-image': 'url(' + delegate.profile_photo_url + ')'}">
+        <div class="opacity"></div>
+        <!-- <fa-icon style="z-index: 9;" class="center text-white fs-30" [icon]="['fas', 'camera']"></fa-icon> -->
+        <div class="center">
+          <ion-icon class="mt-5 fs-40" src="assets/icon/camera-add.svg"></ion-icon>
+        </div>
+      </ion-avatar>
+
+      <ion-label class="mt-60">
+        <h6 class="fw-500" text-capitalize> {{delegate.fullname}} </h6>
+        <p text-capitalize> {{delegate.job_title}} </p>
+      </ion-label>
+    </ion-item>
+  </div>
+
+<!--   <input type="file" (change)="fileChangeEvent($event)" />     -->
+
+  <div *ngIf="delegate" class="bg-content pt-30 pb-40">
+    <div class="card b-shadow p-0 b-rad-0 mb-20">
+      <ion-list lines="none">	
+        <ion-item>
+          <ion-label>Let other delegates view my profile </ion-label>
+          <ion-toggle mode="md" [(ngModel)]="user_privacy" 
+          [ngModelOptions]="{standalone: true}" (ionChange)="toggleChange($event)"></ion-toggle>
+        </ion-item>
+      </ion-list>
+    </div> 
+
+    <form class="container" [formGroup]="registrationForm">
+      <div class="card b-shadow p-0 b-rad-0 mb-20">
+        <div id="basic-info" class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+            <fa-icon class="mr-5" [icon]="['fas', 'user']" slot="start"></fa-icon>
+            <h6 class="h-title m-0"> Basic Information </h6>
+        </div>
+        <div class="p-20">
+          <div class="form-group block mb-20 {{isValidClass.fullname}}">
+            <label class="text-secondary mb-10" for="edit-fullname"> Full Name </label>
+            <div id="edit-fullname" class="input-wrapper t-disable">
+              <input 
+                class="form-control" 
+                type="name" 
+                value="" 
+                maxlength="150"
+                (keyup)="formValidator($event, 'fullname')"
+                formControlName="fullname" 
+                disabled="disabled" 
+              >
+              <span class="icon">
+                <!-- <fa-icon [icon]="['fas', 'check-circle']" slot="end"></fa-icon> -->
+              </span>
+            </div>
+            <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter your full name. </p>
+          </div>
+
+          <div class="form-group block mb-20 {{isValidClass.email}}">
+            <label class="text-secondary mb-10" for="edit-email"> Email </label>
+            <div id="edit-email" class="input-wrapper text-gray t-disable">
+              <input 
+                class="form-control" 
+                type="email" 
+                value="" 
+                maxlength="150"
+                (keyup)="formValidator($event, 'email')"
+                formControlName="email" 
+                disabled="disabled" 
+              >
+              <span class="icon">
+                <!-- <fa-icon [icon]="['fas', 'check-circle']" slot="end"></fa-icon> -->
+              </span>
+            </div>
+            <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter valid email. </p>
+          </div>
+
+          <div class="form-group block mb-20 {{isValidClass.job_title}}">
+            <label class="text-secondary mb-10" for="edit-jobtitle"> Job Title </label>
+            <div id="edit-jobtitle" class="input-wrapper">
+              <input 
+                class="form-control" 
+                type="text" 
+                value="" 
+                maxlength="150"
+                (keyup)="formValidator($event, 'job_title')"
+                formControlName="job_title" 
+              >
+              <span class="icon">
+                <!-- <fa-icon [icon]="['fas', 'check-circle']" slot="end"></fa-icon> -->
+              </span>
+            </div>
+            <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter your job title. </p>
+          </div>
+          <div class="form-group block mb-15">
+            <!-- <h6 class="h-title"> Services: </h6> -->
+            <label class="text-secondary mb-5 p-relative" for="edit-jobtitle"> Services: 
+              <span *ngIf="!delegate_id" (click)="editPreferencesProfile('services')" class="routerLinkClass edit text-primary t-0 r-0">
+                <ng-container *ngIf="!delegate.pref_services_ids_detail || (delegate.pref_services_ids_detail && delegate.pref_services_ids_detail.length == 0)">
+                  <fa-icon class="mr-5 fs-11" [icon]="['fas', 'plus']"></fa-icon>
+                  <label class="m-0"> Add </label>
+                </ng-container>
+                <ng-container *ngIf="delegate.pref_services_ids_detail && delegate.pref_services_ids_detail.length > 0">
+                  <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+                  <label class="m-0"> Edit </label>
+                </ng-container>
+              </span>
+            </label>
+            <ng-container class="mt-5" *ngIf="delegate.pref_services_ids_detail" >
+              <ion-badge class="mr-5 fw-400" *ngFor="let ser of delegate.pref_services_ids_detail">{{ser.name}}</ion-badge>
+            </ng-container>
+            <p *ngIf="!delegate.pref_services_ids_detail || (delegate.pref_services_ids_detail && delegate.pref_services_ids_detail.length == 0)" class="m-0"> 
+              No services
+            </p>
+          </div>
+          <div class="form-group block mb-15">
+            <!-- <h6 class="h-title"> Specializations: </h6> -->
+            <label class="text-secondary mb-5 p-relative" for="edit-jobtitle"> Specializations: 
+              <span *ngIf="!delegate_id" (click)="editPreferencesProfile('specializations')" class="routerLinkClass edit text-primary t-0 r-0">
+                <ng-container *ngIf="!delegate.pref_specialization_ids_detail || (delegate.pref_specialization_ids_detail && delegate.pref_specialization_ids_detail.length == 0)">
+                  <fa-icon class="mr-5 fs-11" [icon]="['fas', 'plus']"></fa-icon>
+                  <label class="m-0"> Add </label>
+                </ng-container>
+                <ng-container *ngIf="delegate.pref_specialization_ids_detail && delegate.pref_specialization_ids_detail.length > 0">
+                  <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+                  <label class="m-0"> Edit </label>
+                </ng-container>
+              </span>
+            </label>
+            <ng-container class="mt-5" *ngIf="delegate.pref_specialization_ids_detail" >
+              <ion-badge class="mr-5 fw-400" *ngFor="let special of delegate.pref_specialization_ids_detail">{{special.name}}</ion-badge>
+            </ng-container>
+            <p *ngIf="!delegate.pref_specialization_ids_detail || (delegate.pref_specialization_ids_detail && delegate.pref_specialization_ids_detail.length == 0)" class="m-0"> 
+              No specializations
+            </p>
+          </div>
+          <div class="form-group block mb-15">
+            <!-- <h6 class="h-title"> Operational Software: </h6> -->
+            <label class="text-secondary mb-5 p-relative" for="edit-jobtitle"> Operational Software: 
+              <span *ngIf="!delegate_id" (click)="editPreferencesProfile('operational_software')" class="routerLinkClass edit text-primary t-0 r-0">
+                <ng-container *ngIf="!delegate.pref_software_ids_detail || (delegate.pref_software_ids_detail && delegate.pref_software_ids_detail.length == 0)">
+                  <fa-icon class="mr-5 fs-11" [icon]="['fas', 'plus']"></fa-icon>
+                  <label class="m-0"> Add </label>
+                </ng-container>
+                <ng-container *ngIf="delegate.pref_software_ids_detail && delegate.pref_software_ids_detail.length > 0">
+                  <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+                  <label class="m-0"> Edit </label>
+                </ng-container>
+              </span>
+            </label>
+            <ng-container class="mt-5" *ngIf="delegate.pref_software_ids_detail" >
+              <ion-badge class="mr-5 fw-400" *ngFor="let software of delegate.pref_software_ids_detail">{{software.name}}</ion-badge>
+            </ng-container>
+            <p *ngIf="!delegate.pref_software_ids_detail || (delegate.pref_software_ids_detail && delegate.pref_software_ids_detail.length == 0)" class="m-0"> 
+              No operational software
+            </p>
+          </div>
+
+          <!-- <div class="form-group block mb-20">
+            <label class="text-secondary mb-10" for="edit-preflang"> Preferred Languages </label>
+
+            <ion-badge *ngFor="let lang of selectedLanguage; let i=index" class="lang mr-5">
+              <span class="flex ai-center jc-center">
+                <span class="fw-400"> {{lang}} </span>
+                <ion-icon (click)="removeLanguage(i)" class="fs-20 ml-5" slot="end" name="close-circle"></ion-icon>
+              </span>
+            </ion-badge>
+            <div id="edit-preflang" class="input-wrapper dropdown-content">
+                <input type="text"
+                  class="form-control" 
+                  (focusin)="focusInField($event)"
+                  (focusout)="focusOutField()"
+                  [(ngModel)]="search"
+                  [ngModelOptions]="{standalone: true}"
+                  (ngModelChange)="this.autoCompleteLanguage.next($event)"
+                  (keyup.enter)="setLangValue()"
+                  placeholder="Enter preferred language/s "
+                />
+
+                <div *ngIf="showLanguages && lang_total_page != 0" class="dropdown-container">
+                  <div class="content" 
+                    *ngFor='let lang of languages' 
+                    (click)="setLangValue(lang.language)"
+                  > {{lang.language}}</div>
+                </div>
+              <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter your preferred languages. </p>
+            </div>
+          </div> -->
+        </div>
+      </div>
+        
+      <div id="contact-info" class="card b-shadow p-0 b-rad-0 mb-20">
+          <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+            <fa-icon class="mr-5" [icon]="['fas', 'phone']" slot="start"></fa-icon>
+            <h6 class="h-title m-0"> Contact Information </h6>
+          </div>
+          <div>
+            <ion-list lines="none" class="pb-15">
+              <div class="p-20">
+                <div class="form-group block mb-20 {{isValidClass.mobile}}">
+                  <label class="text-secondary mb-10" for="edit-mobile"> Mobile </label>
+                  <div id="edit-mobile" class="input-wrapper">
+                    <input 
+                      class="form-control" 
+                      type="number" 
+                      value="" 
+                      maxlength="150"
+                      (keyup)="formValidator($event, 'mobile')"
+                      formControlName="mobile" 
+                      onkeydown="return event.keyCode !== 69 && event.keyCode !== 190"
+                    >
+                    <span class="icon">
+                      <!-- <fa-icon [icon]="['fas', 'check-circle']" slot="end"></fa-icon> -->
+                    </span>
+                  </div>
+                  <p class="error mt-5 mb-5 fs-15 text-danger"> Please enter your mobile. </p>
+                </div>
+                <div class="textfield">
+                  <label class="text-secondary mb-10" for="edit-mobile"> Social Links </label>
+                  <ion-grid class="m-0 w-100-per">
+                    <ion-row class="w-100-per mt-10">
+                      <ion-col text-center size="4">
+                        <div class="flex jc-center" >
+                          <div class="social-media-icon ln" 
+                            (click)="presentSocialModal('Linkedin', 'ln', 'linkedin-in')">
+                            <a>
+                              <fa-icon [icon]="['fab', 'linkedin-in']"></fa-icon>
+                            </a>
+                          </div>
+                        </div>
+                        <p class="m-0 pt-5 text-lbl"> LinkedIn </p>
+                      </ion-col>
+                      <ion-col text-center size="4">
+                        <div class="flex jc-center" >
+                          <div class="social-media-icon fb" 
+                            (click)="presentSocialModal('Facebook', 'fb', 'facebook-f')">
+                            <a>
+                              <fa-icon [icon]="['fab', 'facebook-f']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                        </div>
+                        <p class="m-0 pt-5 text-lbl"> Facebook </p>
+                      </ion-col>
+                      <ion-col text-center size="4">
+                        <div class="flex jc-center" >
+                          <div class="social-media-icon tw"
+                            (click)="presentSocialModal('Twitter', 'tw', 'twitter')">
+                            <a>
+                              <fa-icon [icon]="['fab', 'twitter']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                        </div>
+                        <p class="m-0 pt-5 text-lbl"> Twitter </p>
+                      </ion-col>
+                    </ion-row>
+                    <ion-row class="w-100-per mt-10">
+                      <ion-col text-center size="4">
+                        <div class="flex jc-center" >
+                          <div class="social-media-icon wa"
+                            (click)="presentSocialModal('WhatsApp', 'wa')">
+                            <a>
+                              <fa-icon [icon]="['fab', 'whatsapp']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                        </div>
+                        <p class="m-0 pt-5 text-lbl"> WhatsApp </p>
+                      </ion-col>
+                      <ion-col text-center size="4">
+                        <div class="flex jc-center" >
+                          <div class="social-media-icon wc"
+                            (click)="presentSocialModal('WeChat', 'wc', 'weixin')">
+                            <a>
+                              <fa-icon [icon]="['fab', 'weixin']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                        </div>
+                        <p class="m-0 pt-5 text-lbl"> WeChat </p>
+                      </ion-col>
+                      <ion-col text-center size="4">
+                        <div class="flex jc-center" >
+                          <div class="social-media-icon kt"
+                            (click)="presentSocialModal('Kakao', 'kt')">
+                            <a> 
+                              <fa-icon [icon]="['fas', 'comment']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                        </div>
+                        <p class="m-0 pt-5 text-lbl"> Kakao </p>
+                      </ion-col>
+                    </ion-row>
+                    <ion-row class="w-100-per mt-10">
+                      <ion-col text-center size="4">
+                        <div class="flex jc-center" >
+                          <div class="social-media-icon sk"
+                            (click)="presentSocialModal('Skype', 'sk')">
+                            <a>
+                              <fa-icon [icon]="['fab', 'skype']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                        </div>
+                        <p class="m-0 pt-5 text-lbl"> Skype </p>
+                      </ion-col>
+                      <ion-col text-center size="4">
+                        <div class="flex jc-center" >
+                          <div class="social-media-icon zm"
+                            (click)="presentSocialModal('Zoom', 'zm')">
+                            <a>
+                              <fa-icon [icon]="['fas', 'video']" slot="start"></fa-icon>
+                            </a>
+                          </div>
+                        </div>
+                        <p class="m-0 pt-5 text-lbl"> Zoom </p>
+                      </ion-col>
+                    </ion-row>
+                  </ion-grid>
+                </div>
+              </div>	
+            </ion-list>
+          </div>
+      </div>
+
+      <div id="business-card" class="card b-shadow p-0 b-rad-0 mb-20">
+          <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+            <ion-icon class="mr-5" src="/assets/icon/b-card.svg" slot="start"></ion-icon>
+            <h6 class="h-title m-0"> Business Card </h6>
+          </div>
+          <div *ngIf="delegate" class="p-20">
+            <div class="mb-15 text-secondary">
+              This step is optional, but you can always upload your business card later.
+            </div>
+    
+            <div *ngIf="!delegate.businesscard || delegate.businesscard.length  == 1" class="business-card pt-30 pb-30" text-center>
+              <div class="flex jc-center">
+                <img class="h-60 pb-5" src="assets/images/business-card.png">
+              </div>
+              You didn't upload any business card.
+              <p (click)="uploadBusinessCard()" class="text-primary mt-5 mb-0"> <fa-icon class="mr-5" [icon]="['fas', 'camera']" slot="start"></fa-icon> Upload one now? </p>
+            </div>
+    
+            <ng-container *ngIf="delegate.businesscard && delegate.businesscard.length > 1">
+              <div class="business-card photo" [ngStyle]="{'background-image': 'url('+ delegate.businesscard_url + ')'}">
+              </div>
+              <div (click)="uploadBusinessCard()" class="text-secondary mt-10 flex ai-center jc-center"> <fa-icon class="mr-5" [icon]="['fas', 'times']" slot="start"></fa-icon> Change photo </div>
+            </ng-container>
+          </div>
+      </div>
+    </form>
+
+    <!-- <div class="card b-shadow p-0 b-rad-0 mb-20">
+      <div id="preferences" class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+        <fa-icon class="mr-5" [icon]="['fas', 'thumbs-up']" slot="start"></fa-icon>
+        <h6 class="h-title m-0"> Preferences </h6>
+      </div>
+
+      <div class="form-group block mb-20">
+        <ion-item (click)="editPreferencesProfile()" lines="none" class="select-button text-primary">
+          Edit your preferences
+          <ion-icon class="p-absolute forward fs-20 text-primary" name="ios-arrow-forward"></ion-icon>
+        </ion-item> 
+      </div>
+    </div> -->
+     <div class="card p-0 b-rad-0 mb-20">
+      <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+        <fa-icon class="mr-10" [icon]="['fas', 'thumbs-up']" slot="start"></fa-icon>
+        <h6 class="h-title m-0"> <span *ngIf="!delegate_id"> Meeting </span>Preferences </h6>
+        <div *ngIf="!delegate_id" (click)="editPreferencesProfile('preferences')" class="routerLinkClass edit text-primary">
+          <ng-container *ngIf="!delegate.pref_countries_ids_detail || delegate.pref_countries_ids_detail.length == 0">
+            <fa-icon class="mr-5 fs-11" [icon]="['fas', 'plus']"></fa-icon>
+            <label class="m-0"> Add </label>
+          </ng-container>
+          <ng-container *ngIf="delegate.pref_countries_ids_detail && delegate.pref_countries_ids_detail.length > 0">
+            <fa-icon class="mr-5 fs-11" [icon]="['fas', 'pencil-alt']"></fa-icon>
+            <label class="m-0"> Edit </label>
+          </ng-container>
+        </div>
+      </div>
+      <div class="mt-0" class="p-20">
+        <!-- <p class="mt-0">
+          Services, specializations, operational software, and countries I'm not interested in.
+        </p> -->
+        <div *ngIf="delegate.pref_countries_ids_detail" class="form-group block">
+          <h6 class="h-title mt-0"> Countries I'm not prepared to meet (this will not show up in your profile): </h6>
+          <ion-badge *ngFor="let country of delegate.pref_countries_ids_detail" class="country mr-5">
+            <span class="flex">
+              <span class="mini-flag-icon" [ngStyle]="{'background-image': 'url(assets/images/flags/'+country.iso+'.png)'}"> </span> 
+              <span class="fw-400"> {{country.nicename}} </span>
+            </span>
+          </ion-badge>
+        </div>
+        <p *ngIf="!delegate.pref_countries_ids_detail || (delegate.pref_countries_ids_detail && delegate.pref_countries_ids_detail.length == 0)" class="m-0"> 
+          You can add here the countries you're not willing to meet so we can filter it out for you.
+        </p>
+      </div>
+    </div>
+
+    <div class="card b-shadow p-0 b-rad-0 mb-20">
+      <div id="basic-info" class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+        <fa-icon class="mr-5" [icon]="['fas', 'map-marker-alt']" slot="start"></fa-icon> &nbsp;&nbsp;
+        <!-- <i class="fas fa-map-marker-alt"></i> -->
+        <h6 class="h-title m-0"> My City and Timezone </h6>
+    </div>
+
+    <form> 
+      <div class="p-20">
+        <div class="form-group block mb-20">
+          <label  class="text-secondary mb-10" for="edit-jobtitle">My City </label>
+          <div id="edit-jobtitle" class="input-wrapper">
+            <input 
+            type="text" 
+            ngx-google-places-autocomplete 
+            [options]='options' 
+            #placesRef="ngx-places" 
+            (onAddressChange)="handleAddressChange($event)" 
+            [(ngModel)]="delegate.address"
+            [ngModelOptions]="{standalone: true}"       
+            class="form-control" id="eventAddress" 
+            [ngClass]="{ 'is-invalid': submitted && f.eventAddress.errors }"/>
+          </div>
+  
+
+          <div *ngIf="submitted && f.eventAddress.errors" class="invalid-feedback">
+              <div *ngIf="f.eventAddress.errors.required">Your City is required</div>
+          </div> 
+      </div>
+
+      <div class="form-group block mb-20">
+        <!-- <span class="required">*</span> -->
+        <label class="text-secondary mb-10" for="edit-jobtitle">Timezone</label>
+        <div id="edit-jobtitle" class="input-wrapper"> 
+          <!-- formControlName="timeZone"  -->
+          <input 
+          type="text"           
+          [(ngModel)]="delegate.timezone"
+          [ngModelOptions]="{standalone: true}"
+          class="form-control" 
+          id="timeZone" 
+          [ngClass]="{ 'is-invalid': submitted && f.timeZone.errors }" 
+          readonly="true"/>
+        </div>
+        <div *ngIf="submitted && f.timeZone.errors" class="invalid-feedback">
+            <div *ngIf="f.timeZone.errors.required">Timezone is required</div>
+        </div> 
+      </div>
+      </div>
+       
+       
+            
+    </form>
+   <!--  <div class="row">
+      <div class="col-md-8">
+        <div class="event-address-map" id="event-address-map">
+            <agm-map [latitude]="latitude" [longitude]="longitude" [scrollwheel]="false" [zoom]="zoom">
+              <agm-marker [latitude]="latitude" [longitude]="longitude"></agm-marker>
+            </agm-map>
+        </div>
+      </div>
+    </div> -->
+
+    </div>
+
+    <!-- Client suggestion to remove edit of company -->
+    <!-- <div class="card p-0 b-rad-0 mb-20">
+      <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+        <ion-icon class="mr-5" src="assets/icon/company-info.svg" slot="start"></ion-icon>
+        <h6 class="h-title m-0"> Company Information </h6>
+      </div>
+
+      <div class="form-group block mb-20">
+        <ion-item (click)="editCompanyProfile()" lines="none" class="select-button text-primary">
+          Edit your company information
+          <ion-icon class="p-absolute forward fs-20 text-primary" name="ios-arrow-forward"></ion-icon>
+        </ion-item> 
+      </div>
+    </div> -->
+  </div>
+</ion-content>

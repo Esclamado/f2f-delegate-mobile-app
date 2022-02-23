@@ -1,0 +1,54 @@
+ion-content {
+    --ion-background-color: #ebebeb;
+}
+.info-container {
+    box-shadow: 0 0 8px rgba(13,13,13,0.1);
+}
+.info-card {
+    border-bottom: solid 1px #cccccc;
+    position: relative;
+    background: #ffffff;
+
+    .info-items {
+        padding: 25px 0px;
+
+        &.ms-icon {
+            width: 50px;
+            text-align: center;
+            color: #666666;
+        }
+
+        .centerV {
+            right: 0;
+            height: 45px;
+            width: 45px;
+            background: transparent;
+        }
+
+        .info-country {
+            position: relative;
+
+            .country-flag {
+                position: absolute;
+                display: block;
+                width: 15px;
+                height: 15px;
+                background-size: 15px;
+            }
+
+            .country-name {
+                margin-left: 25px;
+            }
+        }
+    }
+}
+
+.schedule-meeting {
+    width: 100%;
+    border-radius: 0;
+}
+ion-textarea{
+    padding: 0px 10px 0px 2px;
+    margin: 0 -10px;
+    width: calc(100% + 20px);
+}

@@ -1,0 +1,119 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss('close')">
+        <ion-icon class="text-back-button back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <div class="clearfix">
+      <ng-container *ngIf="env.chatSocket.convo as convo">
+        <a class="flex ai-center" (click)="goToProfile()">
+          <div class="delegate-photo user-pp" [ngClass]="{'online': env.chatSocket.active_users['user_id_'+convo['user'+convo.chatWith]] }">
+            <img src="{{convo['up'+convo.chatWith+'_profile_pic']}}" />
+          </div> 
+          <div class="delegate-info mw">
+            <p class="company-name mb-0 mt-0 fs-14 fw-500 ellipsis">{{convo['com'+convo.chatWith+'_name']}}</p>
+            <p class="mb-0 mt-0 fs-14 fw-400 ellipsis text-default">
+              <span class="delegate-name" text-capitalize>{{convo['d'+convo.chatWith+'_fullname']}}, </span>
+              <span class="delegate-job-title" text-capitalize>{{convo['d'+convo.chatWith+'_job_title']}}</span> 
+            </p>
+          </div>
+        </a>
+      </ng-container>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ng-container *ngIf="env.chatSocket.messages">
+
+      <!-- empty state -->
+        <ng-container *ngIf="!env.chatSocket.messages.datas.length">
+          <div class="d-table" *ngIf="env.chatSocket.convo as convo">
+            <div class="bg-gray card b-rad-0 va-center" text-center>
+              <img class="w-30-per" src="/assets/empty_states/no_message.png" />
+              <h6 class="mt-10 font-black">No conversation yet</h6>
+              <p class="font-black">This is the very beginning of your direct message history with <span text-capitalize>{{convo['d'+convo.chatWith+'_fullname']}}</span></p>
+            </div>
+          </div>
+        </ng-container>
+      <!-- end empty state -->
+      
+      <ion-infinite-scroll *ngIf="env.chatSocket.messages.current_page < env.chatSocket.messages.total_page" class="mt-20" threshold="100px" (ionInfinite)="infiScroll($event)" position="top">
+        <ion-infinite-scroll-content loadingSpinner="bubbles"></ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+
+
+
+      <ng-container *ngIf="env.chatSocket.messages.datas.length">
+        <ng-container *ngFor="let msg of env.chatSocket.messages.datas">
+
+          <!-- date divider -->
+          <ng-container *ngIf="msg.date_divider">
+              <div class="date-divider">
+                <p>{{msg.date_divider}}</p>
+              </div>
+            </ng-container>
+          <!-- end date divider -->
+
+          <!-- message -->
+            <div class="msg-container clearfix">
+              <ng-container *ngIf="msg.user_id == env.payload.jti">
+                <div class="my-msg-content" [innerHTML]="msg.message"></div>
+              </ng-container>
+
+              <ng-container *ngIf="msg.user_id != env.payload.jti">
+                <div class="chatwith-msg-content clearfix">
+                  <div class="user-photo user-pp" [ngClass]="{'online': env.chatSocket.active_users['user_id_'+msg.user_id] }">
+                    <img src="{{msg.profile_pic_image}}">
+                  </div>
+                  <div class="chatwith-msg" [innerHTML]="msg.message"></div>
+                </div>
+              </ng-container>
+            </div>
+          <!-- message -->
+
+        </ng-container>
+      </ng-container>
+
+
+
+    </ng-container>
+
+    <!-- is typing -->
+    <ng-container *ngIf="env.chatSocket.convo as convo">
+      <div *ngIf="chatWidthIsTyping" class="msg-container clearfix">
+        <div class="chatwith-msg-content clearfix">
+          <div class="user-photo user-pp" [ngClass]="{'online': env.chatSocket.active_users['user'+convo.chatWith] }">
+            <img src="{{convo['up'+convo.chatWith+'_profile_pic']}}">
+          </div>
+          <div class="chatwith-msg">
+              <div class="flex ai-center">
+                <div class="mr-15 text-secondary" text-capitalize>
+                  {{convo['d'+convo.chatWith+'_fullname']}} is typing
+                </div>
+                <div class="">
+                  <ion-spinner name="dots"></ion-spinner>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <!-- is typing -->
+
+</ion-content>
+
+<ion-footer>
+  <div 
+    id="texarea-container" 
+    class="textarea" 
+    placeholder="Type a message..." 
+    contenteditable="true" 
+    (input)="messageToSend = $event.target.innerText" 
+    (keyup)="isTyping()"
+  ></div>
+  <button (click)="sendMessage()" [attr.disabled]="sendButton ? null : 'true' ">
+    <ion-icon class="" [ngClass]="{'active' : sendButton}" ios="ios-send" md="md-send"></ion-icon>
+  </button>
+</ion-footer>

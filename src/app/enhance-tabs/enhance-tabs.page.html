@@ -1,0 +1,40 @@
+<ion-tabs (ionTabsWillChange)="tabChange($event)">
+  <ion-tab-bar slot="bottom">
+
+    <ion-tab-button tab="event-enhance/{{event_id}}">
+      <ion-icon *ngIf="selectedTabs != 'event-enhance'" src="assets/icon/tab-home.svg"></ion-icon>
+      <ion-icon *ngIf="selectedTabs == 'event-enhance'" src="assets/icon/tab-selected-home.svg"></ion-icon>
+      <ion-label [ngClass]="selectedTabs == 'event-enhance' ? 'activated-label' : ''">Home</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="chat-enhance/{{event_id}}">
+      <ion-icon *ngIf="selectedTabs != 'chat-enhance'" src="assets/icon/tab-chat.svg"></ion-icon>
+      <ion-icon *ngIf="selectedTabs == 'chat-enhance'" src="assets/icon/tab-selected-chat.svg"></ion-icon>
+      <ng-container *ngIf="env.unread_msg['event_'+event_id] as unMsgs">
+        <ng-container *ngIf="unMsgs.unread_msg_convo as unreadMsgs">
+          <ion-badge *ngIf="unreadMsgs > 0">
+            {{unreadMsgs}}
+          </ion-badge>
+        </ng-container>
+      </ng-container>
+      <ion-label [ngClass]="selectedTabs == 'chat-enhance' ? 'activated-label' : ''">Message</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="notification-enhance/{{event_id}}">
+      <ion-icon *ngIf="selectedTabs != 'notification-enhance'" src="assets/icon/tab-notification.svg"></ion-icon>
+      <ion-label [ngClass]="selectedTabs == 'notification-enhance' ? 'activated-label' : ''"> Notification </ion-label>
+      <ng-container *ngIf="event && !event.archive_in">
+        <ion-badge *ngIf="total_unread_notif > 0">{{total_unread_notif}}</ion-badge>
+      </ng-container>
+      <ion-icon *ngIf="selectedTabs == 'notification-enhance'" src="assets/icon/tab-selected-notification.svg"></ion-icon>
+    </ion-tab-button>
+
+    <ion-tab-button tab="event-settings-enhance/{{event_id}}">
+      <ion-icon *ngIf="selectedTabs != 'event-settings-enhance'" src="assets/icon/tab-settings.svg"></ion-icon>
+      <ion-icon *ngIf="selectedTabs == 'event-settings-enhance'" src="assets/icon/tab-selected-settings.svg"></ion-icon>
+      <ion-label [ngClass]="selectedTabs == 'event-settings-enhance' ? 'activated-label' : ''"> More </ion-label>
+  
+    </ion-tab-button>
+
+  </ion-tab-bar>
+</ion-tabs>

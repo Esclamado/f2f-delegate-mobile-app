@@ -1,0 +1,96 @@
+<ion-header no-border>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-button (click)="dismiss()">
+          <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title class="p-0" *ngIf="request_type == 'received'" text-center> Received Requests </ion-title>
+      <ion-title class="p-0" *ngIf="request_type == 'sent'" text-center> Sent Requests </ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="presentSocialModal('LNS','ln')" >
+          <ion-icon slot="icon-only" name="ios-help-circle"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+<ion-content>
+  <div class="timeslot-request-header {{request_type}}">
+    <p class="m-0 text-white fs-15" *ngIf="request_type == 'received'">These are all meeting requests you received for</p>
+    <p class="m-0 text-white fs-15" *ngIf="request_type == 'sent'">These are all active meeting requests you sent</p>
+
+    <p class="mb-0 mt-7 text-white fs-15 fw-500" *ngIf="day && timeslot">
+      {{day.formatted}}, {{timeslot.start_time}} - {{timeslot.end_time_orig}}
+    </p>
+  </div>
+
+
+  <!-- Skeleton Loader -->
+  <ng-container *ngIf="!requests">
+    <div class="delegate-profile clearfix mt-20 p-15">    
+      <div *ngIf="!delegate" class="profile-photo">
+        <img src="/assets/empty_states/profile_avatar_1.png" />
+      </div>
+      <div *ngIf="!delegate && !company" class="profile-basic-info pl-10">
+        <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+        <ion-skeleton-text animated class="mt-15" style="width: 75%"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="requests">
+    <ng-container *ngFor="let delegate of requests.datas">
+      <div class="req-items {{request_type}}">
+        <div class="delegate-profile clearfix">
+          <div class="profile-photo">
+              <img *ngIf="delegate.del_profile_photo.length == 1" src="/assets/empty_states/profile_avatar_{{delegate.del_profile_photo}}.png" />
+              <img *ngIf="delegate.del_profile_photo.length > 1" src="{{delegate.del_profile_photo}}" />
+          </div>
+          <div class="profile-basic-info pl-10">
+              <h4 class="fs-16 fw-500 mt-0 mb-10 ellipsis w-100-per capitalize">{{delegate.company_name}}</h4>
+              <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">{{delegate.del_fullname}}</p>
+              <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize text-secondary">{{delegate.del_job_title}}</p>
+              <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">
+                  <span class="country-flag" [ngStyle]="{'background-image': 'url(/assets/images/flags/' + delegate.company_country_iso + '.png)'}"></span>
+                  <span>{{delegate.company_country_nicename}}</span>
+              </p>
+          </div>
+        </div>
+
+        <ng-container *ngIf="request_type == 'received'">
+          <div class="request-message received r-all-5p">
+            <div class="mb-15" [innerHtml]="delegate.request_message"></div>
+            <div class="action-button">
+              <button class="req-btn times mr-10" (click)="showConfirm('decline', delegate)">
+                <fa-icon class="flex jc-center" [icon]="['fas', 'times']" slot="end"></fa-icon>
+              </button>
+              <button class="req-btn check" (click)="showConfirm('accept', delegate)">
+                <fa-icon class="flex jc-center" [icon]="['fas', 'check']" slot="end"></fa-icon>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="request_type == 'sent'">
+            <div class="action-button sent">
+              <button class="req-btn times" (click)="showConfirm('cancel', delegate)">
+                <fa-icon class="flex jc-center" [icon]="['fas', 'times']" slot="end"></fa-icon>
+              </button>
+            </div>
+        </ng-container>
+
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <ion-infinite-scroll class="mt-20" threshold="100px" (ionInfinite)="infiScroll($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Loading more delegate...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+</ion-content>

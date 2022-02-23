@@ -1,0 +1,36 @@
+ion-header {
+    ion-toolbar {
+       &:last-child {
+          .toolbar-background {
+            box-shadow: var(--box-shadow);
+          }
+       }
+    }
+}
+ion-content{
+    --ion-background-color:#ebebeb;
+}
+
+.item .sc-ion-label-md-h {
+    text-overflow: inherit;
+    white-space: normal;
+    line-height: 1.5;
+}
+ion-radio{
+    margin-right: 20px;
+}
+
+:root {
+  --ion-safe-area-top: 20px;
+  --ion-safe-area-bottom: 22px;
+  --color-checked: #7a9f12;
+}
+
+ion-footer ion-toolbar{
+  height: auto;
+}
+ion-footer {
+  &.footer-md::before {
+      background-image: none;
+  }
+}

@@ -1,0 +1,142 @@
+ion-content{
+    --ion-background-color:#ebebeb;
+}
+
+.profile-banner {
+    background-size: cover;
+    width: 100%;
+    background-repeat: no-repeat;
+}
+
+.timeleft-banner{
+    background-size: cover;
+    width: 100%;
+    background-repeat: no-repeat;
+}
+
+.meeting-done{
+    position: relative;
+}
+
+.chip.meeting-done{
+    position: absolute;
+    right: -35px;
+}
+.chip.set-by-admin{
+    background: #688b06 !important;
+    color: #ffffff;
+}
+.chip.sent{
+    background: #0f9d89 !important;
+    color: #ffffff;
+}
+.chip.received{
+    background: #291487 !important;
+    color: #ffffff;
+}
+
+ion-fab-list{
+    position: absolute;
+    right: 10px;
+}
+
+ion-fab-list ion-fab-button{
+    margin: 0;
+    width: 200px;
+    height: 50px;
+    background: #0a3b8c;
+    line-height: 40px;
+    --ion-color-contrast: #fff !important;
+    --box-shadow: none;
+    transition: none;
+    --border-radius: 0;
+}
+
+ion-fab-button.primary{
+    --ion-color-base: #0a3b8c !important;
+}
+
+ion-fab-button.cancel{
+    --ion-color-base: #b01b30 !important;
+}
+
+.b-b-l-r{
+    border-bottom-left-radius: 4px !important;
+}
+.b-b-r-r{
+    border-bottom-right-radius: 4px !important;
+}
+.b-t-l-r{
+    border-top-left-radius: 4px !important;
+}
+.b-t-r-r{
+    border-top-right-radius: 4px !important;
+}
+
+.noshow-report-button{
+    .flag-icon{
+        span{
+            background-image: url('/assets/icon/flag.png');
+            width: 64px;
+            height: 64px;
+            display: block;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin-right: 20px;
+        }
+    }
+}
+
+.notes-container{
+    max-height: 190px;
+    overflow: hidden;
+}
+
+.btn {
+    padding: 10px 16px;
+    min-width: 10px;
+
+    &.btn-send-mail {
+        background-image: linear-gradient(0deg, #1e50a6 0%, #0a3b8c 100%);
+        color: #fff;
+    }
+    &.btn-edit {
+        background-image: linear-gradient(0deg, #888888 0%, #666666 100%);
+        color: #fff;
+    }
+    &.btn-delete {
+        background-color: #ebebeb;
+        color: #666666;
+    }
+}
+
+.button-ico{
+    display: flex;
+    background: #ebebeb;
+    border-radius: 50%;
+    height: 65px;
+    width: 65px;
+    align-items: center;
+    margin: auto;
+    justify-content: center;
+    &.left{ 
+        //justify-content: flex-start;
+    }
+    &.right{
+        //justify-content: flex-end;
+    }
+    &.center{
+        //justify-content: center;
+    }
+    .icon{
+        padding: 20px;
+        background: #ebebeb;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: right;
+        margin-bottom: 5px;
+        margin-right: 0px !important;
+    }
+}

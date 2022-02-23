@@ -1,0 +1,187 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="myBackButton()">
+        <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="p-0" text-center> Event Details </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="ios-arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="event && event.archive_in" class="header-bar archive">
+    <p class="m-0 text-white fs-15 ellipsis w-100-per flex">
+      <span class="ml-4 mr-8 flex ai-center"><ion-icon src="assets/icon/archived-icon.svg" slot="end"></ion-icon></span>
+      <span class="ellipsis">This event will be archived in: {{event.archive_in}} </span>
+    </p>
+  </div>
+  <div *ngIf="event && !event.image_banner" class="container profile-banner"
+    [ngStyle]="{'background-image': 'url(/assets/images/meeting_details.png)'}">
+    <div class="avatar-container p-25 text-white">
+
+    </div>
+  </div>  
+
+  <div *ngIf="event && event.image_banner" class="container profile-banner"
+    [ngStyle]="{'background-image': 'url('+event.banner_image_src+')'}">
+    <div class="avatar-container p-25 text-white">
+
+    </div>
+  </div> 
+
+  <div *ngIf="!event" class="b-shadow container profile-banner">
+    <div class="avatar-container p-25 text-white">
+      <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 65%"></ion-skeleton-text>
+      <p class="mb-10 mt-20 fs-15 flex ai-top">
+        <span class="mr-10">
+          <ion-icon src="assets/icon/cal-green.svg" slot="end"></ion-icon>
+        </span>
+        <ion-skeleton-text animated style="width: 55%"></ion-skeleton-text>
+      </p>
+      <p class="mt-10 mb-0 fs-15 flex ai-center">
+        <span class="mr-10"><fa-icon [icon]="['fas', 'map-marker-alt']" slot="end"></fa-icon></span>
+        <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+      </p>
+    </div>
+  </div>
+
+  <div *ngIf="event" class="b-shadow card p-20 b-rad-0 mb-25">
+    <h5 class="mt-0">
+      {{event.name}}
+    </h5>
+    <p class="mt-20 fs-15 flex ai-center">
+      <span class="mr-14 mt-2">
+        <ion-icon src="assets/icon/cal-green.svg" slot="end"></ion-icon>
+      </span>
+      <span class="fs-16 lh-26"> {{event.event_date}} </span>
+    </p>
+    <p class="mt-15 fs-15 flex ai-center">
+      <span class="mr-12 mt-2"><fa-icon class="text-success" [icon]="['fas', 'clock']" slot="end"></fa-icon></span>
+      <span class="fs-16 lh-26"> {{event.start_time}} - {{event.end_time}} </span>
+    </p>
+    <!-- <p class="mt-15 mb-20 fs-15 flex ai-start">
+      <span class="mr-16 mt-2"><fa-icon class="text-success" [icon]="['fas', 'map-marker-alt']" slot="end"></fa-icon></span>
+      <span class="fs-16 lh-26"> {{event.event_address}} </span>
+    </p> -->
+
+    <div class="form-group block mb-15">
+      <label class="text-secondary pb-5 fs-16"> Description </label>
+      <div class="fs-16 lh-26 tJ" *ngIf="event.description.length > 0" [innerHtml]="event.description"></div>
+      <div *ngIf="event.description.length == 0">
+        <p class="m-0">  No description yet</p>
+      </div>
+    </div>
+  </div>
+
+    <!-- Skeleton Loader -->
+    <div *ngIf="!event" class="b-shadow card p-20 b-rad-0 mb-25">
+      <h6 class="mt-0"> 
+        <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+      </h6>
+      <p class="mt-20 fs-15 flex ai-center">
+        <span class="mr-10">
+          <ion-icon src="assets/icon/cal-green.svg" slot="end"></ion-icon>
+        </span>
+        <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+      </p>
+      <p class="mt-15 fs-15 flex ai-top">
+        <span class="mr-10"><fa-icon class="text-success" [icon]="['fas', 'clock']" slot="end"></fa-icon></span>
+        <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+      </p>
+      <p class="mt-15 mb-20 fs-15 flex ai-center">
+        <span class="mr-10"><fa-icon class="text-success" [icon]="['fas', 'map-marker-alt']" slot="end"></fa-icon></span>
+        <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+      </p>
+  
+      <div class="form-group block mb-15">
+        <label class="text-secondary pb-5"> Description </label>
+        <div>
+          <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 50%"></ion-skeleton-text>
+        </div>
+        <div class="pt-10">
+          <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="event && event.image_floor_plan" class="b-shadow floor-plan card b-rad-0 mb-25 p-0"
+    [ngStyle]="{'background-image': 'url('+event.floorplan_image_src+')'}">
+    <div class="opacity"></div>
+    <ion-button (click)="gotoEventFloorPlan(event.floorplan_image_src)" class="button blue btn-view">
+      View event floor plan
+      <fa-icon class="ml-5" [icon]="['fas', 'chevron-right']" slot="end"></fa-icon>
+    </ion-button>
+  </div>
+
+  <div class="b-shadow card p-0 b-rad-0 mb-25">
+    <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+      <fa-icon class="mr-5" [icon]="['fas', 'users']" slot="start"></fa-icon>
+      <h6 class="h-title m-0"> Speakers </h6>
+    </div>
+    <div *ngIf="speakers && total_speaker_count > 0">
+      <ion-list class="mb-10" lines="full" no-padding>            
+        <div (click)="gotoSpeaker(speaker)" *ngFor="let speaker of speakers" class="card p-20 b-rad-0 b-bot mh-120">
+          <div class="delegate-profile clearfix">
+            <div class="profile-photo">
+              <img *ngIf="speaker.photo.length == 1" src="/assets/empty_states/profile_avatar_{{speaker.photo}}.png" />
+              <img *ngIf="speaker.photo.length > 1" src="{{speaker.photo_url}}" />
+            </div>
+            <div class="profile-basic-info pl-10">
+              <ion-grid no-padding>
+                <ion-row>
+                  <ion-col no-padding size="10">
+                    <h4 class="fs-16 fw-500 mt-0 mb-10 ellipsis w-100-per capitalize">{{speaker.company}}</h4>
+                    <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">{{speaker.fullname}}</p>
+                    <p class="fs-15 mt-0 mb-0 ellipsis w-100-per text-secondary capitalize">{{speaker.position}}</p>
+                  </ion-col>
+                  <ion-col no-padding class="flex ai-center jc-center" size="2">
+                    <ion-icon class="fs-25" name="ios-arrow-forward" item-right></ion-icon>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </div>
+          </div>
+        </div>
+      </ion-list>
+      <ion-infinite-scroll (ionInfinite)="loadData($event)">
+        <ion-infinite-scroll-content
+          loadingSpinner="bubbles"
+          loadingText="Loading more delegate...">
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+    </div>
+    <div *ngIf="!speakers">
+      <div *ngFor="let skeleton of skeleton_loader" class="mb-20">
+        <div class="card p-20 b-rad-0 b-bot">
+          <div class="delegate-profile clearfix">
+            <div class="profile-photo">
+              <img src="/assets/empty_states/profile_avatar_1.png" />
+            </div>
+            <div class="profile-basic-info pl-10">
+                <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                <ion-skeleton-text animated class="mt-10" style="width: 75%"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+     <div *ngIf="speakers && total_speaker_count == 0">
+        <div class="p-20" text-center>
+          No speaker yet
+        </div>
+      </div>
+  </div>
+</ion-content>

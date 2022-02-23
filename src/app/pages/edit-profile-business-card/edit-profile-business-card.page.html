@@ -1,0 +1,62 @@
+<ion-content>
+  <div class="container">
+    <div class="update-profile-banner">
+     <ion-icon routerLink="/edit-profile-info" class="routerLinkClass p-absolute back fs-30" name="ios-arrow-back"></ion-icon>
+      <div class="login-form p-10">
+        <ion-grid>
+          <ion-row class="mt-20">
+            <ion-col size="3">
+              <circle-progress
+                [percent]= "66"
+                [maxPercent] = "100"
+                [backgroundOpacity]="1"
+                [outerStrokeWidth]="10"
+                [outerStrokeColor]="'#799e11'"
+                [innerStrokeColor]="'#999999'"
+                [titleFontSize]= "30"
+                >
+
+              </circle-progress>
+            </ion-col>
+            <ion-col size="9">
+              <h6>Upload your business card</h6>
+              <p class="fw-400">It would be nice if your business card is in your profile.</p>
+              <p class="text-secondary fw-400"> Next: Preferences </p>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+    </div>
+  </div>
+  <div class=" mb-80">
+    <div class="card p-0 b-rad-0 mb-20">
+      <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot flex ai-center">
+        <ion-icon class="mr-5" src="/assets/icon/b-card.svg" slot="start"></ion-icon>
+        <h6 class="h-title m-0"> Business Card </h6>
+      </div>
+      <div *ngIf="delegate" class="p-20">
+        <div class="mb-15 text-secondary">
+          This step is optional, but you can always upload your business card later.
+        </div>
+        <div *ngIf="!delegate.businesscard || delegate.businesscard == 1 || delegate.businesscard == 2 || delegate.businesscard == 3" class="business-card pt-30 pb-30" text-center>
+          <div class="flex jc-center">
+            <img class="h-60 pb-5" src="assets/images/business-card.png">
+          </div>
+          You didn't upload any business card.
+          <p (click)="cropUpload()" class="text-primary mt-5 mb-0"> <fa-icon class="mr-5" [icon]="['fas', 'camera']" slot="start"></fa-icon> Upload one now? </p>
+        </div>
+
+        <ng-container *ngIf="delegate.businesscard && delegate.businesscard != 1 && delegate.businesscard != 2 && delegate.businesscard != 3">
+          <div class="business-card text-primary photo" [ngStyle]="{'background-image': 'url('+ delegate.businesscard_url + ')'}">
+          </div>
+          <div (click)="cropUpload()" class="text-secondary mt-15 flex ai-center jc-center"> <fa-icon class="mr-5" [icon]="['fas', 'times']" slot="start"></fa-icon> Change photo </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <button routerLink="/edit-profile-preferences" class="modal-btn-bottom fixed fs-15 text-white"> 
+      Next 
+      <fa-icon class="ml-5" [icon]="['fas', 'chevron-right']" slot="start"></fa-icon>
+    </button>
+  </div>
+</ion-content>

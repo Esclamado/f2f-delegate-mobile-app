@@ -1,0 +1,96 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="confirmDismiss()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="p-0 sm-header fs-19" text-center>
+        Schedule a meeting
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="ios-arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="info-container">
+    <div class="info-card clearfix flex ai-top" (click)="reSchedMeeting()">
+      <div class="info-items ms-icon">
+        <fa-icon [icon]="['fas', 'clock']" slot="end"></fa-icon>
+      </div>
+
+      <div class="info-items ms-info" *ngIf="timeslot && dateTime as dt">
+        <p class="fs-16 fw-500 mt-0 mb-10">{{dt.day}}, {{dt.mon}}. {{dt.date}}, {{dt.year}}</p>
+        <p class="fs-15 mt-0 mb-0">{{timeslot.start_time}} - {{timeslot.end_time}}</p>
+
+        <button class="centerV text-primary">
+          <fa-icon [icon]="['fas', 'pencil-alt']" slot="end"></fa-icon>
+        </button>
+      </div>
+
+      <div class="info-items ms-info" *ngIf="!timeslot && !dateTime">
+        <p class="fs-16 mt-0 mb-10 text-secondary"> Please select a timeslot</p>
+
+        <button class="centerV text-primary">
+          <fa-icon [icon]="['fas', 'pencil-alt']" slot="end"></fa-icon>
+        </button>
+      </div>
+    </div>
+
+
+    <div class="info-card delegate-info clearfix flex ai-top" (click)="dismiss('change_delegate')">
+      <div class="info-items ms-icon">
+        <fa-icon [icon]="['fas', 'user']" slot="end"></fa-icon>
+      </div>
+
+      <div class="info-items ms-info" *ngIf="delegate as d">
+        <p class="fs-16 fw-500 mt-0 mb-10 ellipsis w-270">{{d.company_name}}</p>
+        <p class="fs-15 mt-0 mb-10 ellipsis" text-capitalize>{{d.fullname}}</p>
+        <p class="fs-15 mt-0 mb-10 ellipsis" text-capitalize>{{d.job_title}}</p>
+        <p class="info-country fs-15 mt-0 mb-5 ellipsis w-100-per" text-capitalize>
+          <span class="country-flag" [ngStyle]="{'background-image': 'url(/assets/images/flags/'+d.company_country_flag+'.png)'}"></span>
+          <span *ngIf="!d.company_country_name" class="country-name">
+            {{d.company_country}}
+          </span>
+          <span *ngIf="d.company_country_name" class="country-name">
+            {{d.company_country_name}}
+          </span>
+        </p>
+
+        <button *ngIf="timeslot" class="centerV text-primary">
+          <fa-icon [icon]="['fas', 'pencil-alt']" slot="end"></fa-icon>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="event.meeting_request == 2" class="info-card delegate-info clearfix flex ai-top">
+        
+        <div class="info-items ms-icon">
+          <fa-icon [icon]="['fas', 'comment-alt']" slot="end"></fa-icon>
+        </div>
+        <div class="info-items w-75-per ms-info">
+          <p class="fs-16 fw-500 mt-0 mb-10 ellipsis">Message</p>
+          <ion-textarea id="textarea-message" class="lh-25" 
+            [(ngModel)]="requestMessage" 
+            [ngModelOptions]="{standalone: true}" 
+            rows="3"
+            placeholder="Enter your message..."
+          ></ion-textarea>
+          
+          <!-- <button class="centerV text-primary" >
+            <fa-icon [icon]="['fas', 'pencil-alt']" slot="end"></fa-icon>
+          </button> -->
+        </div>
+    </div>
+
+  </div>
+</ion-content>
+<ion-footer *ngIf="timeslot">
+  <button class="btn grad btn-primary schedule-meeting" (click)="startScheduling()">
+    Schedule a meeting
+  </button>
+</ion-footer>

@@ -1,0 +1,141 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="myBackButton()">
+        <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title class="p-0" text-center> No Show Delegates </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="ios-arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+	<div class="event-listing-tabs ml--20 mr--20 pt-5 card p-0 b-rad-0">
+      <div class="tabs flex ai-center mr-20 ml-20">
+          <div class="tabs-item w-50-per pt-4 text-center" [ngClass]="selectedtab == 'top_noshow' ? 'active' : ''" (click)="selectTab('top_noshow')">
+              <p>Top No Show </p><p>Delegates</p>
+          </div>
+          <div class="tabs-item w-50-per pt-4 text-center" [ngClass]="selectedtab == 'noshow_delegate' ? 'active' : ''" (click)="selectTab('noshow_delegate')">
+              <p>No Show of My </p><p> Meeting Partners</p>
+          </div>
+      </div>
+    </div>
+    <ng-container [ngSwitch]="selectedtab">
+        <div *ngSwitchCase="'top_noshow'" class="mt-20">
+			<div *ngIf="topNoshowDelegates"> 
+		        <div class="card b-rad-0 b-bot" text-center>
+		          <img class="w-30-per" src="/assets/icon/top_noshow.png" />
+		          <h6 class="mt-10"> Top No Show Delegates</h6>
+		          <p>These delegates are all marked as no-show. They are all reported by other delegates and has been verified by the admin.</p>
+		        </div>
+		        <ng-container *ngIf="dataIsLoaded">
+		        	<div *ngFor="let noshowDelegate of topNoshowDelegates" class="card p-25 b-rad-0 b-bot ">
+			            <div class="routerLinkClass delegate-profile clearfix" (click)="gotoDelegateProfile(noshowDelegate.rd_delegate_id)">
+			              <div class="profile-photo">
+			                  <img src="{{noshowDelegate.rd_profile_photo_url}}" />
+			              </div>
+			              <div class="profile-basic-info pl-10">
+				                 <h4 class="fs-18 fw-500 mt-0 mb-7 ellipsis w-100-per capitalize">
+				                 	<span [ngStyle]="{'background-image': 'url(/assets/images/flags/' + noshowDelegate.rd_company_country_iso + '.png)'}" class="country-flag mr-5"></span>
+				                  	{{noshowDelegate.rd_company_name}}
+			              		</h4>	
+				                <p class="fs-16 mt-0 mb-5 ellipsis w-100-per capitalize">{{noshowDelegate.rd_fullname}}</p>
+				                <p class="fs-16 mt-0 mb-5 ellipsis w-100-per capitalize text-secondary">{{noshowDelegate.rd_job_title}}</p>
+				                <p class="mt-15 mb-5 text-danger fs-16"><fa-icon [icon]="['fas', 'flag']" slot="end" class="mr-10"></fa-icon>{{noshowDelegate.noshow_count}} no show 
+				                	<span *ngIf="noshowDelegate.noshow_count > 1">meetings</span>
+				                	<span *ngIf="noshowDelegate.noshow_count <= 1">meeting</span>
+				                </p>
+			              </div>
+			            </div>
+			        </div>
+		        </ng-container>
+		        <div *ngIf="!dataIsLoaded" class="card p-25 b-rad-0 b-bot ">
+		            <div class="delegate-profile clearfix">
+		              <div class="profile-photo">
+		              </div>
+		              <div class="profile-basic-info pl-10">
+			                 <h4 class="fs-18 fw-500 mt-0 mb-7 ellipsis w-100-per capitalize">
+			                 	<ion-skeleton-text animated style="width: 100%; height: 18px;"></ion-skeleton-text>
+		              		</h4>		
+			                	<ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+			                	<ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+			            	
+			                <p class="mt-15 mb-5 text-danger fs-16 flex ai-center"><ion-skeleton-text animated style="width: 70%"></ion-skeleton-text></p>
+		              </div>
+		            </div>
+		        </div>
+		        <div *ngIf="dataIsLoaded && topNoshowDelegates.length < 1" class="card p-25 b-rad-0">
+		        	<h4 class="text-center">No record found</h4>
+		        </div>
+		        <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMoreData($event)">
+                  <ion-infinite-scroll-content
+                    loadingSpinner="bubbles"
+                    loadingText="Loading more data...">
+                  </ion-infinite-scroll-content>
+                </ion-infinite-scroll>
+		    </div>
+        </div>
+        <div *ngSwitchCase="'noshow_delegate'" class="mt-20">
+			<div *ngIf="topNoshowDelegates"> 
+		        <div class="card b-rad-0 b-bot" text-center>
+		          <img class="w-30-per" src="/assets/icon/partner_noshow.png" />
+		          <h6 class="mt-10"> No Show of My Meeting Partners </h6>
+		          <p>These are all marked as no-show that you have a meeting with.</p>
+		        </div>
+		        <ng-container *ngIf="dataIsLoaded">
+		        	<div *ngFor="let noshowDelegate of topNoshowDelegates" class="card p-25 b-rad-0 b-bot ">
+			            <div class="routerLinkClass delegate-profile clearfix" 
+			            	(click)="gotoDelegateProfile(noshowDelegate.rd_delegate_id)">
+			              <div class="profile-photo">
+			                  <img src="{{noshowDelegate.rd_profile_photo_url}}" />
+			              </div>
+			              <div class="profile-basic-info pl-10">
+				                 <h4 class="fs-18 fw-500 mt-0 mb-7 ellipsis w-100-per capitalize">
+				                 	<span [ngStyle]="{'background-image': 'url(/assets/images/flags/' + noshowDelegate.rd_company_country_iso + '.png)'}" class="country-flag mr-5"></span>
+				                  	{{noshowDelegate.rd_company_name}}
+			              		</h4>	
+				                <p class="fs-16 mt-0 mb-5 ellipsis w-100-per capitalize">{{noshowDelegate.rd_fullname}}</p>
+				                <p class="fs-16 mt-0 mb-5 ellipsis w-100-per capitalize text-secondary">{{noshowDelegate.rd_job_title}}</p>
+				                <p class="mt-15 mb-5 text-danger fs-16"><fa-icon [icon]="['fas', 'flag']" slot="end" class="mr-10"></fa-icon>{{noshowDelegate.noshow_count}} no show 
+				                	<span *ngIf="noshowDelegate.noshow_count > 1">meetings</span>
+				                	<span *ngIf="noshowDelegate.noshow_count <= 1">meeting</span>
+				                </p>
+			              </div>
+			            </div>
+			        </div>
+		        </ng-container>
+		        
+		        <div *ngIf="!dataIsLoaded" class="card p-25 b-rad-0 b-bot ">
+		            <div class="delegate-profile clearfix">
+		              <div class="profile-photo">
+		              </div>
+		              <div class="profile-basic-info pl-10">
+			                 <h4 class="fs-18 fw-500 mt-0 mb-7 ellipsis w-100-per capitalize">
+			                 	<ion-skeleton-text animated style="width: 100%; height: 18px;"></ion-skeleton-text>
+		              		</h4>		
+			                	<ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+			                	<ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+			            	
+			                <p class="mt-15 mb-5 text-danger fs-16 flex ai-center"><ion-skeleton-text animated style="width: 70%"></ion-skeleton-text></p>
+		              </div>
+		            </div>
+		        </div>
+		        <div *ngIf="dataIsLoaded && topNoshowDelegates.length < 1" class="card p-25 b-rad-0">
+		        	<h4 class="text-center">No record found</h4>
+		        </div>
+		        <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMoreData($event)">
+                  <ion-infinite-scroll-content
+                    loadingSpinner="bubbles"
+                    loadingText="Loading more data...">
+                  </ion-infinite-scroll-content>
+                </ion-infinite-scroll>
+		    </div>
+        </div>
+    </ng-container>
+</ion-content>

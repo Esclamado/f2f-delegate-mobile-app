@@ -1,0 +1,46 @@
+<div class="prompt_modal">
+    <div class="modal_container">
+      <div class="modal_content">
+        <button ion-button icon-only (click)="dismiss()" class="btn-close">
+          <ion-icon class="fs-22" name="md-close"></ion-icon>
+        </button>
+  
+        <div class="flex jc-center">
+          <img class="w-30-per h-30-per" src="{{img_src}}" />
+        </div>
+
+        <h6 text-center> {{title}} </h6>
+        <div class="content-text">
+          <p text-center *ngIf="msg">
+            {{msg}}
+          </p>
+          <div *ngIf="msgHtml" [innerHtml]="msgHtml"></div>
+        </div>
+        <div class="mr--10 ml--10" *ngIf="!btn_txt && !faq_btn">
+          <ion-button (click)="dismiss()" class="button text-gray transparent">
+            {{btn_cancel}}
+          </ion-button>
+          <ion-button (click)="dismiss('save')" class="button blue">
+            {{btn_save}}
+          </ion-button>
+        </div>
+        <div *ngIf="btn_txt && !faq_btn">
+          <button (click)="dismiss('closed')" class="btn btn-primary grad w-100-per mt-10"> 
+            <span class="flex ai-center jc-center"> {{btn_txt}}
+            <ion-icon *ngIf="icon" slot="end" name="{{icon}}"></ion-icon>
+            </span>
+          </button>
+        </div>
+        <div *ngIf="faq_btn">
+            <button (click)="dismiss('event')" class="btn btn-primary-light w-100-per mt-15 flex ai-center jc-center fw-400">
+              Proceed to the event
+              <ion-icon class="ml-5" name="ios-arrow-forward" item-right></ion-icon>
+            </button>
+            <button (click)="dismiss('faq')" class="btn btn-nobg w-100-per mt-10 flex ai-center jc-center fw-400">
+              View the video and FAQs
+            </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  

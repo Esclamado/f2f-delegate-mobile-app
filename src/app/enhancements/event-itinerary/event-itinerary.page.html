@@ -1,0 +1,227 @@
+<ion-header>
+  <div class="event-header">
+    <div class="header-bar ongoing w-100-per p-10">
+      <p class="m-0 text-white">
+        <span class="ml-5 mr-5">
+          <fa-icon [icon]="['fas', 'clipboard-list']" slot="end"></fa-icon>
+        </span>
+        <span class="fw-500"> Your Final Itinerary </span>
+      </p>
+    </div>
+    <div class="event-title p-10 clearfix">
+      <div *ngIf="event">
+        <a (click)="goBacktoHome()" class="routerLinkClass mr-5 f-left text-back-button">
+          <ion-icon class="back-button" name="ios-arrow-back"></ion-icon>
+        </a>
+        <h4 class="e-title text-default m-0 fs-21 fw-500 ellipsis pr-25">
+          <span>{{event.name}}</span>
+        </h4>
+        <!-- <ion-avatar (click)="gotoUserProfile()" class="f-right mt--27 h-30 w-30 text-default no-outline"  slot="end">
+          <img  src="/assets/empty_states/profile_avatar_1.png" />
+        </ion-avatar> -->
+      </div>
+      <div *ngIf="!event">
+        <h4 class="e-title text-default fs-21 fw-500 ellipsis pr-25">
+          <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+        </h4>
+  
+        <!-- <ion-avatar class="f-right h-30 w-30 text-default" slot="end">
+          <img src="/assets/empty_states/profile_avatar_1.png" />
+        </ion-avatar> -->
+      </div> 
+    </div>
+  </div>
+  
+</ion-header>
+
+<ion-content>  
+  <ion-refresher slot="fixed" (ionPull)="startPullRefresh($event)" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="event" class="tab-event-days white pl-15 pr-15 pt-6 pb-6 mb-20 zi-9 pos-f w-100-per">
+    <ul class="flex ai-center mt-10">
+      <li>
+        <div class="tab-event-day">
+          {{monthName}}
+        </div>
+      </li>
+
+      <ng-container *ngFor="let d of event.days; let j = index">
+        <li (click)="selectDay(d)">
+          <div [ngClass]="{'active' : selected_ms_date == d.a_date_orig}" class="tab-event-day" >
+            <div class="day-name">{{d.day_name}}</div>
+            <div class="date-no"><span>{{d.date}}</span></div>
+          </div>
+        </li>
+      </ng-container>
+    </ul>
+  </div>
+
+  
+  <div class="pos-a t-80 w-100-per event-day">
+    <ng-container *ngIf="dataIsLoaded">
+      <ng-container *ngFor="let meeting of meetings_itinerary;">
+        <ng-container *ngIf="meeting.date == selected_ms_date">
+          <ng-container *ngIf="meetings_itinerary && meeting.data">
+            <div *ngFor="let sched of meeting.data; let i = index" class="ed-items clearfix mb-20">
+              <div class="indicator">
+                <div class="radio-style r-all-5p">
+                  <div class="dot">
+                  </div>
+                </div>
+              </div>
+              <div class="card-item f-right r-tl-5p r-bl-5p">
+                <h3 class="fs-18 fw-500 mt-0 mb-0">{{sched.start_time_delegate | date: 'shortTime'}} - {{sched.end_time_delegate | date: 'shortTime'}}</h3>
+        
+                <div *ngIf="sched.d1_id == event_delegate_id" class="delegate-profile clearfix mt-10">
+                  <div class="profile-photo">
+                    <img *ngIf="sched.d2_profile_photo.length == 1" src="/assets/empty_states/profile_avatar_{{sched.d2_profile_photo}}.png" />
+                    <img *ngIf="sched.d2_profile_photo.length > 1" src="{{sched.d2_profile_photo_url}}" />
+                  </div>
+                  <div class="profile-basic-info pl-10">
+                    <h4 *ngIf="sched.d2_company_name" class="fs-16 fw-500 mt-0 mb-7 ellipsis w-100-per capitalize">
+                      {{sched.d2_company_name}}
+                    </h4>
+                    <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">
+                      {{sched.d2_fullname}}
+                    </p>
+                    <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize text-secondary">
+                      {{sched.d2_job_title}}
+                    </p>
+                    <p *ngIf="sched.d2_company_country_name" class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize flex ai-center">
+                        <span class="country-flag" [ngStyle]="{'background-image': 'url(/assets/images/flags/' + sched.d2_company_country_iso + '.png)'}"></span>
+                        <span class="ellipsis">
+                          <span>{{sched.d2_company_country_nicename}}</span>
+                          <span *ngIf="sched.d2_company_country_nicename && sched.d2_company_country_state">,</span>&nbsp;{{sched.d2_company_country_state}}
+                        </span> 
+                    </p>
+                  </div> 
+                  <div class="w-100-per pt-10 flex">
+                    <div class="social-media-icon zm mr-5 w-20 h-20">
+                      <a> 
+                        <fa-icon class="flex ai-center jc-center fs-8" [icon]="['fas', 'envelope']" slot="start"></fa-icon>
+                      </a>
+                    </div>
+                    <p class="flex ai-center m-0 fs-12 w-90-per text-primary"> {{sched.d2_email}} </p>
+                  </div>
+                </div>
+  
+                <div *ngIf="sched.d1_id != event_delegate_id" class="delegate-profile clearfix mt-10">
+                  <div class="profile-photo">
+                    <img *ngIf="sched.d1_profile_photo.length == 1" src="/assets/empty_states/profile_avatar_{{sched.d1_profile_photo}}.png" />
+                    <img *ngIf="sched.d1_profile_photo.length > 1" src="{{sched.d1_profile_photo_url}}" />
+                  </div>
+                  <div class="profile-basic-info pl-10">
+                    <h4 *ngIf="sched.d1_company_name" class="fs-16 fw-500 mt-0 mb-7 ellipsis w-100-per capitalize">
+                      {{sched.d1_company_name}}
+                    </h4>
+                    <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">
+                      {{sched.d1_fullname}}
+                    </p>
+                    <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize text-secondary">
+                      {{sched.d1_job_title}}
+                    </p>
+                    <p *ngIf="sched.d1_company_country_name" class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize flex ai-center">
+                        <span class="country-flag" [ngStyle]="{'background-image': 'url(/assets/images/flags/' + sched.d1_company_country_iso + '.png)'}"></span>
+                        <span class="ellipsis">
+                          <span>{{sched.d1_company_country_nicename}}</span>
+                          <span *ngIf="sched.d1_company_country_nicename && sched.d1_company_country_state">,</span>&nbsp;{{sched.d1_company_country_state}}
+                        </span> 
+                    </p>
+                  </div> 
+                  <div class="w-100-per pt-10 flex">
+                    <div class="social-media-icon zm mr-5 w-20 h-20">
+                      <a>
+                        <fa-icon class="flex ai-center jc-center fs-8" [icon]="['fas', 'envelope']" slot="start"></fa-icon>
+                      </a>
+                    </div>
+                    <p class="flex ai-center m-0 fs-12 w-90-per text-primary"> {{sched.d1_email}} </p>
+                  </div>
+                </div>
+                <ng-container *ngIf="event.type == '2'">
+                  <div *ngIf="sched.zoom_meeting_link_1 && sched.zoom_meeting_link_2" class="pt-10 flex ai-center">
+                    <button class="btn-blue-outline pt-6 pb-6 pr-8 pl-8 flex ai-center jc-center br-12-px" (click)="gotoZoomLink(sched)">
+                      <ion-icon class="mr-4 fs-18" src="assets/icon/zoom.svg"></ion-icon>
+                      <span>
+                        Start Meeting
+                      </span>
+                    </button>
+  
+                    <button class="btn-green-outline pt-6 pb-6 pr-8 pl-8 flex ai-center jc-center br-12-px ml-10" (click)="copyZoomLink(sched)">
+                      <ion-icon class="mr-4 fs-18" src="assets/icon/copy-link.svg"></ion-icon>
+                      <span>
+                        Copy Link
+                      </span>
+                    </button>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </ng-container>
+          
+          <ng-container *ngIf="meetings_itinerary && !meeting.data">
+            <div class="d-table">
+              <div class="card b-rad-0 va-center" text-center>
+                <img class="w-30-per" src="/assets/empty_states/no_meetings.png" />
+                <h6 class="mt-10">
+                  <span>
+                    No scheduled meetings
+                  </span>
+                </h6>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+    
+    <ng-container *ngIf="!dataIsLoaded">
+      <div class="timeslots">
+        <div class="ed-items clearfix mb-20">
+          <div class="indicator">
+            <div class="radio-style r-all-5p"><div class="dot"></div></div>
+          </div>
+          <div class="card-item f-right r-tl-5p r-bl-5p">
+            <h4 class="fs-18 fw-500 mt-0 mb-0"><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></h4>
+            <p class="mt-15"><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></p>
+
+            <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+          </div>
+        </div>
+
+        <div class="ed-items clearfix mb-20">
+          <div class="indicator">
+            <div class="radio-style r-all-5p"><div class="dot"></div></div>
+          </div>
+          <div class="card-item f-right r-tl-5p r-bl-5p">
+            <h4 class="fs-18 fw-500 mt-0 mb-0"><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></h4>
+            <p class="mt-15"><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></p>
+
+            <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar class="flex ai-center jc-center pt-10 pb-10" no-border>
+    <ion-row>
+      <ion-col col-6 class="pt-4">
+        <button (click)="fileOptionModal('download')" class="btn routerLinkClass btn-primary w-90-per fs-15 text-white flex ai-center jc-center m-auto mr-4"> 
+          <fa-icon class="mr-10 text-white" [icon]="['fas', 'download']" slot="start"></fa-icon>
+          Download 
+        </button>
+      </ion-col>
+
+      <ion-col col-6 class="pt-4">
+        <div class="btn btn-primary-outline w-90-per flex ai-center jc-center m-auto ml-4" (click)="fileOptionModal('send')">
+          <fa-icon class="mr-10 color-194FA0" [icon]="['fas', 'envelope']" slot="start"></fa-icon>
+          Send to Email
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-footer>

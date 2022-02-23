@@ -1,0 +1,36 @@
+<div class="image-cropper-container h-100-per">
+	<div class="h-100-per">
+		<div class="flex ai-center h-100-per">
+			<div class="content-item back" (click)="dismiss('exit')">
+				<ion-icon class="fs-30" name="arrow-back" slot="icon-only"></ion-icon>
+			</div>
+			<div class="content-item done" (click)="dismiss()">
+				Done
+			</div>
+   			<!-- 
+			 	[imageChangedEvent]="imageBase64"
+   				[imageBase64]="imageBase64"
+   			-->
+			<image-cropper *ngIf="type == 'avatar'"
+				[imageFile]="imageBase64"
+			    [aspectRatio]="4 / 4"
+			    format="jpeg"
+			    (imageCropped)="imageCropped($event)"
+			    roundCropper="true"
+			    outputType="base64"
+			></image-cropper>
+			<image-cropper *ngIf="type != 'avatar'"
+				[imageFile]="imageBase64"
+			    [aspectRatio]="64 / 33"
+			    format="jpeg"
+			    (imageCropped)="imageCropped($event)"
+			    outputType="base64"
+			></image-cropper>
+			<div class="content-item rotate" (click)="rotateRight()"> 
+			    <div class="crop-icon flex p-10">
+			        <ion-icon name="refresh" slot="icon-only"></ion-icon>
+			    </div>
+ 			</div>
+		</div>
+	</div>
+</div>

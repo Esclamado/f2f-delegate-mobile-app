@@ -1,0 +1,465 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button *ngIf="event && !previous_page" (click)="backButton()">
+        <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+      </ion-button>
+      <ion-button *ngIf="previous_page" (click)="myBackButton()">
+        <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="p-0" text-center> Meeting Details </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="ios-arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ng-container *ngIf="meeting && meeting.meeting_schedule.state == 'On-going'">
+    <ng-container *ngIf="displayTime">
+      <div class="p-20 timeleft-banner" [ngStyle]="{'background-image': 'url(/assets/images/meeting_details.png)'}">
+        <ion-grid class="p-0">
+          <ion-row class="p-0 flex ai-center jc-center">
+            <ion-col class="p-0" size="2">
+              <circle-progress
+              [percent]= "remainingCountdown"
+              [maxPercent] = "100"
+              [backgroundOpacity]="1"
+              [outerStrokeWidth]="20"
+              [outerStrokeColor]="'#799e11'"
+              [innerStrokeColor]="'#F1FFE7'"
+              >
+              </circle-progress>
+            </ion-col>
+            <ion-col class="p-0 flex ai-center" size="4">
+              <div class="text-white w-100-per pl-10 mb-10">
+                <div>
+                  <h3 class="m-0">
+                    <span text-center>{{displayTime.time}}</span>
+                  </h3>
+                </div>
+                <div>
+                  {{displayTime.label}}
+                </div>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <div *ngIf="meeting && (meeting.meeting_schedule.state != 'Done' && meeting.meeting_schedule.state == 'On-going')" class="container profile-banner"
+    [ngStyle]="{'background': '#fff'}"
+    >
+    <div class="avatar-container p-25 text-regular">
+      <div class="flex ai-center">
+        <fa-icon [icon]="['far', 'clock']" slot="end" class="mr-15"> </fa-icon> 
+        <h3 class="lh-30 m-0" text-uppercase> {{meeting.start_time}} - {{meeting.end_time_orig}} </h3>
+      </div>  
+      <p class="mb-20 mt-10 fs-15 flex ai-top">
+        <span class="mr-15">
+          <ion-icon src="assets/icon/meeting-sched.svg" slot="end"></ion-icon>
+        </span>
+        <span> {{meeting.filter_date}} </span>
+      </p>
+      <div class="flex">
+        <button class="chip mr-15 fs-15 pt-2" [ngClass]="{
+          'table-vip' : meeting.meeting_schedule.t_type == '1',
+          'table-booth' : meeting.meeting_schedule.t_type == '2',
+          'darkblue' : meeting.meeting_schedule.t_type == '3'
+        }">
+          <span *ngIf="meeting.meeting_schedule.t_type == '1'"> VIP </span> 
+          <span *ngIf="meeting.meeting_schedule.t_type == '2'"> Booth </span>
+          <span *ngIf="meeting.meeting_schedule.t_type == '3'"> Table </span>
+          &nbsp;{{meeting.meeting_schedule.t_table_no}}</button>
+        <div *ngIf="meeting.meeting_schedule.setter" class="chip m-0 flex ai-center" [ngClass]="{
+          'blue' : meeting.meeting_schedule.setter == 'Received',
+          'sent' : meeting.meeting_schedule.setter == 'Sent',
+          'set-by-admin' : meeting.meeting_schedule.setter == 'Set by admin'
+        }">
+          <span class="mr-5 mt-4">
+            <ion-icon *ngIf="meeting.meeting_schedule.setter == 'Received'" src="assets/icon/sched-receive-white.svg"></ion-icon>
+            <ion-icon *ngIf="meeting.meeting_schedule.setter == 'Sent'" src="assets/icon/sched-send-white.svg"></ion-icon>
+            <fa-icon  *ngIf="meeting.meeting_schedule.setter == 'Set by admin'" class="text-white" [icon]="['fas', 'user-circle']"></fa-icon>
+          </span>
+          <span>
+            {{meeting.meeting_schedule.setter}}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>  
+
+  <div *ngIf="meeting && (meeting.meeting_schedule.state != 'Done' && meeting.meeting_schedule.state != 'On-going')" class="container profile-banner"
+    [ngStyle]="{'background-image': 'url(/assets/images/meeting-details.png)'}"
+    >
+    <div class="avatar-container p-25 text-white">
+      <div class="flex ai-center">
+        <fa-icon [icon]="['far', 'clock']" slot="end" class="mr-15"> </fa-icon> 
+        <h3 class="lh-30 m-0" text-uppercase> {{meeting.start_time}} - {{meeting.end_time_orig}} </h3>
+      </div>  
+      <p class="mb-20 mt-10 fs-15 flex ai-top">
+        <span class="mr-15">
+          <ion-icon src="assets/icon/cal-white.svg" slot="end"></ion-icon>
+        </span>
+        <span> {{meeting.filter_date}} </span>
+      </p>
+      <div class="flex">
+        <button class="chip mr-15 fs-15" [ngClass]="{
+          'table-vip' : meeting.meeting_schedule.t_type == '1',
+          'table-booth' : meeting.meeting_schedule.t_type == '2',
+          'white' : meeting.meeting_schedule.t_type == '3'
+        }">
+          <span *ngIf="meeting.meeting_schedule.t_type == '1'"> VIP </span> 
+          <span *ngIf="meeting.meeting_schedule.t_type == '2'"> Booth </span>
+          <span *ngIf="meeting.meeting_schedule.t_type == '3'"> Table </span>
+          &nbsp;{{meeting.meeting_schedule.t_table_no}}</button>
+        <button class="asdasdasda chip mr-15 flex ai-center" [ngClass]="{
+          'blue' : meeting.meeting_schedule.setter == 'Received',
+          'sent' : meeting.meeting_schedule.setter == 'Sent',
+          'set-by-admin' : meeting.meeting_schedule.setter == 'Set by admin'
+        }"> 
+          <ion-icon *ngIf="meeting.meeting_schedule.setter == 'Received'" src="assets/icon/sched-receive-white.svg" class="mr-5 mb-2" slot="end"></ion-icon>
+          <ion-icon *ngIf="meeting.meeting_schedule.setter == 'Sent'" src="assets/icon/sched-send-white.svg" class="mr-5 mb-2" slot="end"></ion-icon>
+          <fa-icon *ngIf="meeting.meeting_schedule.setter == 'Set by admin'" class="text-white" class="mr-5 mb-2" [icon]="['fas', 'user-circle']"></fa-icon>
+          <p class="m-0 lh-0 fs-15"> {{meeting.meeting_schedule.setter}} </p>
+        </button>
+      </div>
+    </div>
+  </div>  
+
+  <div *ngIf="meeting && meeting.meeting_schedule.state == 'Done'" class="container profile-banner"
+    [ngStyle]="{'background-image': 'url(/assets/images/edit-profile-banner.png)'}"
+    >
+    <div class="avatar-container p-25 text-regular">
+      <div class="meeting-done flex ai-center">
+        <fa-icon [icon]="['far', 'clock']" slot="end" class="mr-15"> </fa-icon> 
+        <h3 class="lh-30 m-0" text-uppercase> {{meeting.start_time}} - {{meeting.end_time_orig}} </h3>
+        <button class="chip meeting-done success pl-10 pr-20"> 
+          <fa-icon [icon]="['fas', 'check-circle']" class="mr-8" slot="end"></fa-icon>
+          <p class="m-0 lh-0 fs-15"> {{meeting.meeting_schedule.state}} </p> 
+        </button>
+      </div>  
+      <p class="mb-20 mt-10 fs-15 flex ai-top">
+        <span class="mr-15">
+          <ion-icon src="assets/icon/meeting-sched.svg" slot="end"></ion-icon>
+        </span>
+        <span> {{meeting.filter_date}} </span>
+      </p>
+      <div class="flex">
+        <button class="chip mr-15 fs-15" [ngClass]="{
+          'table-vip' : meeting.meeting_schedule.t_type == '1',
+          'table-booth' : meeting.meeting_schedule.t_type == '2',
+          'darkblue' : meeting.meeting_schedule.t_type == '3'
+        }">
+          <span *ngIf="meeting.meeting_schedule.t_type == '1'"> VIP </span> 
+          <span *ngIf="meeting.meeting_schedule.t_type == '2'"> Booth </span>
+          <span *ngIf="meeting.meeting_schedule.t_type == '3'"> Table </span>
+          &nbsp;{{meeting.meeting_schedule.t_table_no}}</button>
+        <button class="chip mr-15 flex ai-center"  [ngClass]="{
+          'blue' : meeting.meeting_schedule.setter == 'Received',
+          'sent' : meeting.meeting_schedule.setter == 'Sent',
+          'set-by-admin' : meeting.meeting_schedule.setter == 'Set by admin'
+        }"> 
+          <ion-icon *ngIf="meeting.meeting_schedule.setter == 'Received'" src="assets/icon/sched-receive-white.svg" class="mr-5 mb-2" slot="end"></ion-icon>
+          <ion-icon *ngIf="meeting.meeting_schedule.setter == 'Sent'" src="assets/icon/sched-send-white.svg" class="mr-5 mb-2" slot="end"></ion-icon>
+          <fa-icon *ngIf="meeting.meeting_schedule.setter == 'Set by admin'" class="text-white" class="mr-5 mb-2" [icon]="['fas', 'user-circle']"></fa-icon>
+          <p class="m-0 lh-0 fs-15"> 
+            <span class="text-white">
+              {{meeting.meeting_schedule.setter}}
+            </span>
+          </p>
+        </button>
+      </div>
+    </div>
+  </div> 
+
+  <ng-container *ngIf="meeting && meeting.meeting_schedule.status != 5">
+    <div class="card p-0 b-rad-0 mb-25 mt-25 b-shadow" *ngIf="meeting.meeting_schedule.state == 'On-going'">
+      <div class="p-30 pl-20 pr-20 b-top b-bot">
+        <div class="flex ai-center noshow-report-button">
+          <div class="flag-icon">
+            <span></span>
+          </div>
+          <div class="">
+            <p *ngIf="!meeting.no_show" class="mt-0 mb-15 fs-16">
+              <span text-capitalize>{{meeting.meeting_schedule.delegate_fullname}}</span>&nbsp;didn't show up?</p>
+
+            <p *ngIf="meeting.no_show && (meeting.event_delegate_id == meeting.no_show.reporter_delegate_id) && meeting.no_show.status == 1" class="mt-0 mb-0 fs-16" text-center>
+              You reported<span text-capitalize>&nbsp;{{meeting.meeting_schedule.delegate_fullname}}</span> as no show.
+            </p>
+
+            <p *ngIf="meeting.no_show && (meeting.event_delegate_id == meeting.no_show.reporter_delegate_id) && meeting.no_show.status == 2" class="mt-0 mb-15 fs-16">
+              <span text-capitalize>{{meeting.meeting_schedule.delegate_fullname}}</span>&nbsp;is validated as no show.
+            </p>
+
+            <!-- <p *ngIf="meeting.no_show && (meeting.event_delegate_id == meeting.no_show.reporter_delegate_id) && meeting.no_show.status == 2" class="mt-0 mb-15 fs-16">
+              Did <span text-capitalize>{{meeting.meeting_schedule.delegate_fullname}}</span> show up late?
+            </p> -->
+
+            <!-- <button ng-disable="true" *ngIf="meeting.no_show && (meeting.event_delegate_id == meeting.no_show.reporter_delegate_id) && meeting.no_show.status == 1" class="btn btn-disabled">
+              <span>
+                You reported 
+                <span text-capitalize>
+                  {{meeting.meeting_schedule.delegate_fullname}}
+                </span> as no show.
+              </span>
+            </button> -->
+
+           <!--  <button ng-disable="true" *ngIf="meeting.no_show && (meeting.event_delegate_id == meeting.no_show.reporter_delegate_id) && meeting.no_show.status == 2" class="btn btn-disabled">
+              <span>
+                <span text-capitalize>
+                  {{meeting.meeting_schedule.delegate_fullname}}
+                </span> is validated as no show.
+              </span>
+            </button> -->
+
+            <button *ngIf="meeting.no_show && (meeting.event_delegate_id == meeting.no_show.reporter_delegate_id) && meeting.no_show.status == 1" (click)="cancelRequest(meeting.no_show, meeting)" class="btn btn-gray-outline w-100-per mb--20 text-default">
+              Cancel Report
+            </button>
+
+            <button *ngIf="meeting.no_show && (meeting.event_delegate_id == meeting.no_show.reporter_delegate_id) && meeting.no_show.status == 2" (click)="cancelRequest(meeting.no_show, meeting)" class="btn btn-gray-outline w-100-per mb--20 text-default">
+              Undo my no show report
+            </button>
+
+            <button *ngIf="meeting.no_show && (meeting.event_delegate_id == meeting.no_show.reporter_delegate_id) && meeting.no_show.status == 3" class="btn btn-danger" (click)="reportAsNoshow(meeting)">
+              Report as no show again
+            </button>
+
+            <button *ngIf="!meeting.no_show" class="btn btn-danger" (click)="reportAsNoshow(meeting)">
+              Report
+              <span text-capitalize>
+                &nbsp;{{meeting.meeting_schedule.delegate_fullname}}&nbsp;
+              </span>
+              as no show
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <div class="card p-0 b-rad-0 mb-25 b-shadow">
+    <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot">
+      <ion-grid class="m-0 p-0">
+        <ion-row class="m-0 p-0">
+          <ion-col class="m-0 p-0" size="6">
+            <div class="flex ai-center">
+              <fa-icon class="mr-5" [icon]="['fas', 'handshake']" slot="start"></fa-icon>
+              <h6 class="h-title m-0"> Meeting with: </h6> 
+            </div>
+          </ion-col>
+          <ion-col *ngIf="meeting" class="m-0 p-0" size="6">
+            <div routerLink="/delegate-profile/{{meeting.meeting_schedule.delegate_id}}/{{meeting.event_id}}" class="routerLinkClass f-right flex ai-center text-success fw-500">
+              View Profile 
+              <fa-icon class="ml-5" [icon]="['fas', 'chevron-right']" slot="start"></fa-icon>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+    <div *ngIf="meeting" class="card p-20 b-rad-0 b-bot ">
+      <div class="delegate-profile clearfix">
+        <div class="profile-photo">
+            <img src="{{meeting.meeting_schedule.delegate_profile_photo}}" />
+        </div>
+        <div routerLink="/delegate-profile/{{meeting.meeting_schedule.delegate_id}}/{{meeting.event_id}}" class="profile-basic-info pl-10">
+            <h3 class="fs-16 fw-500 mt-0 mb-10 ellipsis w-100-per capitalize flex ai-center"> <span class="country-flag" [ngStyle]="{'background-image': 'url(/assets/images/flags/' + meeting.meeting_schedule.delegate_company_country_iso + '.png)'}"></span>
+              <span class="ellipsis">{{meeting.meeting_schedule.delegate_company_name}}</span> </h3>
+            <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">{{meeting.meeting_schedule.delegate_fullname}}</p>
+            <p *ngIf="meeting.meeting_schedule.delegate_job_title" class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize text-secondary">{{meeting.meeting_schedule.delegate_job_title}}</p>
+        </div>
+      </div>
+      <p class="mb-10 mt-10 fs-15 flex ai-top">
+          <span class="mr-10"><fa-icon [icon]="['fas', 'phone']" slot="end" class="text-secondary"></fa-icon></span>
+          <span class="ellipsis11" *ngIf="meeting.meeting_schedule.delegate_mobile"> {{meeting.meeting_schedule.delegate_mobile}} </span>
+          <span *ngIf="!meeting.meeting_schedule.delegate_mobile"> No mobile number provided </span>
+      </p>
+      <p class="mt-10 mb-0 fs-15 flex ai-center">
+        <span class="mr-10"><fa-icon [icon]="['fas', 'envelope']" slot="end" class="text-secondary"></fa-icon></span>
+        <span *ngIf="meeting.meeting_schedule.delegate_email"> {{meeting.meeting_schedule.delegate_email}} </span>
+        <span *ngIf="!meeting.meeting_schedule.delegate_email"> No email yet </span>
+      </p>
+
+      <ion-grid class="p-0">
+        <!-- <ng-container *ngIf="meeting && meeting.meeting_schedule.state != 'On-going' && meeting.meeting_schedule.state != 'Done'">
+          <ion-row *ngIf="meeting.meeting_schedule.status == 1" class="p-0 mt-20">
+            <ion-col size="10" class="pl-0 pt-0 pb-0">
+              <ion-button (click)="reSchedMeeting()" class="button light-green w-100-per m-0">
+                <ion-icon class="mr-10" src="assets/icon/green-reshed.svg" slot="start"></ion-icon>
+                Reschedule meeting
+              </ion-button>
+            </ion-col>
+            <ion-col size="2" class="pt-0 pb-0 pr-0">
+              <ion-button class="button blue m-0" (click)="openChatBox(convo)" no-padding>
+                <ion-icon class="fs-20 pl-12 pr-12" src="assets/icon/del-white-chat.svg" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+          <ion-row *ngIf="meeting.meeting_schedule.status == 1" class="p-0 mt-10">
+            <ion-col size="12" class="p-0">
+              <ion-button (click)="cancelRequestModal()" *ngIf="meeting.event_delegate_id != meeting.meeting_schedule.cancel_requested_by" class="button cancel w-100-per m-0">
+                <fa-icon class="mr-10" [icon]="['fas', 'ban']" slot="start"> </fa-icon> 
+                Request to cancel
+              </ion-button>
+              <button ng-disable="true" *ngIf="meeting.event_delegate_id == meeting.meeting_schedule.cancel_requested_by" class="btn btn-danger-light text-danger">
+                Sorry but your request for cancellation has been declined. You have to attend this meeting.
+              </button>
+            </ion-col>
+          </ion-row>
+        </ng-container> -->
+
+        <ng-container *ngIf="meeting && meeting.meeting_schedule.state != 'On-going' && meeting.meeting_schedule.state != 'Done'">
+          <ion-row *ngIf="meeting.meeting_schedule.status == 1" class="p-0 mt-10">
+            <ion-col (click)="openChatBox(convo)" size="4">
+              <div class="button-ico left">
+                <ion-icon class="fs-25" src="assets/icon/meeting-details-chat.svg" slot="icon-only"></ion-icon>
+              </div>
+              <div class="text-center fs-13 mt-8"> Message </div>
+            </ion-col>
+            <ion-col (click)="reSchedMeeting(meeting)" size="4">
+              <div class="button-ico center">
+                <ion-icon class="fs-25" src="assets/icon/meeting-details-resched.svg" slot="start"></ion-icon>
+              </div>
+              <div class="text-center fs-13 mt-8"> Reschedule </div>
+            </ion-col>
+            <ion-col size="4">
+              <div (click)="cancelRequestModal(meeting)" class="button-ico right">
+                <ion-icon class="fs-25" src="assets/icon/meeting-details-cancel.svg" slot="start"></ion-icon>
+              </div>
+              <div class="text-center fs-13 mt-8"> Cancel Meeting </div>
+            </ion-col> 
+
+            <button *ngIf="showWarningMessage && warningMessage" ng-disable="true" class="btn btn-danger-light text-danger mt-10 lh-22">
+              {{warningMessage}}
+            </button>
+          </ion-row>
+        </ng-container>
+
+        <ng-container>
+          <ion-row *ngIf="meeting && meeting.meeting_schedule.state == 'On-going' || meeting.meeting_schedule.state == 'Done'" class="p-0 mt-10">
+            <ion-col size="12" class="p-0 text-capitalize">
+                <ion-button class="button blue w-100-per m-0" (click)="openChatBox(convo)" no-padding>
+                  <ion-icon class="mr-10" src="assets/icon/del-white-chat.svg" slot="start"></ion-icon>
+                  Message <span class="w-140 ellipsis" text-capitalize>&nbsp;{{meeting.meeting_schedule.delegate_fullname}} </span>
+                </ion-button>
+            </ion-col>
+          </ion-row>
+        </ng-container>
+      </ion-grid>
+    </div>
+  </div>
+
+  <div class="card p-0 b-rad-0 mb-40 b-shadow">
+    <div class="pl-20 pr-20 pt-16 pb-16 b-top b-bot">
+      <ion-grid class="m-0 p-0">
+        <ion-row class="m-0 p-0">
+          <ion-col class="m-0 p-0" size="6">
+            <div class="flex ai-center">
+              <ion-icon class="mr-5" src="assets/icon/setting-notes.svg" slot="start"></ion-icon>
+              <h6 class="h-title m-0"> Notes </h6>
+            </div>
+          </ion-col>
+          <ion-col *ngIf="notes && notes != 'not_found'" class="m-0 p-0" size="6">
+            <div class="f-right flex ai-center fw-300">
+              <div *ngIf="note_edited"> {{note_edited}} </div>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+    <div class="p-20">
+      <div *ngIf="!notes">
+        <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text> 
+        <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text> 
+        <ion-skeleton-text animated style="width: 90%"></ion-skeleton-text> 
+        <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text> 
+      </div>
+      <div (click)=addNote() class="text-secondary" *ngIf="notes && notes == 'not_found'">
+        Click here to add notes
+      </div>
+      <div (click)=addNote()  class="lh-25 ellipsis11" *ngIf="notes && notes != 'not_found'" [innerHtml]="notes.note">
+      </div>
+    </div>
+
+    <div *ngIf="notes && notes != 'not_found'" class="flex jc-space-between p-20 pt-0 pb-15">
+      <ion-grid no-padding>
+        <ion-row>
+          <ion-col size=6 class="pl-0">      
+            <button class="btn btn-primary fs-15 w-100-per" (click)="sendModal()"> 
+              <div class="flex ai-center jc-center">
+                <fa-icon class="mr-5" [icon]="['fas', 'envelope']" slot="start"></fa-icon>
+                Send to email 
+              </div>
+            </button>
+          </ion-col>
+          <ion-col size=3>      
+            <button class="btn btn-edit fs-15 w-100-per p-0" (click)="addNote()"> 
+              <div class="flex ai-center jc-center">
+                <ion-icon class="mr-5" src="assets/icon/white-notes.svg" slot="start"> </ion-icon>
+                Edit 
+              </div>
+            </button>
+          </ion-col>
+          <ion-col size=3 class="pr-0">      
+            <button class="btn btn-delete fs-15 w-100-per" (click)="deleteConfirmModal()"> 
+              <div class="flex ai-center jc-center">
+                <fa-icon class="mr-5" [icon]="['fas', 'trash-alt']" slot="start"></fa-icon>
+                Delete 
+              </div>
+            </button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+  </div>
+  
+  <!-- <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="f2f-primary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="top">
+
+      <ng-container *ngIf="meeting && meeting.meeting_schedule.state != 'On-going' && meeting.meeting_schedule.state != 'Done'">
+        <ion-fab-button *ngIf="meeting.meeting_schedule.status == 1" class="b-b-l-r b-b-r-r cancel" color="light" (click)="cancelRequestModal()">
+          <div class="w-100-per ml-16 flex ai-center fs-15" text-left>
+            <fa-icon [icon]="['fas', 'ban']" slot="end" class="mr-15"> </fa-icon> 
+            <ion-label> Request to cancel </ion-label>
+          </div>
+        </ion-fab-button>
+
+        <ion-fab-button *ngIf="meeting.meeting_schedule.status == 1" class="b-bot primary" color="light" (click)="reSchedMeeting()">
+          <div class="w-100-per ml-16 flex ai-center fs-15" text-left>
+            <ion-icon class="mr-15" src="assets/icon/fab-resched.svg" slot="end"></ion-icon>
+            <ion-label> Reschedule meeting </ion-label>
+          </div>
+        </ion-fab-button>
+      </ng-container>
+
+      <ion-fab-button class="b-bot primary" color="light">
+        <div class="w-100-per ml-16 flex ai-center fs-15" text-left>
+          <ion-icon class="mr-15" src="assets/icon/fab-chat.svg" slot="end"></ion-icon>
+          <ion-label> Send messages </ion-label>
+        </div>
+      </ion-fab-button>
+      <ion-fab-button *ngIf="meeting && meeting_with_id" (click)=addNote() class="b-bot b-t-l-r b-t-r-r primary" color="light">
+        <div class="w-100-per ml-16 flex ai-center fs-15" text-left>
+          <ion-icon class="mr-15" src="assets/icon/white-notes.svg" slot="end"></ion-icon>
+          <ion-label> Add notes </ion-label>
+        </div>
+      </ion-fab-button>
+    </ion-fab-list>
+  </ion-fab> -->
+
+ <!--  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="f2f-primary" (click)=addNote()>
+      <ion-icon src="assets/icon/white-notes.svg"></ion-icon>
+    </ion-fab-button>
+  </ion-fab> -->
+</ion-content>

@@ -1,0 +1,50 @@
+@mixin loop($start:1, $max:5, $interval:1, $prefix:"", $suffix:"", $prop:"", $unit:"px", $imp:"!important"){
+    $int: $start * $interval;
+    @while $int <= $max {
+        #{$prefix}#{$int}#{$suffix} {
+            #{$prop}: #{$int}#{$unit} #{$imp};
+        }
+        $start: $start + 1;
+        $int: $start * $interval;
+    }
+}
+
+@mixin r-all ($radius: 5px) {
+	border-radius: $radius;
+	-webkit-border-radius: $radius;
+	-moz-border-radius: $radius;
+}
+@mixin r-tl ($radius: 5px) {
+	border-top-left-radius: $radius;
+	-webkit-border-top-left-radius: $radius;
+	-moz-border-top-left-radius: $radius;
+}
+@mixin r-tr ($radius: 5px) {
+	border-top-right-radius: $radius;
+	-webkit-border-top-right-radius: $radius;
+	-moz-border-top-right-radius: $radius;
+}
+@mixin r-bl ($radius: 5px) {
+	border-bottom-left-radius: $radius;
+	-webkit-border-bottom-left-radius: $radius;
+	-moz-border-bottom-left-radius: $radius;
+}
+@mixin r-br ($radius: 5px) {
+	border-bottom-right-radius: $radius;
+	-webkit-border-bottom-right-radius: $radius;
+	-moz-border-bottom-right-radius: $radius;
+}
+
+
+@mixin centerH () {
+	position: absolute;
+	-ms-transform: translateX(-50%);
+	transform: translateX(-50%);
+	left: 50%;
+}
+@mixin centerV () {
+	position: absolute;
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+	top: 50%;
+}

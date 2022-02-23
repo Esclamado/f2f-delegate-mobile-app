@@ -1,0 +1,74 @@
+ion-content{
+    --ion-background-color:#ebebeb;
+}
+
+.header-bar{
+    width: 100%;
+    height: 36px;
+    padding: 9px 15px 0px 15px;
+}
+.header-bar.archive{
+    background-image: linear-gradient(100deg, #979797 40%, #666666 100%);
+}
+
+.profile-banner {
+    background-size: cover;
+    width: 100%;
+    background-repeat: no-repeat;
+    position: relative;
+    min-height: 34%;
+}
+
+.avatar-container{
+    width: 100%;
+    margin: auto;
+    z-index: 99;
+    position: relative;
+
+    .pic-thumb{
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        margin: auto;
+        width: 68px;
+        height: 68px;
+        border-radius: 4px;
+    }
+}
+
+.floor-plan{
+    background-image: url(/assets/images/meeting_details.png);
+    background-size: cover;
+    width: 100%;
+    background-repeat: no-repeat;
+    min-height: 200px;
+    position: relative;
+    z-index: 2;
+}
+.opacity{
+    background: #000000;
+    opacity: 0.3;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 1;
+}
+.opacity.point-five{
+    opacity: 0.5;
+}
+.btn-view{
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    z-index: 999;
+    letter-spacing: 0px;
+    font-size: 16px;
+}
+.map-container{
+    position: relative;
+    z-index: 2;
+}
+#map {
+  height: 200px;
+}

@@ -1,0 +1,1005 @@
+<ion-header>
+  <div class="event-header">
+    <div *ngIf="ongoing_meeting" (click)="gotoMeetingDetails(ongoing_data, ongoing_meeting_details)" class="header-bar ongoing">
+      <p class="m-0 text-white">
+        <span class="mr-10"><fa-icon [icon]="['fas', 'hourglass-half']" slot="end"></fa-icon></span>
+        <span>You have an </span><span class="fw-500">on-going virtual meeting</span> <!-- at <span class="fw-500">
+            <span *ngIf="ongoing_meeting.t_type == '1'"> VIP </span> 
+            <span *ngIf="ongoing_meeting.t_type == '2'"> Booth </span>
+            <span *ngIf="ongoing_meeting.t_type == '3'"> Table </span>
+            {{ongoing_meeting.t_table_no}}</span> -->
+      </p>
+    </div>
+    <div *ngIf="!ongoing_meeting && next_meeting" (click)="gotoMeetingDetails(next_meeting_data, next_meeting_details)" class="header-bar upcomming">
+      <p class="m-0 text-white">
+        <span class="mr-10"><fa-icon [icon]="['fas', 'stopwatch']" slot="end"></fa-icon></span>
+        <span>You have next upcomming </span><span class="fw-500"> virtual meeting</span> <!-- at <span class="fw-500">
+            <span *ngIf="ongoing_meeting.t_type == '1'"> VIP </span> 
+            <span *ngIf="ongoing_meeting.t_type == '2'"> Booth </span>
+            <span *ngIf="ongoing_meeting.t_type == '3'"> Table </span>
+            {{ongoing_meeting.t_table_no}}</span> -->
+      </p>
+    </div>
+    <div *ngIf="event && event.archive_in" class="header-bar archive">
+      <p class="m-0 text-white fs-15 ellipsis w-100-per flex">
+        <span class="ml-4 mr-8 flex ai-center"><ion-icon src="assets/icon/archived-icon.svg" slot="end"></ion-icon></span>
+        <span class="ellipsis">This event will be archived in: {{event.archive_in}} </span>
+      </p>
+    </div>
+    <div class="event-title pl-10 pr-10 pt-17 clearfix">
+      <div *ngIf="event">
+        <a (click)="goBacktoHome()" class="routerLinkClass mr-5 f-left text-back-button">
+          <ion-icon class="back-button" name="ios-arrow-back"></ion-icon>
+        </a>
+        <h4 class="e-title text-default fs-21 fw-500 ellipsis pr-25">
+          <span>{{event.name}}</span>
+        </h4>
+        <ion-avatar (click)="gotoUserProfile()" class="f-right mt--27 h-30 w-30 text-default no-outline"  slot="end">
+          <img *ngIf="delegate.profile_photo.length == 1" src="/assets/empty_states/profile_avatar_1.png" />
+          <img *ngIf="delegate.profile_photo.length > 1" src="{{delegate.profile_photo_url}}" />
+        </ion-avatar>
+      </div>
+      <div *ngIf="!event">
+        <h4 class="e-title text-default fs-21 fw-500 ellipsis pr-25">
+          <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+        </h4>
+        <!-- <a class="f-right mt-5 fs-19 text-default">
+          <fa-icon [icon]="['fas', 'info-circle']" slot="end"></fa-icon>
+        </a>  -->
+  
+        <ion-avatar class="f-right h-30 w-30 text-default" slot="end">
+          <img src="/assets/empty_states/profile_avatar_1.png" />
+        </ion-avatar>
+      </div> 
+    </div>
+        
+    <ng-container *ngIf="clockService && event && !event.archive_in">
+      <ng-container *ngIf="event && clockService.today">
+        <p class="text-defaults m-0 pl-20 pr-10 w-100-per flex">
+          <!-- [ngClass]="{'pt-15' : !display_event_title}" -->
+          <span class="mr-5 mt-5"><fa-icon [icon]="['fas', 'clock']" slot="end"></fa-icon></span>
+          <span class="mt-5">{{clockService.datetimeTickerVirtual}} • {{userTimezone}} </span>
+          <!-- | date:'MMM. dd, yyyy' : "-4:00" -->
+        </p>
+      </ng-container>
+    </ng-container>
+      
+  
+        <div>
+          <div class="tabs w-100-per">
+            <ion-grid class="w-100-per" no-padding>
+              <!-- If ongoing event  -->
+              <ion-row  *ngIf="event && !event.archive_in" class="w-100-per" no-padding>
+                <ion-col size="4" no-padding>
+                  <div no-padding class="tabs-item flex ai-center jc-center" [ngClass]="tab.selectedtab == 'delegates' ? 'active' : ''" (click)="selectTab('delegates')" >
+                    <p>Find Delegates</p>
+                  </div>
+                </ion-col>
+                <ion-col size="4" no-padding>
+                  <div no-padding class="tabs-item flex ai-center jc-center" [ngClass]="tab.selectedtab == 'schedule' ? 'active' : ''" (click)="selectTab('schedule')" >
+                    <p>My Schedule</p>
+                  </div>
+                </ion-col>
+                <ion-col size="4" no-padding>
+                  <div no-padding class="tabs-item flex ai-center jc-center" [ngClass]="tab.selectedtab == 'sponsors' ? 'active' : ''"  (click)="selectTab('sponsors')" >
+                    <p>Sponsors</p>
+                  </div>
+                </ion-col>
+              </ion-row>
+              
+                 <!-- If past event  -->
+            <ion-row *ngIf="event && event.archive_in" class="w-100-per" no-padding>
+              <ion-col size="3" no-padding>
+                <div no-padding class="tabs-item flex ai-center jc-center" [ngClass]="tab.selectedtab == 'home' ? 'active' : ''" (click)="selectTab('home')">
+                  <p>Home</p>
+                </div>
+              </ion-col>
+              <ion-col size="3" no-padding>
+                <div no-padding class="tabs-item flex ai-center jc-center" [ngClass]="tab.selectedtab == 'delegates' ? 'active' : ''" (click)="selectTab('delegates')">
+                  <p>Delegates</p>
+                </div>
+              </ion-col>
+              <ion-col size="3" no-padding>
+                <div no-padding class="tabs-item flex ai-center jc-center" [ngClass]="tab.selectedtab == 'schedule' ? 'active' : ''" (click)="selectTab('schedule')">
+                  <p>My Schedule</p>
+                </div>
+              </ion-col>
+              <ion-col size="3" no-padding>
+                <div no-padding class="tabs-item flex ai-center jc-center" [ngClass]="tab.selectedtab == 'sponsors' ? 'active' : ''" (click)="selectTab('sponsors')">
+                  <p>Sponsors</p>
+                </div>
+              </ion-col>
+            </ion-row>
+            
+            <ion-row *ngIf="!event && selectedTab == 'home'" class="w-100-per" no-padding>
+              <ion-col size="3" no-padding>
+                <div no-padding class="tabs-item flex ai-center jc-center" [ngClass]="tab.selectedtab == 'home' ? 'active' : ''" (click)="selectTab('home')">
+                  <p>Home</p>
+                </div>
+              </ion-col>
+              <ion-col size="3" no-padding>
+                <div no-padding class="tabs-item flex ai-center jc-center" [ngClass]="tab.selectedtab == 'delegates' ? 'active' : ''" (click)="selectTab('delegates')">
+                  <p>Delegates</p>
+                </div>
+              </ion-col>
+              <ion-col size="3" no-padding>
+                <div no-padding class="tabs-item flex ai-center jc-center" [ngClass]="tab.selectedtab == 'schedule' ? 'active' : ''" (click)="selectTab('schedule')">
+                  <p>My Schedule</p>
+                </div>
+              </ion-col>
+              <ion-col size="3" no-padding>
+                <div no-padding class="tabs-item flex ai-center jc-center" [ngClass]="tab.selectedtab == 'sponsors' ? 'active' : ''" (click)="selectTab('sponsors')">
+                  <p>Sponsors</p>
+                </div>
+              </ion-col>
+            </ion-row>
+
+            <ion-row *ngIf="!event && selectedTab != 'home'" class="w-100-per" no-padding>
+              <ion-col size="4" no-padding>
+                <div no-padding class="tabs-item flex ai-center jc-center" [ngClass]="tab.selectedtab == 'delegates' ? 'active' : ''" (click)="selectTab('delegates')">
+                  <p>Find Delegates</p>
+                </div>
+              </ion-col>
+              <ion-col size="4" no-padding>
+                <div no-padding class="tabs-item flex ai-center jc-center" [ngClass]="tab.selectedtab == 'schedule' ? 'active' : ''" (click)="selectTab('schedule')">
+                  <p>My Schedule</p>
+                </div>
+              </ion-col>
+              <ion-col size="4" no-padding>
+                <div no-padding class="tabs-item flex ai-center jc-center" [ngClass]="tab.selectedtab == 'sponsors' ? 'active' : ''" (click)="selectTab('sponsors')">
+                  <p>Sponsors</p>
+                </div>
+              </ion-col>
+            </ion-row>
+            </ion-grid>
+          </div>
+      </div>
+  
+      <div *ngIf="tab.selectedtab == 'delegates'" class="search-field p-10 clearfix">
+        <div class="form-group block w-100-per">
+          <div class="input-wrapper">
+            <p class="m-0 search-icon fs-20 text-secondary"><fa-icon [icon]="['fas', 'search']" slot="end"></fa-icon></p>
+            <input 
+              class="form-control pl-35 pr-5 fs-15" 
+              type="txt" 
+              value="" 
+              maxlength="255"
+              placeholder="Search name, specialization, company, location"
+              [(ngModel)]="search"
+              (ngModelChange)="this.onStopTyping.next($event)"
+            >
+          </div>
+        </div>
+        <div class="filter-button p-relative">
+          <button class="btn text-default fw-500 fs-15" (click)="showFilters()">Filter</button>
+          <!-- <div *ngIf="tab.selectedtab == 'schedule' && (filters.is_filtered || filters.is_filteredDays)" class="filter-badge"> </div> -->
+         <!--  <div *ngIf="tab.selectedtab == 'delegates' && filter_delegate_counter" class="filter-badge"> </div> -->
+        </div>
+      </div>
+
+  </div>
+  
+</ion-header>
+
+<ion-content
+[scrollEvents]="true" 
+  (ionScroll)="logScrolling($event)"
+  (ionScrollEnd)="logScrollEnd()"
+  #scrollArea scrollEvents="true"
+  class="has-subheader"
+  >
+
+  <ion-refresher class="scroll-content" slot="fixed" (ionPull)="startPullRefresh($event)" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ng-container *ngIf="tab.selectedtab == 'delegates'">
+    <div *ngIf="delegates && total_delegates_count > 0" class="mb-20">
+      <div class="pt-10 pb-10 p-20">
+        <h4>
+          Showing {{total_delegates_count}} delegate<span *ngIf="total_delegates_count > 1">s</span>
+        </h4>
+        <p class="lh-22 mb-0">
+          Browse or search to find someone you can connect to. You can also use filters to get better results.
+        </p>
+      </div>
+      <div *ngFor="let delegate of delegates" class="mt-20">
+        <div class="card pt-20 pr-20 pl-20 pb-5 b-rad-0">
+          <div class="delegate-profile clearfix">
+  
+            <div class="profile-photo" (click)="gotoDelegateProfile(delegate.id)">
+              <img *ngIf="delegate.profile_photo.length == 1" src="/assets/empty_states/profile_avatar_{{delegate.profile_photo}}.png" />
+              <img *ngIf="delegate.profile_photo.length > 1" src="{{delegate.profile_photo_url}}" />
+            </div>
+            <div class="profile-basic-info pl-10" (click)="gotoDelegateProfile(delegate.id)">
+              <h4 *ngIf="delegate.company_name" class="fs-16 fw-500 mt-0 mb-7 ellipsis w-100-per capitalize">{{delegate.company.name}} <!-- <fa-icon *ngIf="delegate.user_privacy != 'yes'" class="mr-4" [icon]="['fas', 'lock']"></fa-icon> -->
+              </h4>
+              <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">{{delegate.fullname}}</p>
+              <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize text-secondary">{{delegate.job_title}}</p>
+              <p *ngIf="delegate.company_country" class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize flex ai-center">
+                  <span class="country-flag" [ngStyle]="{'background-image': 'url(/assets/images/flags/' + delegate.company_country.iso + '.png)'}"></span>
+                  <span class="ellipsis">
+                    <span>{{delegate.company_country.nicename}}</span>
+                    <span *ngIf="delegate.company_country.nicename && delegate.company.state">,</span>&nbsp;{{delegate.company.state}}
+                  </span> 
+              </p>
+                <p class="fs-15 mt-0 mb-5 ellipsis w-100-per text-primary capitalize"> View Profile </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card pt-5 pr-20 pl-20 pb-20 b-rad-0">
+          <div *ngIf="delegate.count_no_show > 0" class="mt-10 mb-10">
+            <p class="m-0 text-danger fs-14">
+              <span class="mr-10"><fa-icon [icon]="['fas', 'flag']" slot="end"></fa-icon></span>
+              <span>{{delegate.count_no_show}} no show meeting</span><span *ngIf="delegate.count_no_show > 1">s</span>
+            </p>
+          </div>
+
+          <!-- available meeting timeslot -->
+          <!-- <div *ngIf="!delegate.meeting_schedule && (event && !event.archive_in)" class="mt-10 mb-10">
+            <p class="m-0 text-primary fs-14">
+              <span class="mr-10">
+                <fa-icon [icon]="['fas', 'handshake']" slot="end"></fa-icon>
+              </span>
+              <span *ngIf="delegate.count_available_timeslots > 0">{{delegate.count_available_timeslots}}</span>
+              <span *ngIf="delegate.count_available_timeslots <= 0">no</span>
+              <span> available meeting timeslot</span>
+              <span *ngIf="delegate.count_available_timeslots > 1">s</span>
+            </p>
+          </div> -->
+          <!-- end of available meeting timeslot -->
+
+          <!-- meeting with the same company -->
+            <!-- <div *ngIf="(event && !event.archive_in) && (delegate.same_company_meeting_count > 0)" class="mt-10 mb-10">
+              <p class="m-0 text-success fs-14">
+                <span class="mr-10">
+                  <fa-icon [icon]="['fas', 'handshake']" slot="end"></fa-icon>
+                </span>
+                <span>{{delegate.same_company_meeting_count}}</span>
+                <span> Meeting</span>
+                <span *ngIf="delegate.same_company_meeting_count > 1">s</span>
+                <span> with the same company</span>
+              </p>
+            </div> -->
+          <!-- end of meeting with the same company -->
+
+          <ion-grid class="p-0">
+            <ion-row *ngIf="event && !event.archive_in"  class="p-0">
+
+              <!-- 
+                ------
+                If the delegate have a meeting scheduled
+                not able to set a meeting schedule again
+                -------
+              -->
+
+              <!-- 1 = approved, 2 = pending approval, 3 = pending cancellation, 4 = cancelled, 5 = no show report -->
+              <ng-container *ngIf="delegate.meeting_schedule && (delegate.meeting_schedule.status != 2 && delegate.meeting_schedule.status != 4)">
+                <ion-col size="8.5" class="pl-0">
+                  <ion-button (click)="gotoDelegateMeetingDetails(delegate.meeting_schedule)" class="button light-green w-100-per">
+                    <fa-icon class="mr-5" [icon]="['fas', 'check-circle']" slot="start"></fa-icon>
+                    Meeting Scheduled
+                  </ion-button>
+                </ion-col>
+                <ion-col size="1.75" class="pl-0">
+                  <ion-button class="button w-100-per blue" (click)="showChatbox(delegate.id)" no-padding>
+                    <ion-icon class="fs-20 pl-12 pr-12" src="assets/icon/del-white-chat.svg" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </ion-col>
+                <ion-col size="1.75" class="pl-0">
+                  <ion-button (click)="addNote(delegate)" no-padding class="button w-100-per dark-gray">
+                    <ion-icon class="fs-20 pl-12 pr-12" src="assets/icon/del-white-notes.svg" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </ion-col>
+              </ng-container>
+              
+              <!-- 
+                ------
+                If the delegate have a have a request and cancel schedule
+                but not approved
+                -------
+              -->
+
+              <ng-container *ngIf="delegate.meeting_schedule && (delegate.meeting_schedule.status == 2 || delegate.meeting_schedule.status == 4)">
+                <ion-col size="8.5" class="pl-0">
+                    <ion-button (click)="scheduleDelegateMeeting(delegate)" class="button btn btn-success w-100-per" color="schedule">
+                      <span class="mr-10"><fa-icon [icon]="['fas', 'handshake']" slot="end"></fa-icon></span>
+                      Schedule a meeting   
+                    </ion-button>
+                </ion-col>
+                <ion-col size="1.75" class="pl-0">
+                  <ion-button class="button w-100-per blue" (click)="showChatbox(delegate.id)" no-padding>
+                    <ion-icon class="fs-20 pl-12 pr-12" src="assets/icon/del-white-chat.svg" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </ion-col>
+                <ion-col size="1.75" class="pl-0">
+                  <ion-button (click)="addNote(delegate)" no-padding class="button w-100-per dark-gray">
+                    <ion-icon class="fs-20 pl-12 pr-12" src="assets/icon/del-white-notes.svg" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </ion-col>
+              </ng-container>
+
+              <!-- 
+                ------
+                If the delegate have a doesn't have scheduled
+                can able to set a meeting schedule
+                -------
+              -->
+
+              <ng-container *ngIf="event.set_meeting && canSetSchedule() && !delegate.meeting_schedule">
+                <ion-col size="8.5" class="pl-0">
+                    <ion-button (click)="scheduleDelegateMeeting(delegate)" class="button btn btn-success w-100-per" color="schedule">
+                      <span class="mr-10"><fa-icon [icon]="['fas', 'handshake']" slot="end"></fa-icon></span>
+                      Schedule a meeting   
+                    </ion-button>
+                </ion-col>
+                <ion-col size="1.75" class="pl-0">
+                  <ion-button class="button w-100-per blue" (click)="showChatbox(delegate.id)" no-padding>
+                    <ion-icon class="fs-20 pl-12 pr-12" src="assets/icon/del-white-chat.svg" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </ion-col>
+                <ion-col size="1.75" class="pl-0">
+                  <ion-button (click)="addNote(delegate)" no-padding class="button w-100-per dark-gray">
+                    <ion-icon class="fs-20 pl-12 pr-12" src="assets/icon/del-white-notes.svg" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </ion-col>
+              </ng-container>
+
+              <!-- 
+                ------
+                If the event doesn't allow to set schedule
+                by delegate to delegate
+                -------
+              -->
+
+              <ng-container *ngIf="!event.set_meeting || !canSetSchedule() && !delegate.meeting_schedule">
+                <ion-col size="6" class="pl-0">
+                  <ion-button class="button w-100-per blue" (click)="showChatbox(delegate.id)" no-padding>
+                    <ion-icon class="fs-20 pr-10" src="assets/icon/del-white-chat.svg" slot="icon-only"></ion-icon>
+                    Message
+                  </ion-button>
+                </ion-col>
+                <ion-col size="6" class="pl-2">
+                  <ion-button *ngIf="!delegate.event_notes" (click)="addNote(delegate)" no-padding class="button w-100-per dark-gray lt-0">
+                    <ion-icon class="fs-20 pr-10" src="assets/icon/del-white-notes.svg" slot="icon-only"></ion-icon>
+                    <span> Add notes </span>
+                  </ion-button>
+                  <ion-button *ngIf="delegate.event_notes" (click)="viewNote(delegate)" no-padding class="button lt-0 w-100-per dark-gray lt-0">
+                    <ion-icon class="fs-20 pr-10" src="assets/icon/del-white-notes.svg" slot="icon-only"></ion-icon>
+                    <span> View Notes </span>
+                  </ion-button>
+                </ion-col>
+              </ng-container>
+            </ion-row>
+
+            <!-- 
+              ------
+              If the event is past
+              not allowed to set schedule
+              -------
+            -->
+
+            <ion-row *ngIf="event && event.archive_in" >
+              <ion-col size="6" class="pl-0">
+                <ion-button class="button w-100-per blue" (click)="showChatbox(delegate.id)" no-padding>
+                  <ion-icon class="fs-20 pr-10" src="assets/icon/del-white-chat.svg" slot="icon-only"></ion-icon>
+                  Message
+                </ion-button>
+              </ion-col>
+              <ion-col size="6" class="pl-2">
+                <ion-button *ngIf="!delegate.event_notes" (click)="addNote(delegate)" no-padding class="button w-100-per dark-gray lt-0">
+                  <ion-icon class="fs-20 pr-10" src="assets/icon/del-white-notes.svg" slot="icon-only"></ion-icon>
+                  <span> Add notes </span>
+                </ion-button>
+                <ion-button *ngIf="delegate.event_notes" (click)="viewNote(delegate)" no-padding class="button lt-0 w-100-per dark-gray lt-0">
+                  <ion-icon class="fs-20 pr-10" src="assets/icon/del-white-notes.svg" slot="icon-only"></ion-icon>
+                  <span> View Notes </span>
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        
+        </div>        
+      </div>
+      <ion-infinite-scroll *ngIf="moreDelegate" class="mt-20" (ionInfinite)="loadData($event)">
+        <ion-infinite-scroll-content
+          loadingSpinner="bubbles"
+          loadingText="Loading more delegate...">
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+    </div>
+    <div *ngIf="!delegates">
+      <div *ngFor="let skeleton of skeleton_loader" class="mb-20">
+        <div class="card pt-20 pr-20 pl-20 pb-5 b-rad-0">
+          <div class="delegate-profile clearfix">
+            <div class="profile-photo">
+              <img src="/assets/empty_states/profile_avatar_1.png" />
+            </div>
+            <div class="profile-basic-info pl-10">
+                <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                <ion-skeleton-text animated class="mt-10" style="width: 75%"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card pt-5 pr-20 pl-20 pb-20 b-rad-0">
+          <ion-grid class="p-0">
+            <ion-row class="p-0">
+              <ion-col size="8.5" class="pl-0">
+                <ion-button class="button light-green w-100-per">
+                  <fa-icon class="mr-5" [icon]="['fas', 'check-circle']" slot="start"></fa-icon>
+                  Meeting Scheduled
+                </ion-button>
+              </ion-col>
+              <ion-col size="1.75" class="pl-0">
+                <ion-button class="button blue" no-padding>
+                  <ion-icon class="fs-20 pl-12 pr-12" src="assets/icon/del-white-chat.svg" slot="icon-only"></ion-icon>
+                </ion-button>
+              </ion-col>
+              <ion-col size="1.75" class="pl-2">
+                <ion-button no-padding class="button dark-gray">
+                  <ion-icon class="fs-20 pl-12 pr-12" src="assets/icon/del-white-notes.svg" slot="icon-only"></ion-icon>
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+          <ion-button class="button light-gray w-100-per">
+            Schedule a meeting
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-table filter w-100-per" *ngIf="delegates && total_delegates_count == 0">
+      <div class="card b-rad-0 va-center" text-center>
+        <img class="w-30-per" src="/assets/empty_states/no_delegates.png" />
+        <h6 *ngIf="filter_delegate" class="mt-10"> No delegates found </h6>
+        <h6 *ngIf="!filter_delegate" class="mt-10"> No delegate yet </h6>
+      </div>
+    </div>
+  </ng-container>
+ 
+  <ng-container *ngIf="tab.selectedtab == 'sponsors'">
+    <div *ngIf="!sponsors">
+      <div class="card b-rad-0 p-20" text-center>
+        <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+      </div>
+      <div class="card pt-0 p-20" text-center>
+        <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+      </div>
+    </div>
+    <div class="d-table nofilter" *ngIf="sponsors && total_sponsor_count == 0">
+      <div class="card b-rad-0 va-center" text-center>
+        <img class="w-27-per" src="/assets/empty_states/no_sponsors.png" />
+        <h6 class="mt-10"> No sponsors yet </h6>
+      </div>
+    </div>
+    <div *ngIf="sponsors && total_sponsor_count > 0"> 
+      <div class="card b-rad-0 p-40" text-center>
+        <img class="w-27-per" src="/assets/icon/sponsor.png" />
+        <h4 class="mt-10"> Event Sponsors </h4>
+      </div>
+      <ng-container *ngFor="let level of sponsors">
+        <div *ngIf="level.sponsors" class="sponsor-con">
+          <div class="title">
+            <p class="fs-15 fw-500 m-0">{{level.name}}</p>
+          </div>
+          <ion-item (click)="gotoSponsor(sponsor)" class="card b-rad-0 pt-10 pb-10 pl-0 pr-0 b-bot" *ngFor="let sponsor of level.sponsors" lines="none">
+            <ion-avatar class="avatar border-all" slot="start">
+              <img src="{{sponsor.logo_url}}">
+            </ion-avatar>
+            <ion-label> {{sponsor.company}} </ion-label>
+            <ion-icon name="ios-arrow-forward" item-right></ion-icon>
+          </ion-item>
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
+
+  <!-- My Schedule -->
+  <ng-container *ngIf="tab.selectedtab == 'schedule'">
+    <div class="event-day">
+      <!-- skeleton loader -->
+      <ng-container *ngIf="!schedules">
+        <div class="ed-days mb-30">
+          <p class="fs-15 fw-500 m-0"><ion-skeleton-text animated style="width: 70%"></ion-skeleton-text></p>
+        </div>
+        <div class="timeslots">
+          <div class="ed-items clearfix mb-20">
+            <div class="indicator">
+              <div class="radio-style r-all-5p"><div class="dot"></div></div>
+            </div>
+            <div class="card-item f-right r-tl-5p r-bl-5p">
+              <h4 class="fs-18 fw-500 mt-0 mb-0"><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></h4>
+              <p class="mt-15 fs-15 fw-500"><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></p>
+              
+              <p class="mt-15 fs-15 flex ai-center text-secondary">
+                <span class="mr-10"><fa-icon [icon]="['fas', 'map-marker-alt']" slot="end"></fa-icon></span>
+                <span class="w-100-per"><ion-skeleton-text animated style="width: 80%"></ion-skeleton-text></span>
+              </p>
+              <p class="mb-0 mt-15 fs-15 flex ai-top text-secondary">
+                <span class="mr-10"><fa-icon [icon]="['fas', 'info-circle']" slot="end"></fa-icon></span>
+                <span class="w-100-per"><ion-skeleton-text animated style="width: 80%"></ion-skeleton-text></span>
+              </p>
+              <p class="mb-0 mt-15 fs-15 flex ai-top text-secondary">
+                <span class="mr-10"><fa-icon [icon]="['fas', 'user']" slot="end"></fa-icon></span>
+                <span class="w-100-per"><ion-skeleton-text animated style="width: 80%"></ion-skeleton-text></span>
+              </p>
+            </div>
+          </div>
+
+
+          <div class="ed-items clearfix mb-20">
+            <div class="indicator">
+              <div class="radio-style r-all-5p"><div class="dot"></div></div>
+            </div>
+            <div class="card-item f-right r-tl-5p r-bl-5p">
+              <h4 class="fs-18 fw-500 mt-0 mb-0"><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></h4>
+              <p class="mt-15"><ion-skeleton-text animated style="width: 50%"></ion-skeleton-text></p>
+
+              <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- empty states -->
+      <div class="d-table mt-25" *ngIf="dayFilterSelectAll && schedules">
+        <div class="card b-rad-0 va-center" text-center>
+            <img class="w-30-per" src="/assets/empty_states/no_meetings.png" />
+            <h6 *ngIf="!search" class="mt-10">
+              <span *ngIf="event && event.archive_in">
+                No agenda or scheduled meetings
+              </span>
+              <span *ngIf="event && !event.archive_in">
+                No available agenda or timeslot
+              </span>
+            </h6>
+            <h6 *ngIf="search" class="mt-10">No results found</h6>
+        </div>
+    </div>
+    
+    <ng-container *ngIf="schedules">
+      <ng-container *ngFor="let day of schedules; let i = index">
+        <!-- <ng-container *ngIf="filters.days['day_'+day.milisec] && day.milisec == selected_ms_date"> -->
+        <ng-container *ngIf="day.milisec == selected_ms_date">
+          <div *ngIf="event" slot="fixed" class="tab-event-days white pl-15 pr-15 pt-6 pb-6 mb-20 zi-9 pos-f w-100-per">
+            <ul class="flex ai-center mt-10">
+              <li>
+                <div class="tab-event-day">
+                  {{monthName}}
+                </div>
+              </li>
+  
+              <ng-container *ngFor="let d of event.days; let j = index">
+                <li *ngIf = "j <= schedules.length-1" (click)="selectDay(schedules[j].milisec)">
+                  <div class="tab-event-day" [ngClass]="{'active' : selected_ms_date == schedules[j].milisec}">
+                    <div class="day-name">{{d.day_name}}</div>
+                    <div class="date-no"><span>{{d.date}}</span></div>
+                  </div>
+                </li>
+              </ng-container>
+
+              <li>
+                <div (click)="viewItinerary()" class="tC btn-itinerary br-4">
+                  <fa-icon class="color-0a3b8c fs-16" [icon]="['fas', 'clipboard-list']" slot="start"></fa-icon>
+                  <div class="fs-10 color-0a3b8c">
+                    Final Itinerary
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+           <!-- empty state -->
+           <div class="d-table mt-0 mb-25 w-100-per pos-a" *ngIf="dayScheduleSelectAll(i) || !day.schedules.length">
+            <div class="card b-rad-0 va-center pt-50 pb-50" text-center>
+              <h6 *ngIf="!search" class="m-0">
+                <span *ngIf="event && event.archive_in">
+                  No agenda or scheduled meetings
+                </span>
+                <span *ngIf="event && !event.archive_in">
+                  No available agenda or timeslot
+                </span>
+              </h6>
+              <h6 *ngIf="search" class="m-0">No results found</h6>
+            </div>
+        </div>
+        <!-- end empty state -->
+        <div class="timeslots pos-a t-80 w-100-per">
+          <ng-container *ngFor="let sched of day.schedules; let idx = index">
+            <div id = "{{sched.data.id}}" *ngIf="filters.agenda && sched.type == 'agenda' &&  sched.candisplay" class="ed-items clearfix mb-20">
+              <div class="indicator">
+                <div class="radio-style r-all-5p">
+                  <div class="dot">
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="sched.data as a" class="card-item f-right r-tl-5p r-bl-5p">
+               <h3 class="fs-16 fw-500 mt-0 mb-0">{{a.date + "T" + clockService.convertTo24Hrs(a.start_time) | date: 'shortTime'}} - {{a.date + "T" + clockService.convertTo24Hrs(a.end_time) | date: 'shortTime'}}</h3>
+                <p class="mt-15 fs-15 fw-500">{{a.title}}</p>
+                <p *ngIf="a.location" class="mt-15 fs-15 flex ai-center text-secondary">
+                  <span class="mr-10"><fa-icon [icon]="['fas', 'map-marker-alt']" slot="end"></fa-icon></span>
+                  <span>{{a.location}}</span>
+                </p>
+                <p *ngIf="a.description" class="mb-0 mt-15 fs-15 flex ai-top text-secondary">
+                  <span class="mr-10"><fa-icon [icon]="['fas', 'info-circle']" slot="end"></fa-icon></span>
+                  <span>{{a.description}}</span>
+                </p>
+                <p *ngIf="a.fullname" class="mb-0 mt-15 fs-15 flex ai-top text-secondary">
+                  <span class="mr-10"><fa-icon [icon]="['fas', 'user']" slot="end"></fa-icon></span>
+                  <span>{{a.fullname}}</span>
+                </p>
+              </div>
+            </div>
+
+            <ng-container *ngIf="sched.data as t">
+                <!-- start passed timeslot -->
+                <ng-container *ngIf="sched.candisplay && sched.type == 'timeslot' && isPassAway(t) && !t.meeting_schedule && canDisplayPassedTS">
+                  <!-- <ng-container *ngIf="!t.meeting_schedule"> -->
+                    <div id="{{t.id}}" class="ed-items clearfix mb-20">
+                      <div class="indicator">
+                        <div class="radio-style r-all-5p" [ngClass]="{'ongoing' : t.meeting_schedule && t.meeting_schedule.state == 'On-going'}">
+                          <div class="dot" [ngClass]="{'ongoing' : t.meeting_schedule && t.meeting_schedule.state == 'On-going'}"></div>
+                        </div>
+                      </div>
+                      <div class="card-item f-right r-tl-5p r-bl-5p" [ngClass]="{'active' : t.meeting_schedule && t.meeting_schedule.state == 'On-going'}">
+                        <h3 class="fs-16 fw-500 mt-0 mb-0">{{t.date + "T" + clockService.convertTo24Hrs(t.start_time) | date: 'shortTime'}} - {{t.date + "T" + clockService.convertTo24Hrs(t.end_time_orig) | date: 'shortTime'}} &nbsp;&nbsp; {{userTimezone}}</h3>
+                        <p class="mt-15 fs-16 text-secondary">Not available for meetings</p>
+                      </div>
+                    </div>
+                  <!-- </ng-container> -->
+                </ng-container>
+              <!-- end passed timeslot -->
+
+               <!-- start available timeslot -->
+               <ng-container *ngIf="sched.candisplay && sched.type == 'timeslot' && !isPassAway(t) && !t.meeting_schedule && canDisplayAvailable">
+                <!-- <ng-container *ngIf="!t.meeting_schedule"> -->
+                  <div id="{{t.id}}" class="ed-items clearfix mb-20">
+                    <div class="indicator">
+                      <div class="radio-style r-all-5p" [ngClass]="{'ongoing' : t.meeting_schedule && t.meeting_schedule.state == 'On-going'}">
+                        <div class="dot" [ngClass]="{'ongoing' : t.meeting_schedule && t.meeting_schedule.state == 'On-going'}"></div>
+                      </div>
+                    </div>
+                    <div class="card-item f-right r-tl-5p r-bl-5p" [ngClass]="{'active' : t.meeting_schedule && t.meeting_schedule.state == 'On-going'}">
+                      <h3 class="fs-16 fw-500 mt-0 mb-0">{{t.date + "T" + clockService.convertTo24Hrs(t.start_time) | date: 'shortTime'}} - {{t.date + "T" + clockService.convertTo24Hrs(t.end_time_orig) | date: 'shortTime'}} &nbsp;&nbsp;&nbsp; {{userTimezone}}</h3>
+
+                      <p *ngIf="t.status == 'yes' && t.isPassAway != 'yes' && t.enabled && event.set_meeting && canSetSchedule()" class="mt-15 fs-16">I’m available for meetings</p>
+                      <p *ngIf="t.status == 'yes' && !t.enabled && !t.by_admin" class="mt-15 fs-16 text-secondary">I’m not available for meetings</p>
+                      <p *ngIf="t.status !== 'yes' || t.by_admin" class="mt-15 fs-16 text-secondary">This timeslot is blocked by admin</p>
+                      <p *ngIf="t.status == 'yes' && t.enabled && t.isPassAway == 'yes'" class="mt-15 fs-16 text-secondary">Not available for meetings</p>
+                      <!-- <p *ngIf="t.status == 'yes' && t.enabled && t.isPassAway != 'yes'" class="mt-15 fs-16 text-secondary">Not available for meetings</p> -->
+
+                      <div class="availability-switch" *ngIf="t.isPassAway != 'yes' && t.status == 'yes' && !t.by_admin && event.set_meeting && canSetSchedule()">
+                        <ion-toggle mode="md" checked (click)="blockUnblock(t)" [(ngModel)]="t.enabled"></ion-toggle>
+                      </div>
+                      
+                      <ng-container *ngIf="event.set_meeting && canSetSchedule()">
+                        <button *ngIf="t.status == 'yes' && t.enabled && t.isPassAway != 'yes'" class="btn btn-success w-100-per" (click)="scheduleAMeeting(t, t.id, t.event_delegate_id)">
+                          <span class="mr-10"><fa-icon [icon]="['fas', 'handshake']" slot="end"></fa-icon></span>
+                          Schedule a meeting   
+                        </button>
+                      </ng-container>
+                    </div>
+                  </div>
+                <!-- </ng-container> -->
+              </ng-container>
+
+            </ng-container>
+             <!-- start schduled meetings timeslot -->
+             <ng-container *ngIf="sched.candisplay && sched.type == 'timeslot' && filters.scheduled_meetings && sched.data as t">
+              <ng-container *ngIf="t.meeting_schedule as ms">
+                  <div id="on-going" *ngIf="(ms.status == '1' || ms.status == '3') && ms.state == 'On-going'"></div>
+                  <div id="upcomming" *ngIf="(ms.status == '1' || ms.status == '3') && ms.state == 'Upcomming'"></div>
+                  <div id="{{t.id}}" *ngIf="sched.type == 'timeslot'" class="ed-items clearfix mb-20">
+                    <div class="indicator">
+                      <div class="radio-style r-all-5p" 
+                        [ngClass]="[
+                          t.meeting_schedule && t.meeting_schedule.state == 'On-going' ? 'ongoing' : '',
+                          !ongoing_meeting && next_meeting_id == t.id? 'upcomming' : ''
+                        ]">
+                        <div class="dot" [ngClass]="{'ongoing' : t.meeting_schedule && t.meeting_schedule.state == 'On-going'}"></div>
+                      </div>
+                    </div>
+                    <div class="card-item f-right r-tl-5p r-bl-5p" 
+                      [ngClass]="[
+                        ms.state == 'On-going' && (ms.status == 1 || ms.status == 3) ? 'active' : '',
+                        ms.status == 3 && ms.state == 'Upcomming' ? 'for-cancelation' : '',
+                        !ongoing_meeting && next_meeting_id == t.id ? 'upcomming' : ''
+                      ]">
+                        <h3 class="fs-16 fw-500 mt-0 mb-0" [ngClass]="{'text-primary' : t.meeting_schedule && t.meeting_schedule.state == 'On-going'}">{{t.date + "T" + clockService.convertTo24Hrs(t.start_time) |date: 'shortTime'}} - {{t.date + "T" + clockService.convertTo24Hrs(t.end_time_orig) | date: 'shortTime'}} &nbsp;&nbsp;&nbsp; {{ userTimezone}}</h3>
+                        
+                        <div class="f-right mb-5 mt-5" *ngIf="!ongoing_meeting && next_meeting_id == t.id">
+                          <p class="m-0 text-primary fs-14">
+                            <span class="mr-5"><fa-icon [icon]="['fas', 'stopwatch']" slot="end"></fa-icon></span>
+                            <span>Next</span>
+                          </p>
+                        </div>
+
+                        <div class="f-right mb-5 mt-5" *ngIf="ms.state == 'On-going' && (ms.status != 5 && ms.status != 2)">
+                          <p class="m-0 text-primary fs-14">
+                            <span class="mr-5"><fa-icon [icon]="['fas', 'hourglass-half']" slot="end"></fa-icon></span>
+                            <span>On-going</span>
+                          </p>
+                        </div>
+                        
+                        <div class="f-right mb-5 mt-5" *ngIf="ms.state == 'Done' && (ms.status != 5 && ms.status != 2)">
+                          <p class="m-0 text-success fs-15">
+                            <span class="mr-5"><fa-icon [icon]="['fas', 'check-circle']" slot="end"></fa-icon></span>
+                            <span>Done</span>
+                          </p>
+                        </div>
+
+                        <div class="mt-10" *ngIf="ms.status == 3">
+                          <p class="m-0 text-danger fs-14">
+                            <span *ngIf="ms.state == 'Upcomming'">Pending Cancellation</span>
+                            <span *ngIf="ms.state == 'On-going' || ms.state == 'Done'">Not approved cancellation</span>
+                          </p>
+                        </div>
+
+                        <div class="mt-20 mb-10 flex ai-start" *ngIf="ms.state == 'Upcomming' && ms.status == '2'">
+                          <span>
+                            <ion-icon *ngIf="ms.setter == 'Sent'" class="fs-15 mr-5 mt-2" src="assets/icon/sched-send.svg"></ion-icon>
+                            <ion-icon *ngIf="ms.setter == 'Received'" class="fs-15 mr-5 mt-2" src="assets/icon/sched-receive.svg"></ion-icon>
+                          </span>
+                          <p class="m-0 text-secondary">
+                            <span>You’ve 
+                              <span text-lowercase> {{ms.setter}} </span>
+                              a meeting requests for this timeslot.</span>
+                          </p>
+                        </div>
+
+                        <p *ngIf="ms.status == '2' && (t.isPassAway == 'yes') && t.enabled" class="mt-15 fs-16 text-secondary">Not approved meeting request</p>
+                        
+                        <div *ngIf="ms.status != '2'" class="delegate-profile clearfix mt-20">
+                          
+                          <div *ngIf="ms.count_no_show > 0" class="mt-10 mb-10">
+                            <p class="m-0 text-danger fs-14">
+                              <span class="mr-10"><fa-icon [icon]="['fas', 'flag']" slot="end"></fa-icon></span>
+                              <span>{{ms.count_no_show}} no show meeting</span><span *ngIf="ms.count_no_show > 1">s</span>
+                            </p>
+                          </div>
+                          
+                          <div class="profile-photo" (click)="gotoDelegateProfile(ms.delegate_id)">
+                              <img src="{{ms.delegate_profile_photo}}" />
+                          </div>
+                          <div class="profile-basic-info pl-10" (click)="gotoDelegateProfile(ms.delegate_id)">
+                            <h4 class="fs-16 fw-500 mt-0 mb-10 ellipsis w-100-per capitalize">{{ms.delegate_company_name}} <!-- <fa-icon *ngIf="delegate.user_privacy != 'yes'" class="mr-4" [icon]="['fas', 'lock']"></fa-icon> -->
+                            </h4> 
+                            <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">{{ms.delegate_fullname}}</p>
+                            <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize text-secondary">{{ms.delegate_job_title}}</p>
+                            <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">
+                              <span class="country-flag" [ngStyle]="{'background-image': 'url(/assets/images/flags/'+ms.delegate_company_country_iso+'.png)'}"></span>
+                              <span>{{ms.delegate_company_country_nicename}}</span>
+                              <span *ngIf="ms.delegate_company_country_nicename && ms.delegate_company_state">
+                                ,
+                              </span>
+                              <span> {{ms.delegate_company_state}}</span>
+                            </p>
+                          </div>
+                        </div>
+                        <div *ngIf="ms.status != '2'" class="done-meeting-footer pt-15 pl-15 pr-15 flex ai-center">
+
+                         <!--  <button class="chip mr-15"
+                            [ngClass]="{
+                              'table-vip' : ms.t_type == '1',
+                              'table-booth' : ms.t_type == '2',
+                              'darkblue' : ms.t_type == '0'
+                            }
+                            "
+                          >
+                          <span *ngIf="ms.t_type == '1'"> VIP </span> 
+                          <span *ngIf="ms.t_type == '2'"> Booth </span>
+                          <span *ngIf="ms.t_type == '0'"> Virtual </span>
+                          &nbsp;{{ms.t_table_no}}
+                        </button> -->
+
+                          <div *ngIf="ms.setter" class="m-0 flex ai-center">
+                            <span class="mr-5 pt-2">
+                              <ion-icon *ngIf="ms.setter == 'Received'" src="assets/icon/sched-receive.svg"></ion-icon>
+                              <ion-icon *ngIf="ms.setter == 'Sent'" src="assets/icon/sched-send.svg"></ion-icon>
+                              <fa-icon  *ngIf="ms.setter == 'Set by admin'" class="text-success" [icon]="['fas', 'user-circle']"></fa-icon>
+                            </span>
+                            <span [ngClass]="{
+                              'text-green' : ms.setter == 'Sent',
+                              'text-primary' : ms.setter == 'Received',
+                              'text-success' : ms.setter == 'Set by admin'}">
+                              {{ms.setter}}
+                            </span>
+                          </div>
+
+                          <button *ngIf="ms.zoom_meeting_link_1 && ms.zoom_meeting_link_2" class="btn-primary-outline pt-6 pb-6 pr-8 pl-8 flex ai-center jc-center br-12-px ml-10" (click)="gotoZoomLink(ms)">
+                            <ion-icon class="mr-4 fs-18" src="assets/icon/zoom.svg"></ion-icon>
+                            <span>
+                              Start Meeting
+                            </span>
+                          </button>
+
+                          <button *ngIf="ms.zoom_meeting_link_1 && ms.zoom_meeting_link_2" class="btn-green-outline pt-6 pb-6 pr-8 pl-8 flex ai-center jc-center br-12-px ml-10" (click)="copyZoomLink(ms)">
+                            <ion-icon class="mr-4 fs-18" src="assets/icon/copy-link.svg"></ion-icon>
+                            <span>
+                              Copy Link
+                            </span>
+                          </button>
+                        </div>
+                        
+                        <button *ngIf="(ms.status == '1' || ms.status == '3') && ms.state == 'Upcomming'" (click)="gotoMeetingDetails(day, t)" class="btn grad btn-done w-100-per mt-15 text-default">
+                          View Details
+                        </button>
+                        <button *ngIf="ms.state == 'Done' && ms.status == '1'" (click)="gotoMeetingDetails(day, t)" class="btn grad btn-done w-100-per mt-15 text-default">
+                          View Details
+                        </button>
+
+                        <button *ngIf="(ms.status == '1' || ms.status == '3') && ms.state == 'On-going' && (!t.no_show)" (click)="reportAsNoshow(day, t)" class="btn btn-danger-outline w-100-per mt-15 mb--10 text-default">
+                          Report as No Show
+                        </button>
+                        <button *ngIf="(ms.status == '1' || ms.status == '3') && ms.state == 'On-going' && (t.no_show && (t.event_delegate_id == t.no_show.reporter_delegate_id) && t.no_show.status == 1)" (click)="cancelRequest(t.no_show, t)" class="btn btn-gray-outline w-100-per mt-15 mb--20 text-default">
+                          Cancel no show report
+                        </button>
+                        <button *ngIf="(ms.status == '1' || ms.status == '3') && ms.state == 'On-going' && (t.no_show && (t.event_delegate_id == t.no_show.reporter_delegate_id) && t.no_show.status == 2)" (click)="cancelRequest(t.no_show, t)" class="btn btn-gray-outline w-100-per mt-15 mb--20 text-default">
+                          Undo my no show report
+                        </button>
+
+                        <button *ngIf="(ms.status == '1' || ms.status == '3') && ms.state == 'On-going'" (click)="gotoMeetingDetails(day, t)" class="btn grad btn-primary w-100-per mt-15 text-default">
+                          View Details
+                        </button> 
+                        <ng-container *ngIf="ms.state == 'Upcomming' && ms.status == '2'" >
+
+                          <button  class="btn btn-success w-100-per" (click)="scheduleAMeeting(t, t.id, t.event_delegate_id)">
+                            <span class="mr-10"><fa-icon [icon]="['fas', 'handshake']" slot="end"></fa-icon></span>
+                            Schedule a meeting   
+                          </button>
+
+                          <button style="background: transparent !important;" (click)="showRequestListModal(day, t)" class="btn btn-primary-light w-100-per flex ai-center jc-center fw-400">
+                            View meeting requests
+                            <ion-icon class="ml-5" name="ios-arrow-forward" item-right></ion-icon>
+                          </button>
+                        </ng-container>
+                    </div>
+                  </div>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+        </div>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+
+    </div>
+  </ng-container>
+  
+  <ng-container *ngIf="tab.selectedtab == 'home'">
+    <ng-container *ngIf="event">    
+      
+      <div *ngIf="!event.summary && !event.summary_youtube_link" class="card p-20 b-rad-0 b-bot mt-40">
+        <div class="post-summary-container clearfix">
+          <div class="icon-container">
+            <img src="assets/icon/post-event-summary.svg" />
+          </div>
+          <div class="post-summary-content pl-15">
+            <h4 class="fs-16 fw-500 mt-0 mb-10 w-100-per"> No Event Summary posted yet! </h4>
+            <p class="fs-15 mt-0 mb-5 w-100-per">
+              Seems like Event Organizer haven't posted the event summary yet. Try visiting it on some other time.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="event.summary" class="card p-20 b-rad-0 b-bot mt-40">
+        <div class="post-summary-container clearfix">
+          <div class="icon-container">
+            <img src="assets/icon/post-event-summary.svg" />
+          </div>
+          <div class="post-summary-content pl-15">
+            <h4 class="fs-16 fw-500 mt-0 mb-10 w-100-per capitalize"> Post Event Summary </h4>
+            <p class="fs-15 mt-0 mb-5 w-100-per">
+              {{event.summary}}
+            </p>
+            
+            <div *ngIf="event.summary_link" (click)="gotoExternalBrowser(event.summary_link)" class="routerLinkClass f-left fs-14 flex mt-10 ai-center text-primary">
+              View our post event summary now
+              <fa-icon class="ml-8" [icon]="['fas', 'chevron-right']" slot="start"></fa-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="event.summary_youtube_link" class="card no-bg p-20 b-rad-0 mt-20">
+        <div class="video-header p-15 flex ai-center text-white">
+          <ion-icon class="mr-15" src="assets/icon/video-icon.svg" slot="start"></ion-icon>
+          <h6 class="m-0">
+            Watch our Aftermovie
+          </h6>
+        </div>
+        <div class="clearfix w-100-per h-200">
+          <iframe width="100%" height="100%" [src]="event.summary_youtube_link | safeUrl" frameborder="0" allowfullscreen></iframe>
+        </div>
+      </div>
+      
+      <div class="card p-20 b-rad-0 b-bot mt-20 mb-40">
+        <div class="feedback-container clearfix">
+          <div class="icon-container">
+            <img src="assets/icon/feedback-icon.svg" />
+          </div>
+          <div class="feedback-content pr-15">
+            <h4 class="fs-16 fw-500 mt-0 mb-10 w-100-per"> Leave a feedback </h4>
+            <p class="fs-15 mt-0 mb-5 w-100-per">
+              <!-- Your feedback will help us improve our events and mobile app. -->
+              Your feedback helps us improve our events and mobile app, thank you!
+            </p>
+            
+            <div routerLink="/event-feedback/{{event_id}}" class="routerLinkClass f-left fs-14 flex mt-10 ai-center text-primary">
+              <span *ngIf="!event.feedback_id"> 
+              <!-- Provide feedback  -->
+              Share us your event experience
+              </span>
+              <span *ngIf="event.feedback_id"> Update feedback </span>
+              <fa-icon class="ml-8" [icon]="['fas', 'chevron-right']" slot="start"></fa-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="!event">
+      <div class="card p-20 b-rad-0 b-bot mt-40">
+        <div class="post-summary-container clearfix">
+          <div class="icon-container">
+            <img src="assets/icon/post-event-summary.svg" />
+          </div>
+          <div class="post-summary-content pl-15">
+            <h4 class="fs-16 fw-500 mt-0 mb-10 w-100-per capitalize"> Post Event Summary </h4>
+            <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+            
+            <div class="routerLinkClass f-left fs-14 flex mt-10 ai-center text-primary">
+              View our post event summary now
+              <fa-icon class="ml-8" [icon]="['fas', 'chevron-right']" slot="start"></fa-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card no-bg p-20 b-rad-0 mt-20">
+        <div class="video-header p-15 flex ai-center text-white">
+          <ion-icon class="mr-15" src="assets/icon/video-icon.svg" slot="start"></ion-icon>
+          <h6 class="m-0">
+            Watch our Aftermovie
+          </h6>
+        </div>
+        <div class="clearfix bg-dark flex ai-center jc-center w-100-per h-200">
+          <fa-icon class="skeleton-play-icon flex ai-center" [icon]="['far', 'play-circle']" slot="start"></fa-icon>
+        </div>
+      </div>
+
+      <div class="card p-20 b-rad-0 b-bot mt-20 mb-40">
+        <div class="feedback-container clearfix">
+          <div class="icon-container">
+            <img src="assets/icon/feedback-icon.svg" />
+          </div>
+          <div class="feedback-content pr-15">
+            <h4 class="fs-16 fw-500 mt-0 mb-10 w-100-per"> Leave a feedback </h4>
+            <p class="fs-15 mt-0 mb-5 w-100-per">
+              <!-- Your feedback will help us improve our events and mobile app. -->
+              Your feedback helps us improve our events and mobile app, thank you!
+            </p>
+            
+            <div routerLink="/event-feedback/{{event_id}}" class="routerLinkClass f-left fs-14 flex mt-10 ai-center text-primary">
+              <!-- Provide feedback -->
+              Share us your event experience
+              <fa-icon class="ml-8" [icon]="['fas', 'chevron-right']" slot="start"></fa-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+  
+</ion-content>

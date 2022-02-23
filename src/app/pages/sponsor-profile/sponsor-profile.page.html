@@ -1,0 +1,100 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="myBackButton()">
+        <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="p-0" text-center> About Sponsor </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="ios-arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="sponsor && sponsor.banner.length > 1" class="container profile-banner"
+    [ngStyle]="{'background-image': 'url('+sponsor.banner_url+')'}">
+    <div class="avatar-container p-25">
+      <div *ngIf="sponsor.logo.length == 1" class="pic-thumb flex jc-center ai-center" [ngStyle]="{'background-image': 'url(/assets/empty_states/profile_avatar_'+sponsor.logo+'.png)'}">
+      </div>
+      <div *ngIf="sponsor.logo.length > 1" class="pic-thumb flex jc-center ai-center" [ngStyle]="{'background-image': 'url(' + sponsor.logo_url + ')'}">
+      </div>
+      <h6 text-center class="fs-16"> {{sponsor.company}} </h6>
+    </div>
+  </div>
+
+  <div *ngIf="sponsor && sponsor.banner.length == 1" class="container profile-banner"
+    [ngStyle]="{'background-image': 'url(/assets/images/no_banner.png)'}">
+    <div class="avatar-container p-25">
+      <div *ngIf="sponsor.logo.length == 1" class="pic-thumb flex jc-center ai-center" [ngStyle]="{'background-image': 'url(/assets/empty_states/profile_avatar_'+sponsor.logo+'.png)'}">
+      </div>
+      <div *ngIf="sponsor.logo.length > 1" class="pic-thumb flex jc-center ai-center" [ngStyle]="{'background-image': 'url(' + sponsor.logo_url + ')'}">
+      </div>
+      <h6 text-center class="fs-16"> {{sponsor.company}} </h6>
+    </div>
+  </div>
+
+  <div *ngIf="sponsor" class="card b-shadow p-20 b-rad-0 mt--10"> 
+    <div class="form-group block mb-18">
+      <label class="text-secondary fs-16"> Website </label>
+      <p *ngIf="sponsor.social_media_links && sponsor.social_media_links.website.length > 0" class="m-0 fs-16"> {{sponsor.social_media_links.website}} </p>
+      <p *ngIf="sponsor.social_media_links && sponsor.social_media_links.website.length == 0" class="m-0 fs-16"> No website provided </p>
+    </div>
+    <div class="form-group block mb-18">
+      <label class="text-secondary fs-16"> Email </label>
+      <p *ngIf="sponsor.social_media_links && sponsor.social_media_links.email.length > 0" class="m-0 fs-16"> {{sponsor.social_media_links.email}} </p>
+      <p *ngIf="sponsor.social_media_links && sponsor.social_media_links.email.length == 0" class="m-0 fs-16"> No email address provided </p>
+    </div>
+    <div class="form-group block mb-18">
+      <label class="text-secondary fs-16"> Phone </label>
+      <p *ngIf="sponsor.social_media_links && sponsor.social_media_links.phone" class="m-0 fs-16"> {{sponsor.social_media_links.phone}} </p>
+      <p *ngIf="sponsor.social_media_links && !sponsor.social_media_links.phone" class="m-0 fs-16"> No phone number provided </p>
+    </div>
+    <div class="form-group block">
+      <label class="text-secondary fs-16"> Social Links </label>
+      <div *ngIf="sponsor.social_media_links" class="flex" >
+        <div *ngIf="sponsor.social_media_links.linkedln" class="social-media-icon ln mr-5"
+          (click)="presentSocialModal('Linkedln', 'ln', 'linkedin-in')">
+          <a>
+            <fa-icon [icon]="['fab', 'linkedin-in']"></fa-icon>
+          </a>
+        </div>
+        <div *ngIf="sponsor.social_media_links.facebook" class="social-media-icon fb mr-5"
+          (click)="presentSocialModal('Facebook', 'fb', 'facebook-f')">
+          <a>
+            <fa-icon [icon]="['fab', 'facebook-f']" slot="start"></fa-icon>
+          </a>
+        </div>
+        <div *ngIf="sponsor.social_media_links.twitter" class="social-media-icon tw mr-5"
+          (click)="presentSocialModal('Twitter', 'tw', 'twitter')">
+          <a>
+            <fa-icon [icon]="['fab', 'twitter']" slot="start"></fa-icon>
+          </a>
+        </div>
+        <p *ngIf="!sponsor.social_media_links.linkedln &&
+            !sponsor.social_media_links.facebook &&
+            !sponsor.social_media_links.twitter"
+          class="m-0"> No social media provided </p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="sponsor" class="card b-shadow p-20 b-rad-0 mt-25">
+    <div class="form-group block mb-15">
+      <label class="text-secondary mb-15"> Description </label>
+      <div *ngIf="sponsor.profile.length > 0" [innerHtml]="sponsor.profile" class="fs-16 lh-24"></div>
+      <div *ngIf="sponsor.profile.length == 0">
+        <p class="m-0 fs-16 ">  No description provided</p>
+      </div>
+    </div>
+  </div>
+
+</ion-content>

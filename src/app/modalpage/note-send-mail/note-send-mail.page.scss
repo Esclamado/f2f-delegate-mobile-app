@@ -1,0 +1,32 @@
+.modal_content {
+    min-width: 324px;
+    padding: 0px !important;
+
+    .prompt_modal-header {
+        height: 50px;
+        border-bottom: solid 1px #f1f1f1;
+        text-align: left;
+        padding: 15px 15px 0px 15px;
+        position: relative;
+
+        .btn-close {
+            position: absolute;
+            z-index: 3;
+            font-size: 20px;
+            top: 15px;
+            color: #999999;
+            right: 10px;
+        }
+    }
+
+    .prompt_modal-content {
+        text-align: left;
+        padding: 15px;
+    }
+
+    .prompt_modal-footer {
+        button.f-left {
+            text-align: left;
+        }
+    }
+}

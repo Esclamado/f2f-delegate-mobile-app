@@ -1,0 +1,13 @@
+.tabs{
+	box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.1);
+	.tabs-item{
+		display: inline-block;
+		&.active:after{
+			left: 0px;
+		}
+	}
+}
+
+.card:last-child{
+	border-bottom: 0px !important;
+}

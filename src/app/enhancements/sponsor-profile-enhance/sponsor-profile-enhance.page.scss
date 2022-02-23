@@ -1,0 +1,33 @@
+ion-content{
+    --ion-background-color:#ebebeb;
+}
+
+.profile-banner {
+    background-size: cover;
+    width: 100%;
+    background-repeat: no-repeat;
+}
+
+.avatar-container{
+    width: 100%;
+    margin: auto;
+
+    .pic-thumb{
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        margin: auto;
+        width: 68px;
+        height: 68px;
+        border-radius: 4px;
+    }
+}
+
+// .sc-ion-buttons-md-s .button-has-icon-only.button-clear{
+//     --padding-top: 10px;
+//     --padding-end: 10px;
+//     --padding-bottom: 10px;
+//     --padding-start: 10px;
+//     width: 50px;
+//     height: 50px;
+// }

@@ -1,0 +1,122 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button routerLink="/tabs/event-settings/{{event_id}}">
+        <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <!-- <ion-buttons slot="start">
+      <ion-button routerLink="/meeting-details">
+        <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons> -->
+    <ion-title class="p-0" text-center> Notes </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="ios-arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollEvents]="true" >
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="!notes" class="note-container bg-gray pl-15 pb-15">
+    <div class="masonary-skeleton w-100-per pr-15 pt-15" *ngFor="let n of skeleton_loader">
+      <div class="w-48-per routerLinkClass card p-15">
+        <ion-skeleton-text float-right animated style="width: 30%"></ion-skeleton-text>
+        <div class="delegate-profile clearfix">
+          <div class="profile-photo">
+            <img src="/assets/empty_states/profile_avatar_1.png" />
+          </div>
+        </div>
+
+        <h4 class="fs-15 fw-500 mt-10 mb-0 ellipsis"> 
+          <ion-skeleton-text class="mb-0" animated style="width: 80%"></ion-skeleton-text> 
+        </h4>
+        <p class="fs-14 text-secondary mt-5 mb-0"> 
+          <ion-skeleton-text class="mb-0" animated style="width: 100%"></ion-skeleton-text> 
+        </p>
+        
+        <div class="mt-20 ellipsis11">
+          <p class="fs-14 text-secondary mt-5 mb-0"> <ion-skeleton-text class="mb-0" animated style="width: 100%"></ion-skeleton-text> </p>
+          <p class="fs-14 text-secondary mt-5 mb-0"> <ion-skeleton-text class="mb-0" animated style="width: 100%"></ion-skeleton-text> </p>
+          <p class="fs-14 text-secondary mt-5 mb-0"> <ion-skeleton-text class="mb-0" animated style="width: 50%"></ion-skeleton-text> </p>
+        </div>
+      </div>
+      <div class="w-48-per routerLinkClass card p-15">
+        <ion-skeleton-text float-right animated style="width: 30%"></ion-skeleton-text>
+        <div class="delegate-profile clearfix">
+          <div class="profile-photo">
+            <img src="/assets/empty_states/profile_avatar_1.png" />
+          </div>
+        </div>
+
+        <h4 class="fs-15 fw-500 mt-10 mb-0 ellipsis"> 
+          <ion-skeleton-text class="mb-0" animated style="width: 80%"></ion-skeleton-text> 
+        </h4>
+        <p class="fs-14 text-secondary mt-5 mb-0"> 
+          <ion-skeleton-text class="mb-0" animated style="width: 100%"></ion-skeleton-text> 
+        </p>
+        
+        <div class="mt-20 ellipsis11">
+          <p class="fs-14 text-secondary mt-5 mb-0"> <ion-skeleton-text class="mb-0" animated style="width: 100%"></ion-skeleton-text> </p>
+          <p class="fs-14 text-secondary mt-5 mb-0"> <ion-skeleton-text class="mb-0" animated style="width: 100%"></ion-skeleton-text> </p>
+          <p class="fs-14 text-secondary mt-5 mb-0"> <ion-skeleton-text class="mb-0" animated style="width: 50%"></ion-skeleton-text> </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="notes && total_notes > 0" class="note-container bg-gray pl-15 pb-15">
+    <ngx-masonry>
+      <div ngxMasonryItem class="masonry-item pr-15 pt-15" *ngFor="let n of notes">
+        <div class="routerLinkClass card p-15" (click)="gotoNotes(n)">
+          <p class="m-0 f-right fs-14 text-primary">{{n.edited_date}}</p>
+          <div class="delegate-profile clearfix">
+            <div class="profile-photo">
+              <img *ngIf="n.d_profile_photo.length == 1" src="/assets/empty_states/profile_avatar_{{n.d_profile_photo}}.png" />
+              <img *ngIf="n.d_profile_photo.length > 1" src="{{n.d_profile_photo}}" />
+            </div>
+          </div>
+  
+          <h4 class="fs-15 fw-500 mt-10 mb-0 ellipsis">{{n.company_name}}</h4>
+          <p class="fs-14 text-secondary mt-5 mb-0" text-capitalize>{{n.d_fullname}}</p>
+          
+          <div class="mt-20 ellipsis11" [innerHtml]="n.note"></div>
+        </div>
+      </div>
+    </ngx-masonry>
+    <ion-infinite-scroll class="mt-20" threshold="100px" (ionInfinite)="loadData($event)">
+      <ion-infinite-scroll-content
+        loadingSpinner="bubbles"
+        loadingText="Loading more notes...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+
+    <!-- <div class="va-center" text-center>
+        <img class="w-30-per" src="/assets/icon/delegate_locator.png" />
+        <p class="mt-10 pl-20 pr-20">Type the name of a delegate to know which table they're currenlty having a meeting.</p>
+    </div> -->
+  </div>
+
+  <!-- start empty state -->
+  <ng-container *ngIf="notes && total_notes == 0">
+    <div class="d-table">
+      <div class="card b-rad-0 va-center" text-center>
+        <img class="w-30-per" src="/assets/empty_states/no-notes.png" />
+        <p class="fs-15 text-default tC">No note yet.</p>
+      </div>
+    </div>
+  </ng-container>
+  <!-- end empty state -->
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="f2f-primary" (click)="showDelegatesModal()">
+      <ion-icon src="assets/icon/white-notes.svg"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

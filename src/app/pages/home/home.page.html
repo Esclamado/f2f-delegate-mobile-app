@@ -1,0 +1,316 @@
+<ion-content>
+    <div class="event-list-profile">
+        <div class="pattern-bg"></div>
+        <div (click)="gotoSetting()" class="routerLinkClass profile-settings-btn bar flex ai-center jc-center">
+            <!-- <fa-icon class="flex" [icon]="['fas', 'cog']" slot="end"></fa-icon> -->
+            <fa-icon class="flex" [icon]="['fas', 'bars']" slot="end"></fa-icon>
+        </div>
+        <div class="f2f-logo tC">
+            <img class="w-25" src="/assets/images/f2flogo.png" />
+        </div>
+        <div (click)="gotoUserProfile()" class="routerLinkClass delegate-profile clearfix mt-20">
+            <div *ngIf="delegate" class="profile-photo">
+                <img *ngIf="delegate.profile_photo.length == 1" src="/assets/empty_states/profile_avatar_{{delegate.profile_photo}}.png" />
+                <img *ngIf="delegate.profile_photo.length > 1" src="{{delegate.profile_photo_url}}" />
+            </div>
+            <div *ngIf="delegate && company" class="profile-basic-info pl-10">
+                <h4 class="fs-16 fw-500 mt-0 mb-10 ellipsis w-100-per">{{company.name}}</h4>
+                <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">{{delegate.fullname}}</p>
+                <!-- <p class="fs-15 mt-0 mb-5 ellipsis w-100-per text-secondary capitalize">{{delegate.job_title}}</p> -->
+                <!-- <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">
+                    <span class="country-flag" [ngStyle]="{'background-image': 'url(/assets/images/flags/' + company.pref_country_iso + '.png)'}"></span>
+                    <span>{{company.pref_country_nicename}}</span><span *ngIf="company.state && company.state != 'Select State' ">, {{company.state}}</span>
+                </p> -->
+                <p class="fs-15 mt-0 mb-5 ellipsis w-100-per text-primary capitalize"> View Profile </p>
+            </div>
+            <!-- Skeleton Loader -->
+            <div *ngIf="!delegate" class="profile-photo">
+                <img src="/assets/empty_states/profile_avatar_1.png" />
+            </div>
+            <div *ngIf="!delegate && !company" class="profile-basic-info pl-10">
+                <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                <ion-skeleton-text animated class="mt-15" style="width: 75%"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+            </div>
+        </div>
+
+        <div class="event-listing-tabs ml--20 mr--20 mt-5">
+            <div class="tabs w-100-per">
+                <div class="tabs-item fs-16 w-50-per flex ai-center jc-center" [ngClass]="selectedtab == 'myevent' ? 'active' : ''" (click)="selectTab('myevent')">
+                    <p>My Events</p>
+                </div>
+                <div class="tabs-item fs-16 w-50-per flex ai-center jc-center" [ngClass]="selectedtab == 'mypastevent' ? 'active' : ''" (click)="selectTab('mypastevent')">
+                    <p>My Past Events</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <ion-content class="ref-content">
+        <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+          <ion-refresher-content></ion-refresher-content>
+        </ion-refresher>
+        <ng-container [ngSwitch]="selectedtab">
+            <div class="h-100-per" *ngSwitchCase="'myevent'">
+                <div class="event-list-container">
+                    <h4 class="fs-21 fw-500 mt-25">On-going and upcoming events</h4>
+                    <p class="fs-15 mt-10 lh-22">Select an event to view its details and start scheduling meetings with other delegates.</p>
+    
+                    <div *ngIf="events" class="events mt-30">
+                        <!-- skeleton loader -->
+                        <ng-container *ngIf="!events.ongoingandupcomming">
+                            <div class="card r-all-5p clearfix p-8 mb-20">
+                                <div class="clearfix">
+                                    <div class="event-photo w-50 h-50 f-left">
+                                        <ion-skeleton-text animated style="width: 100%; height: 100%;"></ion-skeleton-text>
+                                    </div>
+                                    <div class="event-info f-left">
+                                        <p class="fs-15 w-100-per ellipsis2 m-0 lh-19">
+                                            <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                                        </p>
+                                        <p class="text-secondary fs-15 mb-0 mt-10">
+                                            <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <!-- end skeleton loader -->
+    
+                        <ng-container *ngIf="events.ongoingandupcomming">
+    
+                            <!-- empty state -->
+                            <div class="d-table w-100-per" *ngIf="events.ongoingandupcomming.datas.length == 0">
+                                <div class="card b-rad-0 va-center" text-center>
+                                    <img class="w-30-per" src="/assets/empty_states/no_event.png" />
+                                    <h6 class="mt-10"> No event yet </h6>
+                                </div>
+                            </div>
+                            <!-- end empty state -->
+    
+    
+                            <ng-container *ngFor="let e of events.ongoingandupcomming.datas">
+                                <div *ngIf="e.isongoing && e.type == 1" class="routerLinkClass card r-all-5p clearfix p-8 mb-20 active" (click)="checkEvent(e, e.id, 'ongoing')">
+                                    <div class="event-list-header mb-10">
+                                        <p class="m-0 text-white">
+                                            <span class="mr-8"><fa-icon [icon]="['fas', 'clock']" slot="end"></fa-icon></span>
+                                            <span>On-going event</span>
+                                        </p>
+                                    </div>
+                                    <div class="clearfix flex ai-center">
+                                        <div class="event-photo w-60 h-60 f-left">
+                                            <img class="r-all-5p" src="{{e.event_icon_url ? e.event_icon_url : '/assets/empty_states/no_event_profile.png'}}">
+                                        </div>
+                                        <div class="event-info f-left">
+                                            <div class="flex">
+                                                <p class="fs-15 w-100-per ellipsis2 m-0 lh-19">{{e.name}}</p>
+                                                <button  class="chip physical fs-15 pt-2">
+                                                    <span>Physical</span>
+                                                </button>
+                                            </div>
+                                            
+                                            <p class="text-primary fs-15 mb-0 mt-5">{{e.event_date}}</p>
+                                            <p class="fs-15 text-secondary w-100-per ellipsis2 mb-0 mt-5 lh-19">{{e.event_address | splitAddress}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div *ngIf="e.isongoing && e.type == 2" class="routerLinkClass card r-all-5p clearfix p-8 mb-20 active" (click)="checkVirtual(e, e.id, 'ongoing')">
+                                    <div class="event-list-header mb-10">
+                                        <p class="m-0 text-white">
+                                            <span class="mr-8"><fa-icon [icon]="['fas', 'clock']" slot="end"></fa-icon></span>
+                                            <span>On-going event</span>
+                                        </p>
+                                    </div>
+                                    <div class="clearfix flex ai-center">
+                                        <div class="event-photo w-60 h-60 f-left">
+                                            <img class="r-all-5p" src="{{e.event_icon_url ? e.event_icon_url : '/assets/empty_states/no_event_profile.png'}}">
+                                        </div>
+                                        <div class="event-info f-left">
+                                            <div class="flex">
+                                                <p class="fs-15 w-100-per ellipsis2 m-0 lh-19">{{e.name}}</p>
+                                                <button  class="chip virtual fs-15 pt-2">
+                                                    <span>Virtual</span>
+                                                </button>
+                                            </div>
+                                            <!-- <p class="text-primary fs-15 mb-0 mt-5">{{e.event_date}}</p> -->
+                                            <p *ngIf = "(e.start_date + 'T' + clockService.convertTo24Hrs(e.start_time) | date: 'MM' : degetateTimezoneOffset) == (e.end_date + 'T' + clockService.convertTo24Hrs(e.end_time) | date: 'MM' : degetateTimezoneOffset)" class="text-primary fs-15 mb-0 mt-5">{{e.start_date + "T" + clockService.convertTo24Hrs(e.start_time) | date: 'MMMM d' : degetateTimezoneOffset}} - {{e.end_date + "T" + clockService.convertTo24Hrs(e.end_time) | date: 'd, y' : degetateTimezoneOffset}} </p>
+                                            <p *ngIf = "(e.start_date + 'T' + clockService.convertTo24Hrs(e.start_time) | date: 'MM' : degetateTimezoneOffset) != (e.end_date + 'T' + clockService.convertTo24Hrs(e.end_time) | date: 'MM' : degetateTimezoneOffset)" class="text-primary fs-15 mb-0 mt-5">{{e.start_date + "T" + clockService.convertTo24Hrs(e.start_time) | date: 'MMMM d' : degetateTimezoneOffset}} - {{e.end_date + "T" + clockService.convertTo24Hrs(e.end_time) | date: 'MMMM d, y' : degetateTimezoneOffset}} </p>
+                                           <!--  <p class="fs-15 text-secondary w-100-per ellipsis2 mb-0 mt-5 lh-19">{{e.event_address | splitAddress}}</p> -->
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <div *ngIf="!e.isongoing && e.type == 1" class="routerLinkClass card r-all-5p clearfix p-8 mb-20" (click)="checkEvent(e, e.id, 'upcoming')">
+                                    <div class="clearfix">
+                                        <div class="event-photo w-50 h-50 f-left">
+                                            <img class="r-all-5p" src="{{e.event_icon_url ? e.event_icon_url : '/assets/empty_states/no_event_profile.png'}}">
+                                        </div>
+                                        <div class="event-info f-left">
+                                            <div class="flex">
+                                                <p class="fs-15 w-100-per ellipsis2 m-0 lh-19">{{e.name}}</p>
+                                                <button  class="chip physical fs-15 pt-2">
+                                                    <span>Physical</span>
+                                                </button>
+                                            </div>
+                                           
+                                            <p class="text-secondary fs-15 mb-0 mt-10">{{e.event_date}}</p>
+                                            <p class="fs-15 text-secondary w-100-per ellipsis2 mb-0 mt-5 lh-19">{{e.event_address | splitAddress}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                              
+                                    <div *ngIf="!e.isongoing && e.type == 2" class="routerLinkClass card r-all-5p clearfix p-8 mb-20" (click)="checkVirtual(e, e.id, 'upcoming')">
+                                        <div class="clearfix">
+                                            <div class="event-photo w-50 h-50 f-left">
+                                                <img class="r-all-5p" src="{{e.event_icon_url ? e.event_icon_url : '/assets/empty_states/no_event_profile.png'}}">
+                                            </div>
+                                            <div class="event-info f-left">
+                                                <div class="flex">
+                                                    <p class="fs-15 w-100-per ellipsis2 m-0 lh-19">{{e.name}}</p>
+                                                <button  class="chip virtual fs-15 pt-2">
+                                                    <span>Virtual</span>
+                                                </button>
+                                                </div>
+                                                
+                                                <p class="text-secondary fs-15 mb-0 mt-10">{{e.event_date}}</p>
+                                               <!--  <p class="fs-15 text-secondary w-100-per ellipsis2 mb-0 mt-5 lh-19">{{e.event_address | splitAddress}}</p> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                              
+                               
+                                
+                            </ng-container>
+                        </ng-container>
+                        <!-- static virtual event -->
+                       <!--  <div class="routerLinkClass card r-all-5p clearfix p-8 mb-20 active" (click)="goToVirtualDashboard()">
+                            <div class="event-list-header mb-10">
+                                <p class="m-0 text-white">
+                                    <span class="mr-8"><fa-icon [icon]="['fas', 'clock']" slot="end"></fa-icon></span>
+                                    <span>On-going event</span>
+                                </p>
+                            </div>
+                            <div class="clearfix flex ai-center">
+                                <div class="event-photo w-60 h-60 f-left">
+                                    <img class="r-all-5p" src="'/assets/empty_states/no_event_profile.png'">
+                                </div>
+                                <div class="event-info f-left">
+                                    <div class="flex">
+                                        <p class="fs-15 w-100-per ellipsis2 m-0 lh-19">Folklore Event</p>
+                                        <button  class="chip virtual fs-15 pt-2">
+                                            <span>Virtual</span>
+                                        </button>
+                                    </div>
+                                    <p class="text-primary fs-15 mb-0 mt-5">July 24, 2020</p>
+                                    <p class="fs-15 text-secondary w-100-per ellipsis2 mb-0 mt-5 lh-19">Tanza,Cavite, Philippines</p>
+                                </div>
+                            </div>
+                        </div> -->
+                        <!-- end static virtual event -->
+                    </div>
+                </div>
+            </div>
+            <div class="h-100-per" *ngSwitchCase="'mypastevent'">
+                <div class="event-list-container">
+                    <h4 class="fs-21 fw-500 mt-25">Past Events</h4>
+                    <p class="fs-15 mt-10 lh-22">You can still view all the details, notes and messages in this event before it is archived.</p>
+    
+                    <div class="events mt-30">
+    
+                        <!-- skeleton loader -->
+                        <ng-container *ngIf="!events.past">
+                            <div class="card r-all-5p clearfix p-8 mb-20">
+                                <div class="clearfix">
+                                    <div class="event-photo w-50 h-50 f-left">
+                                        <ion-skeleton-text animated style="width: 100%; height: 100%;"></ion-skeleton-text>
+                                    </div>
+                                    <div class="event-info f-left">
+                                        <p class="fs-15 w-100-per ellipsis2 m-0 lh-19">
+                                            <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+                                        </p>
+                                        <p class="text-secondary fs-15 mb-0 mt-10">
+                                            <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <!-- end skeleton loader -->
+    
+                        <ng-container *ngIf="events.past">
+    
+    
+                            <!-- empty state -->
+                            <div *ngIf="events.past.datas.length == 0" class="d-table w-100-per">
+                                <div class="card b-rad-0 va-center" text-center>
+                                    <img class="w-30-per" src="/assets/empty_states/no_event.png" />
+                                    <h6 class="mt-10"> No event yet </h6>
+                                </div>
+                            </div>
+                            <!-- end empty state -->
+    
+                            <ng-container *ngFor="let e of events.past.datas">
+                                <ng-container *ngIf="e.type == 1">
+                                    <div class="routerLinkClass card r-all-5p p-8 mb-20" (click)="checkEvent(e, e.id, 'past')">
+                                        <div class="clearfix">
+                                            <div class="event-photo w-50 h-50 f-left">
+                                                <img class="r-all-5p" src="{{e.event_icon_url ? e.event_icon_url : '/assets/empty_states/no_event_profile.png'}}">
+                                            </div>
+                                            <div class="event-info f-left">
+                                                <div class="flex">
+                                                    <p class="fs-15 w-100-per ellipsis2 m-0 lh-19">{{e.name}}</p>
+                                                    <button  class="chip physical fs-15 pt-2">
+                                                        <span>Physical</span>
+                                                    </button>
+                                                </div>
+                                                <p class="text-secondary fs-15 mb-0 mt-5">{{e.event_date}}</p>
+                                                <p class="fs-15 text-secondary w-100-per ellipsis2 mb-0 mt-5 lh-19">{{e.event_address | splitAddress}}</p>
+                                            </div>
+                                        </div> 
+                                        <div class="event-list-footer mt-10 r-bl-5p r-br-5p">
+                                            <p class="m-0 text-white fs-15 ellipsis w-100-per flex">
+                                                <span class="ml-4 mr-8 flex ai-center"><ion-icon src="assets/icon/archived-icon.svg" slot="end"></ion-icon></span>
+                                                <span class="ellipsis">This event will be archived in: {{e.archive_day}} </span>
+                                            </p>
+                                        </div> 
+                                    </div>
+                                </ng-container>
+                               
+                                <ng-container *ngIf="e.type == 2">
+                                    <div class="routerLinkClass card r-all-5p p-8 mb-20" (click)="checkVirtualEvent(e, e.id, 'past')">
+                                        <div class="clearfix">
+                                            <div class="event-photo w-50 h-50 f-left">
+                                                <img class="r-all-5p" src="{{e.event_icon_url ? e.event_icon_url : '/assets/empty_states/no_event_profile.png'}}">
+                                            </div>
+                                            <div class="event-info f-left">
+                                                <div class="flex">
+                                                    <p class="fs-15 w-100-per ellipsis2 m-0 lh-19">{{e.name}}</p>
+                                                    <button  class="chip virtual fs-15 pt-2">
+                                                        <span>Virtual</span>
+                                                    </button>
+                                                </div>
+                                                <p class="text-secondary fs-15 mb-0 mt-5">{{e.event_date}}</p>
+                                               <!--  <p class="fs-15 text-secondary w-100-per ellipsis2 mb-0 mt-5 lh-19">{{e.event_address | splitAddress}}</p> -->
+                                            </div>
+                                        </div> 
+                                        <div class="event-list-footer mt-10 r-bl-5p r-br-5p">
+                                            <p class="m-0 text-white fs-15 ellipsis w-100-per flex">
+                                                <span class="ml-4 mr-8 flex ai-center"><ion-icon src="assets/icon/archived-icon.svg" slot="end"></ion-icon></span>
+                                                <span class="ellipsis">This event will be archived in: {{e.archive_day}} </span>
+                                            </p>
+                                        </div> 
+                                    </div>
+                                </ng-container>
+                            </ng-container>
+
+                        </ng-container>
+
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </ion-content>
+</ion-content>

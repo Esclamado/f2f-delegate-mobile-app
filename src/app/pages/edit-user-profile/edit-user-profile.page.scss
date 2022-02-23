@@ -1,0 +1,73 @@
+.profile-banner {
+    background-image: url(/assets/images/edit-profile-banner.png);
+    background-size: cover;
+    width: 100%;
+    background-repeat: no-repeat;
+    min-height: 105px;
+    position: relative;
+    z-index: 1;
+}
+.avatar-overlay{
+    z-index: 2;
+    border: 3px solid #fff;
+    display: table;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.bg-content{
+    --ion-background-color:#ebebeb;
+    background-color:#ebebeb;
+}
+.save{
+    background: #0a3b8c;
+    border-radius: 4px;
+    padding: 10px;
+}
+.opacity{
+    background: #000;
+    opacity: .7;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: -1;
+    border-radius: 50%;
+}
+.center{
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+}
+
+ion-badge{
+    --padding-bottom: 8px;
+    --padding-end: 12px;
+    --padding-top: 8px;
+    --padding-start: 12px;
+    --background: #cad9ec;
+    --color: #05172e;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+ion-badge.lang{
+    --background: #e3e3e3;
+}
+.t-disable{
+    input{
+        background: transparent;
+        color: #000;
+    }
+}
+.edit{
+    position: absolute;
+    right: 16px;
+    display: flex;
+    align-items: center;
+}
+.social-media-icon{
+    width: 40px;
+    height: 40px;
+    fa-icon{
+        font-size: 15px;
+    }
+}

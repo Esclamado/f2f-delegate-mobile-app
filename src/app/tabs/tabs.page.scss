@@ -1,0 +1,30 @@
+// :root {
+//   ion-tab-button.tab-selected {
+//     ion-icon, ion-label {
+//       color: #7a9f12 !important;
+//       --ion-color-base: #7a9f12 !important;
+//       --color-selected: #7a9f12 !important;
+//     }
+//   }
+// }
+
+.activated {
+  ion-icon{
+    color: blue;
+  }
+}
+
+ion-badge{
+  --background: #b01b30;
+  --color: #ffffff;
+   height: 16px;
+   width: 16px;
+   font-size: 10px;
+   font-weight: 700;
+}
+
+
+.activated-label {
+	color: #678b04;
+}
+  

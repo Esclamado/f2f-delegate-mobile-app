@@ -1,0 +1,58 @@
+<div class="prompt_modal">
+	<div class="modal_container" (click)="dismiss()">
+		<div class="modal_content" (click)="stopPropagation($event)">
+      <div class="prompt_modal-header">
+        <h4 class="fs-16 text-default fw-500 m-0">Send notes to email</h4>
+        <button ion-button icon-only class="btn-close" (click)="dismiss()">
+          <ion-icon class="fs-22" name="md-close"></ion-icon>
+        </button>
+      </div>
+
+
+      <div *ngIf="note" class="prompt_modal-content">
+
+
+          <div class="form-check">
+            <input 
+              type="checkbox" 
+              class="form-check-input" 
+              id="send-to-my-email"
+              [(ngModel)]="myemail"
+            />
+            <label class="form-check-label text-secondary" for="send-to-my-email">Send to my email</label>
+            <div class="cb-style">
+              <div class="cb-style-icon">
+                <fa-icon [icon]="['fas', 'check']" slot="end"></fa-icon>
+              </div>
+            </div>
+          </div>
+
+
+
+          <div class="form-check">
+            <input 
+              type="checkbox" 
+              class="form-check-input" 
+              id="send-to-meeting-with"
+              [(ngModel)]="meeting_with_email"
+            />
+            <label class="form-check-label text-secondary" for="send-to-meeting-with">Send to <span text-capitalize>{{note.d2_fullname}}’s</span> email</label>
+            <div class="cb-style">
+              <div class="cb-style-icon">
+                <fa-icon [icon]="['fas', 'check']" slot="end"></fa-icon>
+              </div>
+            </div>
+          </div>
+
+          <p *ngIf="isError" class="mb-0 fs-14 text-danger">Please choose at least 1 to send email with.</p>
+      </div>
+
+      <div *ngIf="!isError" class="prompt_modal-footer p-15 jc-end clearfix">
+        <button class="btn p-0 btn-primary w-100-per" (click)="sendToEmail()">
+          Send notes
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,99 @@
+.event-list-profile {
+    min-height: 150px;
+    padding: 20px 20px 0px 20px;
+    position: relative;
+
+    .pattern-bg {
+        position: absolute;
+        background-image: url("/assets/images/pattern.png");
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 3;
+        background-size: 250px;
+        background-position-x: -80px;
+        background-position-y: -80px;
+        opacity: 0.2;
+    }
+    .event-listing-tabs,
+    .delegate-profile,
+    .f2f-logo {
+        position: relative;
+        z-index: 4;
+    }
+
+    .profile-settings-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 18px;
+        box-shadow: 0px 2px 5px rgba(13,13,13,0.24);
+        background-color: #ebebeb;
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        cursor: pointer;
+        z-index: 9;
+        font-size: 22px;
+    }
+    .profile-settings-btn.bar{
+        box-shadow: none;
+        background-color: transparent;
+    }
+}
+
+.event-list-container {
+    padding: 15px;
+    background-image: url("/assets/images/greybg.png");
+    background-size: 105% 105%;
+    background-position: -5px;
+    height: 100%;
+    //min-height: calc(100vh - 225px);
+}
+
+.events {
+    .card {
+        box-shadow: 0 0 8px rgba(13,13,13,0.1);
+
+        &.active {
+            border: solid 1px #0f4193;
+
+            .event-list-header {    
+                width: calc(100% + 16px);
+                background: #1a4ca1;
+                margin-top: -8px;
+                margin-left: -8px;
+                padding-top: 5px;
+                padding-bottom: 5px;
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+        }
+
+        .event-list-footer {
+            position: relative;
+            background-image: linear-gradient(100deg, #979797 40%, #666666 100%);
+            width: calc(100% + 16px);
+            margin-bottom: -8px;
+            margin-left: -8px;
+            padding: 5px 8px 5px;
+        }
+    }
+    .event-info {
+        width: calc(100% - 50px);
+        padding-left: 13px;
+    }
+}
+
+.event-photo{
+    border-radius: 4px;
+    border: 1px solid #efefef;
+}
+
+ion-refresher {
+    z-index: 10;
+}
+
+.ref-content{
+    height: calc(100vh - 235px);
+}

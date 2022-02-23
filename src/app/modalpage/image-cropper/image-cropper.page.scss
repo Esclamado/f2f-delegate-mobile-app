@@ -1,0 +1,26 @@
+.image-cropper-container{
+	background: #000;
+}
+.content-item{
+    position: absolute;
+    z-index: 1;
+    color: #fff;
+    &.back{
+        top: 20px;
+        left: 20px;
+    }
+    &.done{
+    	top: 20px;
+        right: 20px;
+    }
+    &.rotate{
+        right: 20px;
+    	bottom: 20px;
+	    font-size: 30px;
+	    display: flex;
+    }
+}
+.crop-icon{
+	border-radius: 50px;
+    background-color: #5a5a5a;
+}

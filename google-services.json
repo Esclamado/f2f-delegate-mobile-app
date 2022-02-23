@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "803859933995",
+    "firebase_url": "https://face2face-d3e7b.firebaseio.com",
+    "project_id": "face2face-d3e7b",
+    "storage_bucket": "face2face-d3e7b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:803859933995:android:ae280786e72467b1f7f36e",
+        "android_client_info": {
+          "package_name": "com.rwsolutions.face2face"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "803859933995-qbfu3she8boibt0rcm6lnou9l5lshg6f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnveitSfSl8JTzF7sfsVso8MYpzfT7yIk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "803859933995-qbfu3she8boibt0rcm6lnou9l5lshg6f.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "803859933995-k9jfuvv9i3s0omg3rs25o20tngbnpsnh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.rwsolutions.face2face"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

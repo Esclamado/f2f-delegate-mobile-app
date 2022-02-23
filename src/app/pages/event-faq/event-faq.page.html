@@ -1,0 +1,87 @@
+<ion-header no-border>
+  <ion-toolbar class="header-banner text-white">
+    <div>
+      <ion-buttons slot="start">
+        <ion-button (click)="myBackButton()">
+          <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+  </div>
+    <h2 class="p-0 mt-10 mb-20 text-white" text-center> How can we help you? </h2>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+
+    <div class="form-group block pt-20">
+      <div class="input-wrapper">
+        <input 
+          class="form-control pr-40 p-5 pl-15 fs-15" 
+          type="text" 
+          value="" 
+          maxlength="255"
+          placeholder="Type keywords to find answers"
+          [(ngModel)]="keyword"
+          (ngModelChange)="this.onStopTyping.next($event)"
+        ><p class="m-0 search-icon fs-20 text-secondary"><fa-icon [icon]="['fas', 'search']" slot="end"></fa-icon></p>
+      </div>
+    </div>
+
+    <div class="mb-20 mt-40">
+      <h6 class="mb-20"> Top Questions </h6>
+      <div>
+        <div *ngIf="faq_category" class="tab-container flex">
+          <div *ngFor="let category of faq_category; let i = index" 
+            class="tab-content flex ai-center mr-15" 
+            [ngClass]="{'selected': selectedCategory == category.id }"
+            (click)="selectFaq(category, i)"
+          >
+            {{category.name}}
+          </div>
+        </div>
+        <div *ngIf="!faq_category" class="tab-container flex">
+          <div *ngFor="let skeleton of skeleton_loader" class="tab-content flex ai-center mr-15">
+            <ion-skeleton-text animated style="width: 80px;"></ion-skeleton-text>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ion-list *ngIf="faqList && total_faq > 0" class="faq-list mt-20" no-padding>
+      <ion-item *ngFor="let faq of faqList" (click)="gotoFaqProfile(faq)" no-padding>
+        <ion-label> {{faq.question}} </ion-label>
+        <ion-icon name="ios-arrow-forward" item-right></ion-icon>
+      </ion-item>
+      <ion-infinite-scroll *ngIf="moreFaq" class="mt-20" (ionInfinite)="loadData($event)">
+        <ion-infinite-scroll-content
+          loadingSpinner="bubbles"
+          loadingText="Loading more FAQ...">
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+    </ion-list>
+
+    <div class="d-table filter w-100-per" *ngIf="faqList && total_faq == 0">
+      <div class="card b-rad-0 va-center" text-center>
+        <ng-container *ngIf="keyword == ''">
+          <img class="w-30-per" src="/assets/empty_states/no_faqs.png" />
+          <h6 class="mt-10"> No available FAQs </h6>
+        </ng-container>
+        <ng-container *ngIf="keyword != ''">
+          <img class="w-50-per" src="/assets/empty_states/no_result.png" />
+          <h6 class="mt-10"> No results found </h6>
+          <p>
+            We didn't get any result, please try another keyword.
+          </p>
+        </ng-container>
+      </div>
+    </div>
+
+    <ion-list *ngIf="!faqList" class="faq-list mt-20" no-padding>
+      <ion-item *ngFor="let skeleton of skeleton_loader" no-padding>
+        <ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+      </ion-item>
+    </ion-list>
+
+</ion-content>

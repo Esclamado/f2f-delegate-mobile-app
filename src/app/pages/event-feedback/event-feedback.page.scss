@@ -1,0 +1,22 @@
+.feedback-message {
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+
+    .textfield {
+        min-height: 100px;
+        outline: none;
+    }
+}
+.feedback-message.valid{
+    border: 1px solid #17489d;
+}
+.feedback-message.invalid{
+    border: solid 1px #b01b30;
+}
+.feedback-btn {
+    border-radius: 0;
+    width: 100%;
+}
+ion-textarea{
+    padding: 0px 10px 0px 2px;
+}

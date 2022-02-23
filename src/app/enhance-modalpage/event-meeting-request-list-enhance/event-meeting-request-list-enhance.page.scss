@@ -1,0 +1,60 @@
+.timeslot-request-header {
+    padding: 30px 15px;
+
+    &.received {
+        background-image: url("/assets/images/received_request_meeting.png");
+        background-size: 100% 100%;
+    }
+    &.sent {
+        background-image: url("/assets/images/meeting_request_bg_sent.png");
+        background-size: 100% 100%;
+    }
+}
+.req-items {
+    border-bottom: solid 1px #e5e5e5;
+    padding: 30px 15px 45px 15px;
+    position: relative;
+
+    &.sent{
+        padding: 30px 15px 25px 15px;
+    }
+}
+
+.request-message {
+    padding: 15px 15px 20px 15px;
+    background-color: #ebebeb;
+    position: relative;
+    margin-top: 10px;
+
+    &.received {
+        .action-button {
+            bottom: -16px;
+            right: 15px;
+        }
+    }
+}
+
+.action-button {
+    position: absolute;
+
+    .req-btn {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        box-shadow: 0 0 8px rgba(13,13,13,0.25);
+        color: #ffffff;
+        font-size: 20px;
+
+        &.times {
+            background-image: linear-gradient(0deg, #8c0618 0%, #b01b30 100%);
+        }
+        &.check {
+            background-image: linear-gradient(0deg, #237d06 0%, #389d18 100%);
+        }
+    }
+
+    &.sent {
+        top: 23px;
+        right: 15px;
+    }
+}

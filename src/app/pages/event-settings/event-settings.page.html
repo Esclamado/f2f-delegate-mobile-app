@@ -1,0 +1,76 @@
+<ion-content>
+    <div *ngIf="event && event.archive_in" class="header-bar archive">
+      <p class="m-0 text-white fs-15 ellipsis w-100-per flex">
+        <span class="ml-4 mr-8 flex ai-center"><ion-icon src="assets/icon/archived-icon.svg" slot="end"></ion-icon></span>
+        <span class="ellipsis">This event will be archived in: {{event.archive_in}}  </span>
+      </p>
+    </div>
+	<div class="event-setting-container">
+		<div (click)="gotoUserProfile()" class="routerLinkClass p-30 pl-25 pr-25 m-0 delegate-profile clearfix mt-20">
+	        <div *ngIf="delegate" class="profile-photo">
+	            <img *ngIf="delegate.profile_photo.length == 1" src="/assets/empty_states/profile_avatar_{{delegate.profile_photo}}.png" />
+	            <img *ngIf="delegate.profile_photo.length > 1" src="{{delegate.profile_photo_url}}" />
+	        </div>
+	        <div *ngIf="delegate && company" class="profile-basic-info pl-20">
+	            <h4 class="fs-16 fw-500 mt-0 mb-10 ellipsis w-100-per capitalize">{{company.name}}</h4>
+	            <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">{{delegate.fullname}}</p>
+	            <!-- <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize text-secondary">{{delegate.job_title}}</p> -->
+	            <p class="fs-15 mt-0 mb-5 ellipsis w-100-per capitalize">
+	                <span class="country-flag" [ngStyle]="{'background-image': 'url(/assets/images/flags/' + company.pref_country_iso + '.png)'}"></span>
+	                <span>{{company.pref_country_nicename}}, {{company.state}}</span>
+	            </p>
+                <p class="fs-15 mt-0 mb-5 ellipsis w-100-per text-primary capitalize"> View Profile </p>
+	        </div>
+	        <!-- Skeleton Loader -->
+	        <div *ngIf="!delegate" class="profile-photo">
+	            <img src="/assets/empty_states/profile_avatar_1.png" />
+	        </div>
+	        <div *ngIf="!delegate && !company" class="profile-basic-info pl-10">
+	            <ion-skeleton-text animated style="width: 70%"></ion-skeleton-text>
+	            <ion-skeleton-text animated class="mt-15" style="width: 75%"></ion-skeleton-text>
+	            <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+	            <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+	        </div>
+	    </div>
+
+	    <div class="event-profile-menu">
+			<ion-list lines="none" background-color="none"  class="m-0">
+				<ion-item *ngIf="event && event.meeting_request == '2' && !event.archive_in" routerLink="/event-meeting-request/{{event_id}}" class="b-t b-b transp">
+				  <ion-icon class="mr-15" src="assets/icon/setting-check.svg"></ion-icon>
+			      <ion-label class="pt-10 pb-10"> Meeting Requests  </ion-label>
+  				  <ion-badge *ngIf="event && request_count > 0" slot="end">{{request_count}}</ion-badge>
+				</ion-item>
+			    <ion-item routerLink="/event-notes/{{event_id}}" class="b-t b-b">
+				  <ion-icon class="mr-15" src="assets/icon/setting-notes.svg"></ion-icon>
+			      <ion-label class="pt-10 pb-10"> Notes  </ion-label>
+			    </ion-item>
+			    <ion-item *ngIf="event && !event.archive_in" routerLink="/delegate-locator/{{event_id}}" class="b-t b-b">
+					<ion-icon class="mr-15" src="assets/icon/setting-locator.svg"></ion-icon>
+			      <ion-label class="pt-10 pb-10"> Delegates Locator  </ion-label>
+			    </ion-item>
+			    <ion-item *ngIf="event && event.display_noshow && !event.archive_in" routerLink="/noshow-delegates/{{event_id}}" class="b-t b-b">
+					<ion-icon class="mr-15" src="assets/icon/setting-no-show.svg"></ion-icon>
+			      <ion-label class="pt-10 pb-10"> No Show Delegate  </ion-label>
+			    </ion-item>
+			    <ion-item (click)="gotoEventProfile()" class="b-t b-b">
+					<ion-icon class="mr-15" src="assets/icon/setting-details.svg"></ion-icon>
+			      <ion-label class="pt-10 pb-10"> Event Details  </ion-label>
+				</ion-item>
+				<!-- && (event && !event.archive_in) -->
+			    <ion-item *ngIf="faq_category" (click)="gotoFaq()" class="b-t b-b">
+					<ion-icon class="mr-15" src="assets/icon/setting-faq.svg"></ion-icon>
+			      <ion-label class="pt-10 pb-10"> FAQs  </ion-label>
+			    </ion-item>
+			    <ion-item routerLink="/event-feedback/{{event_id}}" class="b-t b-b">
+					<ion-icon class="mr-15" src="assets/icon/setting-feedback.svg"></ion-icon>
+			      <ion-label class="pt-10 pb-10"> Send us a Feedback  </ion-label>
+			    </ion-item>
+			    <ion-item (click)="gotoSetting()" class="b-t b-b">
+					<ion-icon class="mr-15" src="assets/icon/setting-settings.svg"></ion-icon>
+			      <ion-label class="pt-10 pb-10"> Settings </ion-label>
+			    </ion-item>
+			</ion-list>
+		</div>
+	</div>
+	
+</ion-content>

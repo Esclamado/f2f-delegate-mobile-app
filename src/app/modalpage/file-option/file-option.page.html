@@ -1,0 +1,77 @@
+<div class="prompt_modal">
+	<div class="modal_container" (click)="dismiss()">
+		<div class="modal_content" (click)="stopPropagation($event)">
+      <div class="prompt_modal-header">
+        <h4 class="fs-16 text-default fw-500 m-0">Choose file type</h4>
+        <button ion-button icon-only class="btn-close" (click)="dismiss()">
+          <ion-icon class="fs-22" name="md-close"></ion-icon>
+        </button>
+      </div>
+
+      <div class="prompt_modal-content">
+          <div class="form-check">
+            <input 
+              type="checkbox" 
+              class="form-check-input" 
+              id="pdf-file"
+              [(ngModel)]="pdf_file"
+            />
+            <label class="form-check-label text-secondary" for="pdf-file">
+              <fa-icon class="mr-6 color-c50806" [icon]="['fas', 'file-pdf']" slot="start"></fa-icon>
+              Pdf
+            </label>
+            <div class="cb-style">
+              <div class="cb-style-icon">
+                <fa-icon [icon]="['fas', 'check']" slot="end"></fa-icon>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-check">
+            <input 
+              type="checkbox" 
+              class="form-check-input" 
+              id="ical-file"
+              [(ngModel)]="ical_file"
+            />
+            <label class="form-check-label text-secondary" for="ical-file">
+              <fa-icon class="mr-6 color-e04a3a" [icon]="['far', 'calendar']" slot="start"></fa-icon>
+              iCal/Ics
+            </label>
+            <div class="cb-style">
+              <div class="cb-style-icon">
+                <fa-icon [icon]="['fas', 'check']" slot="end"></fa-icon>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="form-check">
+            <input 
+              type="checkbox" 
+              class="form-check-input" 
+              id="ics-file"
+              [(ngModel)]="ics_file"
+            />
+            <label class="form-check-label text-secondary" for="ics-file">
+              <fa-icon class="mr-6 color-000" [icon]="['far', 'file-alt']" slot="end"></fa-icon>
+              Ics
+            </label>
+            <div class="cb-style">
+              <div class="cb-style-icon">
+                <fa-icon [icon]="['fas', 'check']" slot="end"></fa-icon>
+              </div>
+            </div>
+          </div> -->
+
+          <p *ngIf="isError" class="mb-0 fs-14 text-danger">Please choose at least 1 file type.</p>
+      </div>
+
+      <div *ngIf="!isError" class="prompt_modal-footer p-15 jc-end clearfix">
+        <button class="btn p-0 btn-primary w-100-per" (click)="sendToEmail()">
+          <fa-icon *ngIf="type == 'download'" class="mr-10 text-white" [icon]="['fas', 'download']" slot="start"></fa-icon>
+          <fa-icon *ngIf="type == 'send'" class="mr-10 text-white" [icon]="['fas', 'envelope']" slot="start"></fa-icon>
+          <span class="capitalize"> {{type}} </span>Final Itinerary
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

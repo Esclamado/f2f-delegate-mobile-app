@@ -1,0 +1,44 @@
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="container profile-banner">
+    <ion-grid>
+      <ion-row class="flex ai-center">
+        <ion-col size="2">
+          <ion-icon (click)="myBackButton()" name="ios-arrow-back" class="text-white back-button"></ion-icon>
+        </ion-col>
+        <ion-col size="8">
+          <ion-title class="text-white" text-center> About Speaker </ion-title>
+        </ion-col>
+        <ion-col size="2">
+
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <ion-item *ngIf="speaker" class="mt--40" lines="none">
+    <ion-avatar class="avatar-overlay h-100 w-100 m-auto">
+      <img *ngIf="speaker.photo.length == 1" src="/assets/empty_states/profile_avatar_{{speaker.photo}}.png">
+      <img *ngIf="speaker.photo.length > 1" src="{{speaker.photo_url}}">
+    </ion-avatar>
+  </ion-item>
+  <div *ngIf="speaker" text-center class="p-20 pt-0">
+    <h4 class="m-5 fs-16 mt-15"> {{speaker.company}} </h4>
+    <p class="m-5 mb-0 fs-16" text-capitalize> {{speaker.fullname}} </p>
+    <p class="text-secondary m-5 mt-0"> {{speaker.position}} </p>
+  </div>
+
+  <div *ngIf="speaker" class="p-20">
+    <div class="form-group block mb-15">
+      <label class="text-secondary"> Description </label>
+      <div *ngIf="speaker.description.length > 0" [innerHtml]="speaker.description" class="fs-16 lh-24"></div>
+      <div *ngIf="speaker.description.length == 0">
+        <p class="m-0 fs-16">  No description provided</p>
+      </div>
+    </div>
+  </div>
+
+</ion-content>  

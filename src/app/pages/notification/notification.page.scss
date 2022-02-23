@@ -1,0 +1,25 @@
+// .header-md{
+//     box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
+// }
+
+.notif-item{
+    padding: 15px 20px;
+    .avatar-photo{
+        float: left;
+        width: 30px;
+        height: 30px;
+        border-radius: 50px;
+    }
+    .notif-desc{
+        float: left;
+        width: calc(100% - 30px);
+    }
+}
+
+.notif-item.unread{
+    background: #F1F6FF;
+}
+
+b, strong{
+    font-weight: 500 !important;
+}

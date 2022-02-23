@@ -1,0 +1,162 @@
+<ion-header no-border>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="myBackButton()">
+        <ion-icon class="back-button" slot="icon-only" name="ios-arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title class="p-0" text-center> Delegates Locator </ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon slot="icon-only" name="ios-arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+	<div class="delegate-locator-wrapper">
+		<div class="search-field p-15 pb-25 pl-25 pr-25 clearfix">
+	        <div class="form-group block">
+	          <div class="input-wrapper">
+	            <fa-icon [icon]="['fas', 'search']" slot="end"></fa-icon>
+	            <input 
+	              class="form-control pr-35 pl-15" 
+	              type="txt" 
+	              value="" 
+	              maxlength="255"
+	              placeholder="Search a delegate or company"
+	              [(ngModel)]="search"
+              	  (ngModelChange)="this.onStopTyping.next($event)"
+	            >
+	          </div>
+	        </div>
+	    </div>
+	    <div class="search-result-container">
+	    	<div *ngIf="search && dataIsLoaded && total_data_count > 0" class="m-20 ml-25 mr-25"><h6>Showing {{total_data_count}} results:</h6></div>
+	    	<div *ngIf="search" class="result-list">
+	    		<ng-container *ngIf="dataIsLoaded && delegateLocatorResult">
+	    			<ng-container *ngFor="let delegate of delegateLocatorResult">
+		    			<div *ngIf="delegate.meeting_schedule" class="card routerLinkClass p-25 b-rad-0 b-bot b-shadow" routerLink="/delegate-profile/{{delegate.delegate_id}}/{{event_id}}">
+				            <div class="delegate-profile clearfix">
+				              <div class="profile-photo">
+				                  <img src="{{delegate.profile_photo_url}}" />
+				              </div>
+				              <div class="profile-basic-info pl-10">
+				                  <h4 class="fs-18 fw-500 mt-0 mb-7 ellipsis w-100-per" text-capitalize>{{delegate.name}}</h4>	
+				                  <div class="fs-16 mt-0 w-100-per lh-24 text-secondary">
+				                  	<span class="text-default"><span style="display: inline-block;" [innerHtml]="delegate.d_fullname | safeHtml"></span></span> is currently having a meeting on 
+				                  	<span *ngIf="delegate.meeting_schedule.table_type == 3" class="chip table text-white">Table {{delegate.meeting_schedule.table_table_no}}</span>
+				                  	<span *ngIf="delegate.meeting_schedule.table_type == 2" class="chip table-booth text-white">Booth {{delegate.meeting_schedule.table_table_no}}</span>
+				                  	<span *ngIf="delegate.meeting_schedule.table_type == 1" class="chip table-vip text-white">VIP {{delegate.meeting_schedule.table_table_no}}</span>
+				                  </div>
+				              </div>
+				            </div>
+				        </div>
+				        <div *ngIf="!delegate.meeting_schedule && !delegate.blocked" class="card routerLinkClass p-25 b-rad-0 b-bot b-shadow" routerLink="/delegate-profile/{{delegate.delegate_id}}/{{event_id}}">
+				            <div class="delegate-profile clearfix">
+				              <div class="profile-photo">
+				                  <img src="{{delegate.profile_photo_url}}" />
+				              </div>
+				              <div class="profile-basic-info pl-10">
+				                  <div class="fs-18 fw-500 mt-0 mb-7 ellipsis w-100-per" text-capitalize [innerHtml]="delegate.name | safeHtml"></div>	
+				                  <div class="fs-16 mt-0 w-100-per lh-24 text-secondary">
+				                  	<span class="text-default"><div style="display: inline-block;" text-capitalize [innerHtml]="delegate.d_fullname | safeHtml"></div></span> doesn't have any meeting right now.
+				                  </div>
+				              </div>
+				            </div>
+				        </div>
+				        <div *ngIf="delegate.blocked" class="routerLinkClass card p-25 b-rad-0 b-bot b-shadow" routerLink="/delegate-profile/{{delegate.delegate_id}}/{{event_id}}">
+				            <div class="delegate-profile clearfix">
+				              <div class="profile-photo">
+				                  <img src="{{delegate.profile_photo_url}}" />
+				              </div>
+				              <div class="profile-basic-info pl-10">]
+								  <div></div>
+				                  <div class="fs-18 fw-500 mt-0 mb-7 ellipsis w-100-per" [innerHtml]="delegate.name | safeHtml"></div>	
+				                  <div class="fs-16 mt-0 w-100-per lh-24 text-secondary">
+				                  	<span class="text-default"><div text-capitalize style="display: inline-block;" [innerHtml]="delegate.d_fullname | safeHtml"></div></span> blocked current timeslot.
+				                  	<!-- ,says <span class="text-default">"Bathroom Break"</span>. -->
+				                  </div>
+				              </div>
+				            </div>
+				        </div>
+			        </ng-container>
+			        <!-- infinite scroll -->
+			        <ion-infinite-scroll *ngIf="dataIsLoaded && delegateLocatorResult.length > 0" threshold="100px" (ionInfinite)="loadMoreData($event)">
+	                  <ion-infinite-scroll-content
+	                    loadingSpinner="bubbles"
+	                    loadingText="Loading more data...">
+	                  </ion-infinite-scroll-content>
+	                </ion-infinite-scroll>
+	                <!-- empty state -->
+					<div *ngIf="dataIsLoaded && delegateLocatorResult.length == 0"  class="card p-25 b-rad-0 d-table mt-55 w-100-per">
+						<div class="va-center" text-center>
+							<img class="w-30-per" src="/assets/icon/delegate_locator.png" />
+							<h6 class="text-center">No result found</h6>	
+						</div>
+					</div>
+	    		</ng-container>
+		    	
+		        <!-- skeleton loader -->
+		        <ng-container *ngIf="!dataIsLoaded">
+		        	<div class="card p-25 b-rad-0 b-bot ">
+			            <div class="delegate-profile clearfix">
+			              <div class="profile-photo">
+			              </div>
+			              <div class="profile-basic-info pl-10">
+			                  <h4 class="fs-18 fw-500 mt-0 mb-7 ellipsis w-100-per" text-capitalize>
+			                  	<ion-skeleton-text animated style="width: 100%; height: 18px;"></ion-skeleton-text>
+			                  </h4>	
+			                  <div class="fs-16 mt-0 w-100-per lh-24 text-secondary">
+			                  	<ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+			                  	<ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+			                  </div>
+			              </div>
+			            </div>
+			        </div>
+			        <div class="card p-25 b-rad-0 b-bot ">
+			            <div class="delegate-profile clearfix">
+			              <div class="profile-photo">
+			              </div>
+			              <div class="profile-basic-info pl-10">
+			                  <h4 class="fs-18 fw-500 mt-0 mb-7 ellipsis w-100-per" text-capitalize>
+			                  	<ion-skeleton-text animated style="width: 100%; height: 18px;"></ion-skeleton-text>
+			                  </h4>	
+			                  <div class="fs-16 mt-0 w-100-per lh-24 text-secondary">
+			                  	<ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+			                  	<ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+			                  </div>
+			              </div>
+			            </div>
+			        </div>
+			        <div class="card p-25 b-rad-0 b-bot ">
+			            <div class="delegate-profile clearfix">
+			              <div class="profile-photo">
+			              </div>
+			              <div class="profile-basic-info pl-10">
+			                  <h4 class="fs-18 fw-500 mt-0 mb-7 ellipsis w-100-per" text-capitalize>
+			                  	<ion-skeleton-text animated style="width: 100%; height: 18px;"></ion-skeleton-text>
+			                  </h4>	
+			                  <div class="fs-16 mt-0 w-100-per lh-24 text-secondary">
+			                  	<ion-skeleton-text animated style="width: 100%"></ion-skeleton-text>
+			                  	<ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+			                  </div>
+			              </div>
+			            </div>
+			        </div>
+		        </ng-container>
+		    </div>
+
+	    	<!-- empty state -->
+	        <div *ngIf="!search && !dataIsLoaded"  class="d-table mt-55">
+	            <div class="va-center" text-center>
+	                <img class="w-30-per" src="/assets/icon/delegate_locator.png" />
+	                <p class="mt-10 pl-20 pr-20">Type the name of a delegate to know which table they're currenlty having a meeting.</p>
+	            </div>
+	        </div>
+	        <!-- end empty state -->
+	    </div>
+	</div>
+</ion-content>

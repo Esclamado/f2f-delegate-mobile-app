@@ -1,0 +1,68 @@
+<ion-content>
+  
+  <div class="container login-container">
+    <div class="login-background-image"></div>
+    <div class="login-form pl-16 pr-16">
+      <p class="tC mt-50 mb-55">
+        <img class="m-Auto mw-50-per" src="assets/images/f2f-logo-white.png">
+      </p>
+      <h4 class="text-white fw-500 fs-23 m-0">Welcome</h4>
+      <p class="text-white fs-15 mt-5 mb-0">Sign in to your account</p>
+      <div class="card mt-25 p-20">
+
+        <div class="form-group block mb-20 {{isValidClass}}">
+          <label class="text-secondary mb-10" for="login-email">Email</label>
+          <div id="login-email" class="input-wrapper">
+            <input 
+              class="form-control" 
+              type="email" 
+              value="" 
+              maxlength="150"
+              (focusout)="validateEmail()"
+              (keyup)="setEmail($event)"
+              (keydown.enter)="login()"
+              [(ngModel)]="email"
+            >
+            <span class="icon">
+              <fa-icon [icon]="['fas', 'check-circle']" slot="end"></fa-icon>
+            </span>
+            <span class="icon-error">
+              <fa-icon [icon]="['fas', 'times-circle']" slot="end"></fa-icon>
+            </span>
+          </div>
+          <p *ngIf="invalidEmail" class="error mt-5 mb-5 fs-15 text-danger">Invalid email address</p>
+        </div>
+        
+        <div class="form-group block mb-20 {{isValidClasPass}}">
+          <label class="text-secondary mb-10" for="login-password">Password</label>
+          <div id="login-password" class="input-wrapper">
+            <input 
+              class="form-control" 
+              type="{{inputPassType}}" 
+              value="" 
+              maxlength="30"
+              (keyup)="setPass($event)"
+              (keydown.enter)="login()"
+              [(ngModel)]="password"
+            >
+            <span class="icon eye" (click)="openPassword()">
+              <fa-icon [icon]="['fas', passwordOpenIcon]" slot="end"></fa-icon>
+            </span>
+          </div>
+          <!-- <p class="error mt-5 mb-5 fs-15 text-danger">Password must be at least 6 characters long</p> -->
+        </div>
+
+        <p class="tR m-0">
+          <a routerLink="/forgot-password" class="routerLinkClass text-success">
+            Forgot Password?
+          </a>
+        </p>
+
+        <div>
+          <button class="btn btn-success grad w-100-per mt-20" (click)="login()">Login</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</ion-content>
